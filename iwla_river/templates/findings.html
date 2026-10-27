@@ -75,6 +75,7 @@ tr:last-child td { border-bottom: 0; }
 .pill.good { color: var(--good); background: color-mix(in srgb, var(--good) 14%, transparent); }
 .pill.warn { color: var(--warn); background: color-mix(in srgb, var(--warn) 16%, transparent); }
 .pill.bad { color: var(--bad); background: color-mix(in srgb, var(--bad) 14%, transparent); }
+.pill.neutral { color: var(--muted); background: color-mix(in srgb, var(--grey) 18%, transparent); }
 ol.next { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 6px; max-width: 66ch; }
 .callout { border-left: 3px solid var(--warn); padding: 4px 0 4px 16px; }
 footer { border-top: 1px solid var(--rule); padding-top: 16px; display: flex; flex-direction: column; gap: 6px; }
@@ -93,9 +94,17 @@ a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   <div class="glance" id="glance" aria-label="At a glance"></div>
 
   <section>
-    <h2>Stream health has held steady</h2>
+    <h2>The score has held steady</h2>
     <p id="trend-text"></p>
     <figure><div id="chart-trend"></div><figcaption>Clean Water Hub, SOS Biological surveys at the two chapter sites. One dot per survey; dashed lines are the mean of each period.</figcaption></figure>
+  </section>
+
+  <section>
+    <h2>The mix of animals is shifting</h2>
+    <p id="mix-text"></p>
+    <figure><div id="chart-taxa"></div><figcaption>Share of SOS surveys at the two chapter sites that found each animal group, by five-year period. The number of surveys in each period is shown under its column.</figcaption></figure>
+    <p id="trendtbl-text"></p>
+    <div class="tbl" id="tbl-trends"></div>
   </section>
 
   <section>
@@ -107,9 +116,21 @@ a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   </section>
 
   <section>
+    <h2>Road salt reaches the creek every winter</h2>
+    <p id="salt-text"></p>
+    <figure><div id="chart-salt"></div><figcaption>Salt Watch chloride readings from the chapter's own sampling points. Dashed line: EPA chronic aquatic-life criterion for chloride, 230 mg/L.</figcaption></figure>
+  </section>
+
+  <section>
     <h2>The chapter changed survey forms in 2024</h2>
     <p id="va-text"></p>
     <div class="tbl" id="tbl-va"></div>
+  </section>
+
+  <section>
+    <h2>Streams across the Potomac are mostly improving</h2>
+    <p id="nbr-text"></p>
+    <figure><div id="chart-nbr"></div><figcaption>Seasonal Kendall trend in the survey score at each neighbouring site with at least 8 surveys over 5 or more years and 10 same-season comparisons. Change in points per decade on the site's own form.</figcaption></figure>
   </section>
 
   <section>
@@ -137,7 +158,6 @@ a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   <section>
     <h2>Next</h2>
     <ol class="next">
-      <li>Per-survey features (species-group counts, sensitive share, diversity), trends and turning points for the chapter sites, with neighbouring sites alongside.</li>
       <li>A model trained on the national surveys that predicts the expected score for each season, flow and setting; the chapter's observed-minus-expected line over time.</li>
       <li>Tags drawn from volunteers' notes (storms, construction, spills), scanned paper data sheets, and plain-English questions over the tables.</li>
       <li>This page refreshed on a schedule, with an alert when a survey falls outside its expected range.</li>
@@ -174,8 +194,8 @@ const sos = D.sos, early = sos.filter(r => r.date < "2013-01-01"), late = sos.fi
 const mE = mean(early.map(r => r.total)), mL = mean(late.map(r => r.total));
 const chapterCount = sos.length + D.va.length;
 const firstY = year(sos[0].date), lastY = Math.max(...[...sos, ...D.va].map(r => year(r.date)));
-$("lede").textContent = `${chapterCount} usable stream surveys at two sites between ${firstY} and ${lastY} show a creek whose health has neither improved nor declined. Season, team and the survey form explain much of the swing from one survey to the next.`;
-$("meta").textContent = `Data as of ${D.snapshot} · phase 1 of the iwla-river analysis`;
+$("lede").textContent = `${chapterCount} usable stream surveys at two sites between ${firstY} and ${lastY} show a creek whose overall score has held steady while the mix of animals has shifted toward hardier ones. Season, team and the survey form explain much of the swing from one survey to the next.`;
+$("meta").textContent = `Data as of ${D.snapshot} · phases 1 and 2 of the iwla-river analysis`;
 $("foot").textContent = `Built from the Clean Water Hub snapshot of ${D.snapshot}.`;
 $("glance").innerHTML = [
   [chapterCount, "usable chapter surveys"],
@@ -334,5 +354,126 @@ table("tbl-nearby", [
   $("chart-years").innerHTML = s + "</svg>";
   const bio = D.protocols.filter(r => ["sos_bio", "va_rocky", "va_muddy"].includes(r.protocol)).reduce((a, r) => a + r.usable, 0);
   $("nat-text").textContent = `The chapter's record is small on its own, but the Hub holds ${fmt(D.totals.usable_surveys)} usable surveys from ${fmt(D.totals.sites_with_data)} sites. Of these, ${fmt(bio)} are biological surveys: enough to train a model of what a healthy score looks like for a given season and setting, which phase 3 will use to judge the chapter's sites against.`;
+})();
+
+// ================= phase 2 =================
+const pct = v => `${Math.round(100 * v)}%`;
+const pfmt = p => p < 0.001 ? "p < 0.001" : `p = ${p.toFixed(p < 0.1 ? 3 : 2)}`;
+const verdictPill = v => `<span class="pill ${v === "improving" ? "good" : v === "declining" ? "bad" : "neutral"}">${esc(v)}</span>`;
+
+// ---------- heat map: animal groups found by period ----------
+(function taxaMap() {
+  const periods = [...new Set(D.taxa.map(r => r.period))].sort();
+  const TOL = [["sensitive", "Pollution-sensitive"], ["less_sensitive", "Less sensitive"], ["tolerant", "Tolerant"]];
+  const by = {};
+  D.taxa.forEach(r => { (by[r.taxon] ||= { taxon: r.taxon, tol: r.tolerance, p: {} }).p[r.period] = r; });
+  const share = (x, per) => { const c = x.p[per]; return c && c.surveys ? c.found / c.surveys : 0; };
+  const taxa = Object.values(by).filter(x => periods.some(per => share(x, per) > 0));
+  const overall = x => periods.reduce((a, per) => a + share(x, per), 0);
+  const nPer = per => Math.max(0, ...D.taxa.filter(r => r.period === per).map(r => r.surveys));
+  const first = periods[0], last = periods.at(-1);
+  const change = taxa.map(x => ({ x, d: share(x, last) - share(x, first) })).sort((a, b) => a.d - b.d);
+  const drops = change.slice(0, 2).map(c => c.x.taxon), rises = change.slice(-2).reverse().map(c => c.x.taxon);
+  const W = 760, L = 250, R = 16, T = 64, rowH = 22, cw = (W - L - R) / periods.length;
+  const blocks = TOL.map(([k, n]) => ({ k, n, rows: taxa.filter(x => x.tol === k).sort((a, b) => overall(b) - overall(a)) }));
+  const H = T + blocks.reduce((a, b) => a + 28 + b.rows.length * rowH, 0) + 28;
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Animal groups found by period">`;
+  s += `<text class="t-title" x="0" y="18">Fewer ${drops.join(" and ")}; more ${rises.join(" and ")}</text>`;
+  s += `<text class="t-sub" x="0" y="38">Share of surveys finding each group, ${first} to ${last}</text>`;
+  periods.forEach((per, i) => s += `<text class="t-label" x="${L + i * cw + cw / 2}" y="${T - 8}" text-anchor="middle" font-weight="600">${per}</text>`);
+  let y = T;
+  blocks.forEach(b => {
+    y += 22; s += `<text class="t-sub" x="0" y="${y}" font-weight="600">${b.n}</text>`; y += 6;
+    b.rows.forEach(x => {
+      s += `<text class="t-label" x="12" y="${y + rowH / 2 + 4}">${esc(x.taxon)}</text>`;
+      periods.forEach((per, i) => {
+        const v = share(x, per), c = x.p[per];
+        s += `<rect x="${L + i * cw + 2}" y="${y + 1}" width="${cw - 4}" height="${rowH - 2}" rx="3" fill="var(--accent)" fill-opacity="${Math.max(v, 0.04).toFixed(2)}"><title>${x.taxon}, ${per}: found in ${c ? c.found : 0} of ${nPer(per)} surveys</title></rect>`;
+        s += `<text x="${L + i * cw + cw / 2}" y="${y + rowH / 2 + 4}" text-anchor="middle" font-size="11.5" fill="${v > 0.55 ? "var(--bg)" : "var(--ink)"}" class="num">${Math.round(100 * v)}%</text>`;
+      });
+      y += rowH;
+    });
+  });
+  periods.forEach((per, i) => s += `<text class="t-note" x="${L + i * cw + cw / 2}" y="${y + 18}" text-anchor="middle">${nPer(per)} surveys</text>`);
+  $("chart-taxa").innerHTML = s + "</svg>";
+  const d = D.drift.map(r => `${label(r.site_id)} ${r.early} → ${r.late}`).join(", ");
+  const sh = n => { const x = by[n]; return x ? `${pct(share(x, first))} → ${pct(share(x, last))}` : ""; };
+  $("mix-text").textContent = `The total score hides a change in which animals live in the riffles. Between ${first} and ${last}, stoneflies (${sh("stoneflies")}), damselflies (${sh("damselflies")}) and common net-spinning caddisflies (${sh("common net-spinning caddisflies")}) were found less often, while aquatic worms (${sh("aquatic worms")}) and dobsonflies (${sh("dobsonflies")}) became regulars. Each site's surveys now share fewer groups with its first five years (average similarity before and since 2013: ${d}). Some of this may come from changes in who sorts and identifies the animals, which the survey records cannot show.`;
+})();
+
+// ---------- trend table, chapter sites ----------
+(function trendTable() {
+  const ch = D.trends.filter(r => r.is_chapter_site);
+  const unit = r => r.measure === "sensitive_share" ? v => `${v > 0 ? "+" : ""}${(100 * v).toFixed(0)} pts` :
+    r.measure === "ept_found" ? v => Math.abs(v) < 0.05 ? "under 0.1 groups" : `${v > 0 ? "+" : ""}${v.toFixed(1)} groups` : v => `${v > 0 ? "+" : ""}${v.toFixed(1)} points`;
+  table("tbl-trends", [
+    { h: "Site", f: r => label(r.site_id) }, { h: "Measure", f: r => r.label },
+    { h: "Surveys", n: 1, f: r => r.n }, { h: "Result", html: 1, f: r => verdictPill(r.verdict) },
+    { h: "Evidence", n: 1, f: r => pfmt(r.p) },
+    { h: "Change per decade", n: 1, f: r => r.slope_per_decade == null || Number.isNaN(r.slope_per_decade) ? "—" : unit(r)(r.slope_per_decade) },
+  ], ch);
+  const g = (site, m) => ch.find(r => r.site_id === site && r.measure === m) || {};
+  const s1 = g(467, "score"), ss = g(467, "sensitive_share"), ept = g(467, "ept_found");
+  const turn = D.turns.find(r => r.site_id === 467);
+  $("trendtbl-text").textContent = `A seasonal Kendall test compares each survey only with surveys from the same season in other years, so the spring-summer gap cannot pose as a trend. At Site 1 the total score shows ${s1.verdict} (${pfmt(s1.p)}), but the share of groups found that are pollution-sensitive is ${ss.verdict} (${pfmt(ss.p)}), and mayfly, stonefly and caddisfly groups are ${ept.verdict === "declining" ? "also declining" : ept.verdict} (${pfmt(ept.p)}). Site 2 has fewer surveys and shows no clear trend. ${turn ? `No sudden shift stands out at either site: the strongest candidate at Site 1, around ${year(turn.split_before)}, would arise by chance ${Math.round(100 * turn.p)}% of the time.` : ""} Results with p between 0.05 and 0.1 are a signal to watch rather than proof; phase 3 checks whether the shift holds once flow, weather and team size are accounted for.`;
+})();
+
+// ---------- chloride ----------
+(function salt() {
+  const cl = D.salt.filter(r => r.parameter === "chloride");
+  if (!cl.length) return;
+  const W = 760, H = 300, L = 48, R = 24, T = 64, B = 40, top = 250;
+  const x0 = t(cl[0].date) - 20 * 864e5, x1 = t(cl.at(-1).date) + 20 * 864e5;
+  const X = d => L + (t(d) - x0) / (x1 - x0) * (W - L - R), Y = v => T + (1 - v / top) * (H - T - B);
+  const creek = cl.filter(r => r.site_id === D.chemSites[0].site_id);
+  const winter = creek.filter(r => [12, 1, 2, 3].includes(Number(r.date.slice(5, 7)))).map(r => r.value);
+  const summer = creek.filter(r => [6, 7, 8, 9].includes(Number(r.date.slice(5, 7)))).map(r => r.value).sort((a, b) => a - b);
+  const sMed = summer.length ? summer[Math.floor(summer.length / 2)] : null, peak = Math.max(...winter);
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Chloride at the chapter's sampling points">`;
+  s += `<text class="t-title" x="0" y="18">Chloride in Seneca Creek peaks at ${peak} mg/L in winter, against about ${sMed} in summer</text>`;
+  D.chemSites.forEach((c, i) => s += `<circle cx="${i * 170 + 6}" cy="38" r="5" fill="${i ? "var(--grey)" : "var(--accent)"}"/><text class="t-label" x="${i * 170 + 16}" y="42">${esc(c.label)}</text>`);
+  [0, 50, 100, 150, 200, 250].forEach(v => s += `<line class="grid" x1="${L}" x2="${W - R}" y1="${Y(v)}" y2="${Y(v)}"/><text class="t-axis" x="${L - 8}" y="${Y(v) + 4}" text-anchor="end">${v}</text>`);
+  s += `<text class="t-axis" x="${L - 8}" y="${T - 14}" text-anchor="end">mg/L</text>`;
+  s += `<line class="ref" x1="${L}" x2="${W - R}" y1="${Y(230)}" y2="${Y(230)}"/><text class="t-note" x="${W - R}" y="${Y(230) - 6}" text-anchor="end">EPA chronic aquatic-life level, 230</text>`;
+  const months = [];
+  for (let m = new Date(x0); m <= new Date(x1); m.setUTCMonth(m.getUTCMonth() + 1)) { const iso = m.toISOString().slice(0, 7); if (["01", "07"].includes(iso.slice(5))) months.push(iso + "-01"); }
+  months.forEach(d => s += `<text class="t-axis" x="${X(d)}" y="${H - 14}" text-anchor="middle">${d.slice(5, 7) === "01" ? "Jan" : "Jul"} ${d.slice(0, 4)}</text>`);
+  D.chemSites.forEach((c, i) => {
+    const pts = cl.filter(r => r.site_id === c.site_id), col = i ? "var(--grey)" : "var(--accent)";
+    s += `<polyline fill="none" stroke="${col}" stroke-width="1.5" points="${pts.map(r => `${X(r.date)},${Y(r.value)}`).join(" ")}"/>`;
+    pts.forEach(r => s += `<circle cx="${X(r.date)}" cy="${Y(r.value)}" r="4" fill="${col}"><title>${c.label}, ${r.date}: ${r.value} mg/L chloride</title></circle>`);
+  });
+  $("chart-salt").innerHTML = s + "</svg>";
+  const no3 = D.salt.filter(r => r.parameter === "nitrate");
+  const no3Creek = [...new Set(no3.filter(r => r.site_id === D.chemSites[0].site_id).map(r => r.value))];
+  const winters = {};
+  creek.forEach(r => { const m = Number(r.date.slice(5, 7)); if ([12, 1, 2, 3].includes(m)) { const w = m === 12 ? Number(r.date.slice(0, 4)) + 1 : year(r.date); winters[w] = Math.max(winters[w] || 0, r.value); } });
+  const wp = Object.entries(winters).map(([w, v]) => `${w - 1}–${String(w).slice(2)}: ${v}`).join(", ");
+  $("salt-text").textContent = `Since ${year(cl[0].date)} the chapter has also tested its creek and lake for chloride with Salt Watch strips. Road salt shows up every winter: Seneca Creek's readings climb from about ${sMed} mg/L in summer to winter peaks (${wp}). All readings so far sit below the EPA's chronic aquatic-life level of 230 mg/L and below the Maryland Salt Watch median of ${D.mdChloride} mg/L. Two winters is too short for a trend; more years will show whether the peaks keep rising. Nitrate strips have read ${no3Creek.join(" or ")} mg/L at the creek on every one of ${no3.filter(r => r.site_id === D.chemSites[0].site_id).length} visits, the limit of what the strips can resolve.`;
+})();
+
+// ---------- neighbours' trends ----------
+(function neighbours() {
+  const rows = D.trends.filter(r => !r.is_chapter_site && r.measure === "score" && r.verdict !== "too few repeat seasons")
+    .sort((a, b) => b.slope_per_decade - a.slope_per_decade || a.p - b.p);
+  if (!rows.length) return;
+  const imp = rows.filter(r => r.verdict === "improving").length, dec = rows.filter(r => r.verdict === "declining").length;
+  const W = 760, L = 290, R = 60, T = 70, rowH = 19, H = T + rows.length * rowH + 40;
+  const lim = Math.ceil(Math.max(...rows.map(r => Math.abs(r.slope_per_decade))));
+  const X = v => L + (v + lim) / (2 * lim) * (W - L - R);
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Score trends at neighbouring sites">`;
+  s += `<text class="t-title" x="0" y="18">${imp} of ${rows.length} long-record neighbour sites are improving; ${dec} ${dec === 1 ? "is" : "are"} declining</text>`;
+  [["Improving", "var(--good)"], ["No clear trend", "var(--grey)"], ["Declining", "var(--bad)"]].forEach(([n, c], i) => s += `<circle cx="${i * 140 + 6}" cy="38" r="5" fill="${c}"/><text class="t-label" x="${i * 140 + 16}" y="42">${n}</text>`);
+  for (let v = -lim; v <= lim; v += lim > 4 ? 2 : 1) s += `<line class="${v === 0 ? "axis" : "grid"}" x1="${X(v)}" x2="${X(v)}" y1="${T - 6}" y2="${T + rows.length * rowH}"/><text class="t-axis" x="${X(v)}" y="${T + rows.length * rowH + 16}" text-anchor="middle">${v > 0 ? "+" : ""}${v}</text>`;
+  s += `<text class="t-axis" x="${X(0)}" y="${T + rows.length * rowH + 34}" text-anchor="middle">change in score per decade</text>`;
+  rows.forEach((r, i) => {
+    const cy = T + i * rowH + rowH / 2, c = r.verdict === "improving" ? "var(--good)" : r.verdict === "declining" ? "var(--bad)" : "var(--grey)";
+    s += `<text class="t-label" x="0" y="${cy + 4}">${esc(r.stream || r.site_name)}</text><text class="t-note" x="${L - 12}" y="${cy + 4}" text-anchor="end">${r.km} km</text>`;
+    s += `<circle cx="${X(r.slope_per_decade)}" cy="${cy}" r="5" fill="${c}"><title>${r.site_name} (${r.stream}), ${r.n} surveys ${year(r.first)}–${year(r.last)}: ${r.slope_per_decade.toFixed(1)} per decade, ${pfmt(r.p)}</title></circle>`;
+  });
+  $("chart-nbr").innerHTML = s + "</svg>";
+  const va = rows.filter(r => r.state === "VA").length;
+  const ex = Math.round(rows.length * 0.1);
+  $("nbr-text").textContent = `To see whether Great Seneca Creek's pattern is local, the same test ran on every Hub site within 30 km with a long enough record. ${va} of the ${rows.length} are across the Potomac in Northern Virginia, mostly Fairfax County streams such as Snakeden Branch, Colvin Run and Sugarland Run, scored on the Virginia form (a 0–12 scale). ${imp} of ${rows.length} show improving scores, where chance alone would flag about ${ex}. The chapter's slow loss of sensitive animals runs against that direction, so a cause local to the Great Seneca watershed is worth looking for. The comparison has limits: these streams sit in other watersheds and use a different form. Phase 3 tests it properly by judging every site against what its season, flow and setting predict.`;
 })();
 </script>

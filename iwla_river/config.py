@@ -12,6 +12,14 @@ TAXA_MAP = Path(__file__).resolve().parent / "taxa_map.csv"
 
 # Sites the Rockville Chapter monitors on Great Seneca Creek.
 CHAPTER_SITES = {467: "IWLA-R Site 1 (GRESENCRE7.6)", 468: "IWLA-R Site 2 (GRESENCRE7.52)"}
+# The chapter's Salt Watch and Nitrate Watch readings are filed under separate site entries.
+CHAPTER_CHEM_SITES = {38976: "IWLAR Seneca Creek", 38977: "IWLAR Lake"}
+
+# Neighbour search radius for regional comparison (km from the teaching site).
+NEIGHBOUR_KM = 30
+# A site gets trend tests when it has at least this many usable biological surveys over this many years.
+TREND_MIN_SURVEYS = 8
+TREND_MIN_YEARS = 5
 
 SHORT = {
     "biological": "sos_bio",

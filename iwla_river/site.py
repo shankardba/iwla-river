@@ -78,6 +78,33 @@ def collect(db_path=C.DB_PATH) -> dict:
             SELECT d.*, (SELECT count(*) FROM usable_surveys u WHERE u.site_id = d.site_id) AS surveys,
                    (SELECT max(survey_date) FROM usable_surveys u WHERE u.site_id = d.site_id) AS last
             FROM d WHERE km <= 15 ORDER BY km LIMIT 12"""),
+        # ---- phase 2 ----
+        "trends": rows(con, f"""
+            SELECT site_id, protocol, site_name, stream, state, km, is_chapter_site, n, first, last,
+                   measure, label, p, pairs, slope_per_decade, mean, verdict
+            FROM site_trends WHERE is_chapter_site OR measure = 'score' ORDER BY is_chapter_site DESC, km"""),
+        "turns": rows(con, f"""
+            SELECT site_id, protocol, n, split_before, mean_before, mean_after, p FROM turning_points
+            WHERE site_id IN ({chapter})"""),
+        "taxa": rows(con, f"""
+            SELECT taxon, tolerance, period, sum(found)::int AS found, sum(surveys)::int AS surveys
+            FROM taxa_by_period WHERE site_id IN ({chapter}) AND protocol = 'sos_bio'
+            GROUP BY ALL ORDER BY tolerance, taxon, period"""),
+        "drift": rows(con, f"""
+            SELECT site_id, baseline_years,
+                   round(avg(similarity_to_baseline) FILTER (WHERE year(survey_date) < 2013), 2) AS early,
+                   round(avg(similarity_to_baseline) FILTER (WHERE year(survey_date) >= 2013), 2) AS late,
+                   round(corr(similarity_to_baseline, year(survey_date)), 2) AS r
+            FROM baseline_drift WHERE site_id IN ({chapter}) AND protocol = 'sos_bio' GROUP BY ALL ORDER BY site_id"""),
+        "salt": rows(con, f"""
+            SELECT s.site_id, s.survey_date AS date, c.parameter, c.value FROM chemistry c
+            JOIN usable_surveys s USING (survey_uid)
+            WHERE s.site_id IN ({",".join(str(s) for s in C.CHAPTER_CHEM_SITES)})
+              AND c.parameter IN ('chloride', 'nitrate') ORDER BY date"""),
+        "chemSites": [{"site_id": k, "label": v} for k, v in C.CHAPTER_CHEM_SITES.items()],
+        "mdChloride": rows(con, """
+            SELECT round(median(c.value)) AS median FROM chemistry c JOIN usable_surveys s USING (survey_uid)
+            WHERE c.protocol = 'salt' AND c.parameter = 'chloride' AND s.state = 'MD'""")[0]["median"],
         "totals": rows(con, """
             SELECT count(*) FILTER (WHERE usable) AS usable_surveys,
                    count(DISTINCT site_id) FILTER (WHERE usable) AS sites_with_data,
