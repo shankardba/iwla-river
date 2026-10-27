@@ -106,3 +106,26 @@ def season(d: str) -> str:
 
 def verdict_pill(v: str) -> dict:
     return {"pill": "good" if v == "improving" else "bad" if v == "declining" else "neutral", "text": v}
+
+
+# ---------- privacy: site names and locations ----------
+import re as _re
+
+_ADDRESS = _re.compile(r"\d{2,6}\s+\w+.*\b(st|street|rd|road|ave|avenue|dr|drive|ln|lane|ct|court|blvd|way|pl|place|cir|circle|"
+                       r"ter|terrace|hwy|highway|pike|trail|tr)\b\.?", _re.I)
+_PERSONAL = _re.compile(r"\b(home|house|tap|kitchen|sink|faucet|well|residence|backyard|yard|apartment|apt|basement|"
+                        r"my|our|mom|dad)\b|\w's\b", _re.I)
+
+
+def public_site(name, lat, lon, bio: bool, water_source=None):
+    """(label, lat, lon) safe to publish. Biological survey sites are stream sites: name kept unless it looks like an
+    address or a person. Kit sites (salt, nitrate, chemistry) and tap or well water may be someone's home: no name,
+    location rounded to about 1 km."""
+    home_water = bool(water_source and _re.search(r"tap|well|home|drinking|dinking", str(water_source), _re.I))
+    risky = not name or bool(_ADDRESS.search(name) or _PERSONAL.search(name))
+    if bio and not home_water and not risky:
+        return name, lat, lon
+    if bio and not home_water:  # a stream site with a personal-looking name: likely a backyard
+        return "Biological monitoring site", (round(lat, 2) if lat is not None else None), (round(lon, 2) if lon is not None else None)
+    label = "Salt, nitrate or chemistry site"
+    return label, (round(lat, 2) if lat is not None else None), (round(lon, 2) if lon is not None else None)

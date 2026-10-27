@@ -10,7 +10,7 @@ import math
 from pathlib import Path
 
 from ... import config as C
-from ..db import fmt, pfmt, year
+from ..db import fmt, pfmt, public_site, year
 from ..registry import Page, chart, finding, gmaps, links, text
 
 GEO = Path(__file__).resolve().parent.parent / "geo" / "lower48.json"
@@ -114,8 +114,9 @@ def local_map(db):
         WITH s AS (SELECT site_id, site_name, stream, lat, lon,
                      6371 * 2 * asin(sqrt(pow(sin(radians(lat - {lat0}) / 2), 2) + cos(radians({lat0})) * cos(radians(lat)) *
                      pow(sin(radians(lon - {lon0}) / 2), 2))) AS km FROM sites WHERE lat IS NOT NULL)
-        SELECT s.*, count(u.survey_uid) AS n, string_agg(DISTINCT u.protocol, ',') AS forms
-        FROM s JOIN usable_surveys u USING (site_id) WHERE s.km <= {R} GROUP BY ALL""")
+        SELECT s.*, any_value(st.water_source) AS water_source, count(u.survey_uid) AS n, string_agg(DISTINCT u.protocol, ',') AS forms
+        FROM s JOIN usable_surveys u USING (site_id) LEFT JOIN sites st USING (site_id) WHERE s.km <= {R}
+        GROUP BY s.site_id, s.site_name, s.stream, s.lat, s.lon, s.km""")
     trends = {r["site_id"]: r for r in db.trends() if r["measure"] == "score"}
     W = 760
     H = W * 0.8
@@ -134,11 +135,15 @@ def local_map(db):
                     paths.append({"k": kind, "d": "M" + "L".join(f"{x:.1f} {y:.1f}" for x, y in inside)})
     pts = []
     for r in sorted(rows, key=lambda r: r["site_id"] in trends):
+        bio = any(KIND.get(f) == "bio" for f in (r["forms"] or "").split(","))
+        name, r["lat"], r["lon"] = public_site(r["site_name"], r["lat"], r["lon"], bio, r["water_source"])
+        if name != r["site_name"]:
+            r["stream"] = None
+        r["site_name"] = name
         x, y = P(r["lat"], r["lon"])
         if not (0 <= x <= W):
             continue
         t = trends.get(r["site_id"])
-        bio = any(KIND.get(f) == "bio" for f in (r["forms"] or "").split(","))
         p = {"x": x, "y": y, "r": 6 if t else 3.5 if bio else 2.5,
              "c": color.get(t["verdict"], "grey") if t else ("c4" if bio else "c1"),
              "ll": [round(r["lat"], 5), round(r["lon"], 5)],

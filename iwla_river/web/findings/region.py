@@ -5,7 +5,7 @@ from __future__ import annotations
 import math
 
 from ... import config as C
-from ..db import CHAPTER, fmt, pfmt, year
+from ..db import CHAPTER, fmt, pfmt, public_site, year
 from ..registry import Page, chart, finding, gmaps, links, maplink, section, table, text
 
 section("region", "Neighbouring streams",
@@ -20,7 +20,12 @@ def neighbour_trends(db):
     if not rows:
         return None
     rows.sort(key=lambda r: (-r["slope_per_decade"], r["p"]))
-    ll = {r["site_id"]: r for r in db.rows("SELECT site_id, lat, lon FROM sites WHERE lat IS NOT NULL")}
+    for r in rows:
+        r["site_name"] = public_site(r["site_name"], 0.0, 0.0, True)[0]
+    ll = {}
+    for r in db.rows("SELECT site_id, site_name, lat, lon, water_source FROM sites WHERE lat IS NOT NULL"):
+        _, r["lat"], r["lon"] = public_site(r["site_name"], r["lat"], r["lon"], True, r["water_source"])
+        ll[r["site_id"]] = r
     imp = sum(r["verdict"] == "improving" for r in rows)
     dec = sum(r["verdict"] == "declining" for r in rows)
     va = sum(r["state"] == "VA" for r in rows)
@@ -53,7 +58,7 @@ def neighbour_trends(db):
 def nearby_sites(db):
     rows = db.rows(f"""
         WITH c AS (SELECT lat, lon FROM sites WHERE site_id = 467), d AS (
-          SELECT s.site_id, s.site_name, s.stream, s.lat, s.lon,
+          SELECT s.site_id, s.site_name, s.stream, s.lat, s.lon, s.water_source,
             round(6371 * 2 * asin(sqrt(pow(sin(radians(s.lat - c.lat) / 2), 2) +
               cos(radians(c.lat)) * cos(radians(s.lat)) * pow(sin(radians(s.lon - c.lon) / 2), 2))), 1) AS km
           FROM sites s, c WHERE s.lat IS NOT NULL AND s.site_id NOT IN ({CHAPTER}))
@@ -63,6 +68,12 @@ def nearby_sites(db):
         FROM d WHERE km <= 10 AND surveys > 0 ORDER BY km LIMIT 25""")
     if not rows:
         return None
+    for r in rows:
+        bio = any(f in (r["forms"] or "") for f in ("sos_bio", "va_rocky", "va_muddy"))
+        name, r["lat"], r["lon"] = public_site(r["site_name"], r["lat"], r["lon"], bio, r["water_source"])
+        if name != r["site_name"]:
+            r["stream"] = ""
+        r["site_name"] = name
     names = {"sos_bio": "SOS bio", "va_rocky": "VA rocky", "va_muddy": "VA muddy", "sos_chem": "SOS chem", "salt": "Salt", "nitrate": "Nitrate"}
     return Page(
         headline=f"{len(rows)} other Hub sites within 10 km have usable surveys, mostly salt and nitrate readings.",

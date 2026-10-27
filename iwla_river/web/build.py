@@ -89,8 +89,12 @@ def write_watershed_data(db: DB, out: Path) -> None:
         SELECT h.huc12, u.site_id, round(any_value(u.lat), 5) AS lat, round(any_value(u.lon), 5) AS lon,
                count(*) FILTER (WHERE u.protocol IN ('sos_bio', 'va_rocky', 'va_muddy')) AS bio,
                count(*) FILTER (WHERE u.protocol NOT IN ('sos_bio', 'va_rocky', 'va_muddy')) AS other,
-               left(coalesce(any_value(u.site_name), ''), 40) AS name
-        FROM usable_surveys u JOIN site_huc h USING (site_id) GROUP BY h.huc12, u.site_id""")
+               left(coalesce(any_value(u.site_name), ''), 40) AS name, any_value(st.water_source) AS water_source
+        FROM usable_surveys u JOIN site_huc h USING (site_id) LEFT JOIN sites st USING (site_id)
+        GROUP BY h.huc12, u.site_id""")
+    from .db import public_site
+    for s in sites:  # no home addresses, names or exact home locations in published files
+        s["name"], s["lat"], s["lon"] = public_site(s["name"], s["lat"], s["lon"], s["bio"] > 0, s["water_source"])
     small = {}
     for r in rows:
         if r["digits"] >= 10:
