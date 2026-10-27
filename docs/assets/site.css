@@ -244,7 +244,8 @@ ol.next { margin: 0; padding-left: 22px; display: flex; flex-direction: column; 
 .ex-select select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .ex-toggle { font: 600 13px/1 var(--display); color: var(--muted); display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
 .ex-toggle input { accent-color: var(--accent); width: 16px; height: 16px; }
-.app-main { display: grid; grid-template-columns: minmax(0, 1fr) 420px; gap: 14px; height: calc(100vh - 58px - 14px - 52px - 16px); min-height: 560px; }
+.app-main { display: grid; grid-template-columns: minmax(0, 1fr) 420px; grid-template-areas: "map panel"; gap: 14px; height: calc(100vh - 58px - 14px - 52px - 16px); min-height: 560px; }
+.app-map { grid-area: map; } .ex-panel { grid-area: panel; }
 .app-map { display: flex; flex-direction: column; min-width: 0; min-height: 0; background: var(--surface); border: 1px solid var(--rule); border-radius: 12px; padding: 10px 12px; }
 .ex-map { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; }
 .ex-map svg { width: 100%; height: 100%; display: block; }
@@ -307,7 +308,7 @@ ol.next { margin: 0; padding-left: 22px; display: flex; flex-direction: column; 
 .ex-spark { width: 100%; height: auto; display: block; }
 @media (max-width: 1100px) { .app-main { grid-template-columns: minmax(0, 1fr) 360px; } }
 @media (max-width: 900px) {
-  .app-main { grid-template-columns: minmax(0, 1fr); height: auto; min-height: 0; }
+  .app-main { grid-template-columns: minmax(0, 1fr); grid-template-areas: "map" "panel"; height: auto; min-height: 0; }
   .app-map { aspect-ratio: 760 / 600; }
   .ex-panel { overflow: visible; }
   .ex-search { max-width: none; flex-basis: 100%; }
@@ -334,3 +335,15 @@ ol.next { margin: 0; padding-left: 22px; display: flex; flex-direction: column; 
 .sheet summary::-webkit-details-marker { display: none; }
 .sheet summary::after { content: "+"; margin-left: auto; font-weight: 400; color: var(--muted); }
 .sheet details[open] summary::after { content: "–"; }
+
+
+/* watershed areas on the map */
+.ex-area path { fill-opacity: .42; stroke: var(--surface); stroke-width: 1.2; stroke-linejoin: round; cursor: pointer; transition: fill-opacity .12s; }
+.ex-area:hover path, .ex-area.hl path { fill-opacity: .7; stroke: var(--ink); stroke-width: 1.6; }
+.ex-area:focus-visible path { stroke: var(--accent); stroke-width: 3; }
+.ex-area.chapter path { stroke: var(--accent); stroke-width: 2.4; }
+.ex-parent { fill: none; stroke: var(--ink); stroke-width: 1.6; stroke-linejoin: round; pointer-events: none; opacity: .75; }
+.ex-parent.fill { fill: var(--accent); fill-opacity: .08; }
+.ex-heat { pointer-events: none; }
+.ex-label.ch { fill: var(--accent); }
+.ex-legend i.area { border-radius: 2px; opacity: .7; }

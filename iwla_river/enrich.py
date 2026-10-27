@@ -259,6 +259,40 @@ def stage_huc(points, workers: int = 3) -> None:
             print(f"  names: level {digits}, {len(want)} looked up", flush=True)
 
 
+# Simplification per level (degrees): coarse for regions, fine for small subwatersheds.
+WBD_OFFSET = {2: 0.03, 4: 0.012, 6: 0.006, 8: 0.003, 10: 0.0015, 12: 0.0008}
+WBD_CHUNK = {2: 4, 4: 20, 6: 30, 8: 40, 10: 60, 12: 80}
+
+
+def stage_wbdgeo(codes_by_level: dict) -> None:
+    """Simplified boundary of every watershed that has samples, from the USGS Watershed Boundary Dataset."""
+    for digits, layer in HUC_LAYERS.items():
+        name = f"wbd_{digits}.json"
+        cache = _load(name)
+        todo = sorted(set(codes_by_level.get(digits, [])) - set(cache))
+        print(f"wbd geo level {digits}: {len(todo)} to fetch ({len(cache)} cached)", flush=True)
+        for i in range(0, len(todo), WBD_CHUNK[digits]):
+            chunk = todo[i:i + WBD_CHUNK[digits]]
+            params = {"where": f"huc{digits} IN ({','.join(repr(c) for c in chunk)})", "outFields": f"huc{digits}",
+                      "returnGeometry": "true", "outSR": 4326, "maxAllowableOffset": WBD_OFFSET[digits],
+                      "geometryPrecision": 4, "f": "json"}
+            for attempt in range(4):
+                try:
+                    r = requests.get(f"{WBD}/{layer}/query", params=params, timeout=180, headers=UA)
+                    feats = r.json().get("features")
+                    if feats is not None:
+                        break
+                except (requests.RequestException, ValueError):
+                    pass
+                time.sleep(5 * (attempt + 1))
+            else:
+                continue
+            for f in feats:
+                cache[f["attributes"][f"huc{digits}"]] = f["geometry"]["rings"]
+            _save(name, cache)
+        print(f"  level {digits}: {len(cache)} boundaries", flush=True)
+
+
 def write_huc(con) -> None:
     huc = _load("huc.json")
     names = _load("huc_names.json")
@@ -335,6 +369,14 @@ def main(argv=None) -> None:
         stage_rain(rows)
     if "huc" in stages:
         stage_huc(points)
+    if "wbdgeo" in stages:
+        with duckdb.connect(str(C.DB_PATH), read_only=True) as con:
+            rows = con.execute("SELECT digits, code FROM watershed_metrics").fetchall()
+        by = {}
+        for d, c in rows:
+            by.setdefault(d, []).append(c)
+        stage_wbdgeo(by)
+        return
     for attempt in range(10):  # another step may hold the database for a moment
         try:
             with duckdb.connect(str(C.DB_PATH)) as con:

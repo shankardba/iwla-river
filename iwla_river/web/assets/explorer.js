@@ -79,30 +79,60 @@
   const kindWord = () => kind === "all" ? "samples" : `${KINDS.find(k => k[0] === kind)[1].toLowerCase()} samples`;
 
   // ---------- map ----------
+  // ---------- boundaries ----------
+  let GTOP = null; const GREG = {}, GSUB = {};
+  async function ensureGeo(code) {
+    const get = u => fetch(u).then(r => r.ok ? r.json() : {}).catch(() => ({}));
+    if (!GTOP) GTOP = await get("data/geo/top.json");
+    if (code.length >= 2 && !GREG[code.slice(0, 2)]) GREG[code.slice(0, 2)] = await get(`data/geo/r${code.slice(0, 2)}.json`);
+    if (code.length >= 4 && !GSUB[code.slice(0, 4)]) GSUB[code.slice(0, 4)] = await get(`data/geo/s${code.slice(0, 4)}.json`);
+  }
+  const shape = c => !c ? null : c.length === 2 ? (GTOP || {})[c] : c.length === 4 ? (GREG[c.slice(0, 2)] || {})[c] : (GSUB[c.slice(0, 4)] || {})[c];
+
   function mapSvg(code) {
     const isSites = code.length === 12;
-    let items = [];
+    const areas = isSites ? [] : kids(code).map(w).filter(x => x && !(code === "" && ["19", "20", "21", "22"].includes(x.c)));
+    const withShape = areas.filter(x => shape(x.c));
+    let sites = [];
     if (isSites) {
-      items = (SITES[huc4(code)] || []).filter(t => t[3] === code && siteN(t, kind) > 0).map(t => ({
+      sites = (SITES[huc4(code)] || []).filter(t => t[3] === code && siteN(t, kind) > 0).map(t => ({
         la: t[1], lo: t[2], id: t[0], bio: t[4] > 0, r: 3.5 + Math.min(6, Math.log2(1 + siteN(t, kind))),
         color: t[4] ? "var(--c4)" : "var(--heat)",
         tip: `${t[6] || "Site"}: ${t[4]} biological, ${t[5]} other surveys. ${t[4] ? "Click for its history." : "Click for Google Maps."}` }));
-    } else if (showRings) {
-      items = kids(code).map(w).filter(x => x && num(x.la) && !(code === "" && ["19", "20", "21", "22"].includes(x.c))).map(x => ({
-        la: x.la, lo: x.lo, code: x.c, r: Math.min(30, 4 + Math.sqrt(x.s + x.bv) * 0.9), color: colorOf(x),
-        tip: `${x.n || x.c}: ${fmt(x.s)} sites, ${fmt(x.bv)} biological surveys. Click to zoom in.` }));
     }
     const inWs = code.length >= 4 ? (SITES[huc4(code)] || []).filter(t => t[3].startsWith(code)) : [];
     const heat = isSites ? [] : code.length >= 4
       ? inWs.filter(t => siteN(t, kind) > 0).map(t => ({ q: albers(t[1], t[2]), n: siteN(t, kind) }))
       : HEAT.filter(c => cellN(c, kind) > 0 && c[0] > 24 && c[0] < 50 && c[1] > -125 && c[1] < -66).map(c => ({ q: albers(c[0], c[1]), n: cellN(c, kind), cell: 1 }));
-    const p = items.map(i => albers(i.la, i.lo));
-    const own = code.length === 2 ? kids(code).map(w).filter(x => x && num(x.la)).map(x => albers(x.la, x.lo)) : [];
-    const fit = code === "" && GEO ? GEO.border.flat().map(([lo, la]) => albers(la, lo)) : p.concat(inWs.map(t => albers(t[1], t[2])), own);
+    // Frame: the country by its outline; anything smaller by its own boundary, or failing that its areas and sites.
+    let fit;
+    if (code === "" && GEO) fit = GEO.border.flat().map(([lo, la]) => albers(la, lo));
+    else if (shape(code)) fit = shape(code).flat().map(([lo, la]) => albers(la, lo));
+    else fit = withShape.flatMap(x => shape(x.c).flat().map(([lo, la]) => albers(la, lo))).concat(inWs.map(t => albers(t[1], t[2])), sites.map(t => albers(t.la, t.lo)));
     if (!fit.length) return `<div class="ex-empty">No ${kindWord()} here. Try another sample type.</div>`;
     const x0 = Math.min(...fit.map(q => q[0])), x1 = Math.max(...fit.map(q => q[0])), y0 = Math.min(...fit.map(q => q[1])), y1 = Math.max(...fit.map(q => q[1]));
-    const span = Math.max(x1 - x0, (y1 - y0) * W / H, 0.004), sc = (W - (code === "" ? 16 : 90)) / span;
+    const span = Math.max(x1 - x0, (y1 - y0) * W / H, 0.002), sc = (W - (code === "" ? 16 : 40)) / span;
     const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, X = q => W / 2 + (q[0] - cx) * sc, Y = q => H / 2 - (q[1] - cy) * sc;
+    const pathOf = rings => rings.map(ring => {
+      let d = "", last = null;
+      ring.forEach(([lo, la], i) => {
+        const q = albers(la, lo), x = X(q), y = Y(q);
+        if (last && i < ring.length - 1 && Math.abs(x - last[0]) + Math.abs(y - last[1]) < 0.8) return;
+        d += `${d ? "L" : "M"}${x.toFixed(1)} ${y.toFixed(1)}`; last = [x, y];
+      });
+      return d + "Z";
+    }).join("");
+    // Where to put a name: the centre of the largest ring, in screen space.
+    const anchor = rings => {
+      let best = null, bestA = 0;
+      rings.forEach(ring => {
+        const pts = ring.map(([lo, la]) => { const q = albers(la, lo); return [X(q), Y(q)]; });
+        let a = 0, sx = 0, sy = 0;
+        for (let i = 0; i < pts.length - 1; i++) { const c = pts[i][0] * pts[i + 1][1] - pts[i + 1][0] * pts[i][1]; a += c; sx += (pts[i][0] + pts[i + 1][0]) * c; sy += (pts[i][1] + pts[i + 1][1]) * c; }
+        if (Math.abs(a) > bestA) { bestA = Math.abs(a); best = [sx / (3 * a), sy / (3 * a)]; }
+      });
+      return { p: best, area: bestA / 2 };
+    };
     let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Map of ${esc(label(code))}"><clipPath id="exclip"><rect width="${W}" height="${H}"/></clipPath><g clip-path="url(#exclip)">`;
     if (GEO) for (const part of ["inner", "border"]) for (const arc of GEO[part]) {
       let d = "", last = null, on = false;
@@ -114,47 +144,50 @@
       }
       if (d.includes("L")) s += `<path d="${d}" fill="none" class="${part === "border" ? "map-border" : "map-state"}"/>`;
     }
+    // watershed areas
+    const labels = [];
+    withShape.forEach(x => {
+      const rings = shape(x.c), col = colorOf(x), ch = CHAPTER && CHAPTER.startsWith(x.c);
+      s += `<a href="#w${x.c}" data-go="${x.c}" data-code="${x.c}" class="ex-area${ch ? " chapter" : ""}"><path d="${pathOf(rings)}" fill="${showRings ? col : "transparent"}" fill-rule="evenodd"><title>${esc(x.n || x.c)}: ${fmt(x.s)} sites, ${fmt(x.bv)} biological surveys${num(x.g) ? `, ${pts(x.g)} sensitive vs expected` : ""}. Click to zoom in.</title></path></a>`;
+      const an = anchor(rings);
+      if (an.p) labels.push({ x: an.p[0], y: an.p[1], area: an.area, n: x.n || x.c, ch });
+    });
+    // areas with no boundary on file fall back to rings at their sites' centre
+    areas.filter(x => !shape(x.c) && num(x.la)).forEach(x => {
+      const q = albers(x.la, x.lo), r = Math.min(24, 4 + Math.sqrt(x.s + x.bv) * 0.8);
+      s += `<a href="#w${x.c}" data-go="${x.c}" data-code="${x.c}" class="ex-ring"><circle cx="${X(q).toFixed(1)}" cy="${Y(q).toFixed(1)}" r="${r.toFixed(1)}" fill="${colorOf(x)}" fill-opacity=".2" stroke="${colorOf(x)}" stroke-width="2"><title>${esc(x.n || x.c)}. Click to zoom in.</title></circle></a>`;
+      labels.push({ x: X(q), y: Y(q) + r + 10, area: r * r * 3, n: x.n || x.c });
+    });
+    if (shape(code)) s += `<path class="ex-parent${isSites ? " fill" : ""}" d="${pathOf(shape(code))}" fill-rule="evenodd"/>`;
     if (heat.length) {
       const mx = Math.log(1 + Math.max(...heat.map(h => h.n)));
       const cellPx = code.length < 4 ? Math.max(1.6, Math.abs(X(albers(38, -96.25)) - X(albers(38, -96))) * 0.62) : 0;
+      s += `<g class="ex-heat">`;
       heat.forEach(h => {
         const x = X(h.q), y = Y(h.q);
         if (x < -10 || x > W + 10 || y < -10 || y > H + 10) return;
         const f = Math.log(1 + h.n) / mx;
-        s += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(cellPx || 2.2 + 3.5 * f).toFixed(1)}" fill="var(--heat)" fill-opacity="${(0.16 + 0.74 * f).toFixed(2)}"><title>${fmt(h.n)} ${kindWord()}${h.cell ? " in this 25 km cell" : " at this site"}</title></circle>`;
+        s += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(cellPx || 2 + 3 * f).toFixed(1)}" fill="var(--heat)" fill-opacity="${(0.2 + 0.7 * f).toFixed(2)}"/>`;
       });
+      s += `</g>`;
     }
     s += "</g>";
-    items.forEach((it, i) => {
-      const x = X(p[i]).toFixed(1), y = Y(p[i]).toFixed(1);
-      if (isSites) {
-        const sel = site && String(it.id) === String(site);
-        const dot = `<circle cx="${x}" cy="${y}" r="${(it.r + (sel ? 2 : 0)).toFixed(1)}" fill="${it.color}" fill-opacity=".85" stroke="${sel ? "var(--ink)" : "var(--surface)"}" stroke-width="${sel ? 3 : 1.2}"><title>${esc(it.tip)}</title></circle>` +
-          (sel ? `<circle class="ex-chapter" cx="${x}" cy="${y}" r="${(it.r + 8).toFixed(1)}"/>` : "");
-        s += it.bio ? `<a href="#s${it.id}@${code}" data-site="${it.id}" class="ex-site">${dot}</a>` : `<a href="${gmaps(it.la, it.lo)}" target="_blank" rel="noopener">${dot}</a>`;
-      } else {
-        s += `<a href="#w${it.code}" data-go="${it.code}" class="ex-ring" data-code="${it.code}"><circle cx="${x}" cy="${y}" r="${it.r.toFixed(1)}" fill="${it.color}" fill-opacity=".16" stroke="${it.color}" stroke-width="2.2"><title>${esc(it.tip)}</title></circle></a>`;
-      }
+    sites.forEach(it => {
+      const q = albers(it.la, it.lo), x = X(q).toFixed(1), y = Y(q).toFixed(1), sel = site && String(it.id) === String(site);
+      const dot = `<circle cx="${x}" cy="${y}" r="${(it.r + (sel ? 2 : 0)).toFixed(1)}" fill="${it.color}" fill-opacity=".9" stroke="${sel ? "var(--ink)" : "var(--surface)"}" stroke-width="${sel ? 3 : 1.2}"><title>${esc(it.tip)}</title></circle>` +
+        (sel ? `<circle class="ex-chapter" cx="${x}" cy="${y}" r="${(it.r + 8).toFixed(1)}"/>` : "");
+      s += it.bio ? `<a href="#s${it.id}@${code}" data-site="${it.id}" class="ex-site">${dot}</a>` : `<a href="${gmaps(it.la, it.lo)}" target="_blank" rel="noopener">${dot}</a>`;
     });
-    if (!isSites) {
-      const boxes = [], free = (bx, by, bw, bh) => !boxes.some(b => bx < b[0] + b[2] && bx + bw > b[0] && by < b[1] + b[3] && by + bh > b[1]);
-      items.map((it, i) => [it, i]).sort((a, b) => b[0].r - a[0].r).forEach(([it, i]) => {
-        if (!(items.length <= 15 || (it.r > 11 && items.length < 40))) return;
-        const nm0 = (w(it.code) || {}).n || it.code, nm = nm0.length > 22 ? nm0.slice(0, 21) + "…" : nm0;
-        const tw = nm.length * 6.4 + 6, y = Y(p[i]), x = Math.min(W - tw / 2 - 2, Math.max(tw / 2 + 2, X(p[i])));
-        for (const ty of [y + it.r + 13, y - it.r - 5]) {
-          if (ty > 10 && ty < H - 2 && free(x - tw / 2, ty - 11, tw, 14)) {
-            boxes.push([x - tw / 2, ty - 11, tw, 14]);
-            s += `<text class="ex-label" x="${x.toFixed(1)}" y="${ty.toFixed(1)}" text-anchor="middle">${esc(nm)}</text>`;
-            break;
-          }
-        }
-      });
-      if (CHAPTER && CHAPTER.startsWith(code) && showRings) {
-        const ch = items.find(it => CHAPTER.startsWith(it.code));
-        if (ch) { const q = albers(ch.la, ch.lo); s += `<circle class="ex-chapter" cx="${X(q).toFixed(1)}" cy="${Y(q).toFixed(1)}" r="${(ch.r + 5).toFixed(1)}"/>`; }
-      }
-    }
+    // names: biggest areas first, skipped when they would collide or the area is too small to hold them
+    const boxes = [], free = (bx, by, bw, bh) => !boxes.some(b => bx < b[0] + b[2] && bx + bw > b[0] && by < b[1] + b[3] && by + bh > b[1]);
+    labels.sort((a, b) => (b.ch ? 1 : 0) - (a.ch ? 1 : 0) || b.area - a.area).forEach(l => {
+      const nm = l.n.length > 24 ? l.n.slice(0, 23) + "…" : l.n, tw = nm.length * 6.3 + 8;
+      if (l.area < tw * 14 * 0.6 && labels.length > 6 && !l.ch) return;
+      const x = Math.min(W - tw / 2 - 2, Math.max(tw / 2 + 2, l.x)), y = Math.min(H - 6, Math.max(14, l.y + 4));
+      if (!free(x - tw / 2, y - 11, tw, 14)) return;
+      boxes.push([x - tw / 2, y - 11, tw, 14]);
+      s += `<text class="ex-label${l.ch ? " ch" : ""}" x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="middle">${esc(nm)}</text>`;
+    });
     return s + "</svg>";
   }
 
@@ -164,7 +197,7 @@
     if (code.length === 12) parts.push('<span><i style="background:var(--c4)"></i>biological site (click for history)</span><span><i style="background:var(--heat)"></i>salt, nitrate or chemistry only</span>');
     else if (showRings) {
       const cb = COLOR_BY[colorBy];
-      parts.push(`<span class="lg-title">Rings: ${esc(cb.name)}</span>` + cb.bins.map(b => `<span><i class="ring" style="border-color:${b[2]}"></i>${esc(b[3])}</span>`).join("") + '<span><i class="ring" style="border-color:var(--nodata)"></i>no data</span>');
+      parts.push(`<span class="lg-title">Watersheds: ${esc(cb.name)}</span>` + cb.bins.map(b => `<span><i class="area" style="background:${b[2]}"></i>${esc(b[3])}</span>`).join("") + '<span><i class="area" style="background:var(--nodata)"></i>no data</span>');
     }
     return parts.join("");
   }
@@ -281,7 +314,7 @@
 
   // ---------- render ----------
   async function render(push) {
-    await ensure(cur);
+    await Promise.all([ensure(cur), ensureGeo(cur)]);
     if (push) { const h = site ? `#s${site}@${cur}` : `#w${cur || "US"}`; try { history.replaceState(null, "", h); } catch (e) { /* keep the old address */ } }
     const x = w(cur) || {}, parent = cur ? w(cur.slice(0, -2)) : null;
     $(".ex-tools-kind").innerHTML = KINDS.map(([k, t]) => `<button type="button" data-kind="${k}" aria-pressed="${k === kind}">${t}</button>`).join("");
@@ -303,7 +336,7 @@
         `<div class="ex-actions">${cur ? `<button type="button" data-go="${cur.slice(0, -2)}">↑ ${esc(cur.length > 2 ? label(cur.slice(0, -2)) : "United States")}</button>` : ""}` +
         `${CHAPTER && cur !== CHAPTER ? `<button type="button" class="primary" data-go="${CHAPTER}">Go to Great Seneca Creek</button>` : ""}` +
         `${num(x.la) && cur ? `<a class="btn" href="${gmaps(x.la, x.lo)}" target="_blank" rel="noopener">Google Maps ↗</a>` : ""}</div>`;
-      $(".ex-body").innerHTML = (cur === "" ? `<p class="ex-intro">Orange shows where volunteers take samples. Rings are the water-resource regions of the lower 48: click one to zoom in, or search for a watershed or stream<span class="kbd-hint"> (press <kbd>/</kbd>)</span>.</p>` : "") +
+      $(".ex-body").innerHTML = (cur === "" ? `<p class="ex-intro">Shaded areas are the water-resource regions of the lower 48, coloured by the measure you pick; orange dots show where volunteers take samples. Click a region to zoom in, or search for a watershed or stream<span class="kbd-hint"> (press <kbd>/</kbd>)</span>.</p>` : "") +
         cards(x, parent) + `<h3 class="ex-h">${cur.length === 12 ? "Sites" : `${CHILD[cur.length][0].toUpperCase()}${CHILD[cur.length].slice(1)} inside`} <span class="meta">${cur.length === 12 ? "biological sites open their history" : "click a row to zoom in"}</span></h3>` +
         kidTable(cur) + (cur ? measures(x, parent) : "");
     }

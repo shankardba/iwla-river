@@ -138,6 +138,40 @@ def write_watershed_data(db: DB, out: Path) -> None:
         (out / "data" / "huc4" / f"{h}.json").write_text(json.dumps(
             {"w": small.get(h, {}), "sites": by4.get(h, []), "series": series.get(h, {})}, separators=(",", ":")))
 
+    # Watershed boundaries, packaged by the view that draws them: regions (top), subregions per region,
+    # and everything smaller per subregion. Rings are [lon, lat] pairs, rounded and de-duplicated.
+    cache = C.DATA / "cache"
+    geo = {d: json.loads((cache / f"wbd_{d}.json").read_text()) for d in (2, 4, 6, 8, 10, 12) if (cache / f"wbd_{d}.json").exists()}
+    if geo:
+        def thin(rings, nd):
+            out = []
+            for ring in rings:
+                pts, last = [], None
+                for lo, la in ring:
+                    q = [round(lo, nd), round(la, nd)]
+                    if q != last:
+                        pts.append(q)
+                        last = q
+                if len(pts) >= 4:
+                    out.append(pts)
+            return out
+        gdir = out / "data" / "geo"
+        if gdir.exists():
+            shutil.rmtree(gdir)
+        gdir.mkdir(parents=True)
+        (gdir / "top.json").write_text(json.dumps({c: thin(r, 2) for c, r in geo.get(2, {}).items()}, separators=(",", ":")))
+        reg = {}
+        for c, r in geo.get(4, {}).items():
+            reg.setdefault(c[:2], {})[c] = thin(r, 3)
+        for h, d in reg.items():
+            (gdir / f"r{h}.json").write_text(json.dumps(d, separators=(",", ":")))
+        sub = {}
+        for lvl, nd in ((6, 3), (8, 3), (10, 4), (12, 4)):
+            for c, r in geo.get(lvl, {}).items():
+                sub.setdefault(c[:4], {})[c] = thin(r, nd)
+        for h, d in sub.items():
+            (gdir / f"s{h}.json").write_text(json.dumps(d, separators=(",", ":")))
+
     # Search index: every named watershed, and biological sites under their public names.
     search = {"w": [[r["code"], r["name"]] for r in rows if r["name"]],
               "s": [[s["site_id"], s["name"], s["huc12"]] for s in sites if s["bio"] > 0 and s["name"] != "Biological monitoring site"]}
