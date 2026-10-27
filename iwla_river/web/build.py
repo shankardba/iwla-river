@@ -96,7 +96,36 @@ def write_watershed_data(db: DB, out: Path) -> None:
                count(*) FILTER (WHERE protocol = 'sos_chem') AS chem
         FROM usable_surveys WHERE lat IS NOT NULL AND lon IS NOT NULL GROUP BY 1, 2""")
     heat = [[r["la"], r["lo"], r["bio"], r["salt"], r["no3"], r["chem"]] for r in heat]
-    (out / "data" / "watersheds.json").write_text(json.dumps({"w": top, "heat": heat}, separators=(",", ":")))
+    # States: the same measures per state, plus the subbasins with sites in each (to step into watersheds).
+    st = {}
+    if db.has("state_metrics"):
+        subs = {}
+        for r in db.rows("SELECT state, huc8, sites, bio_surveys FROM state_subbasins ORDER BY state, bio_surveys DESC, sites DESC"):
+            subs.setdefault(r["state"], []).append([r["huc8"], r["sites"], r["bio_surveys"]])
+        for r in db.rows("SELECT * FROM state_metrics"):
+            st[r["code"]] = pack(r) | {"hb": subs.get(r["code"], [])}
+    (out / "data" / "watersheds.json").write_text(json.dumps({"w": top, "heat": heat, "st": st}, separators=(",", ":")))
+    # Finer heat inside each state (cells of 0.05 degree, about 5 km), fetched when a state is opened.
+    if db.has("site_state"):
+        hd = out / "data" / "states"
+        if hd.exists():
+            shutil.rmtree(hd)
+        hd.mkdir(parents=True)
+        cells = db.rows("""
+            SELECT s.state, round(u.lat * 20) / 20 AS la, round(u.lon * 20) / 20 AS lo,
+                   count(*) FILTER (WHERE u.protocol IN ('sos_bio', 'va_rocky', 'va_muddy')) AS bio,
+                   count(*) FILTER (WHERE u.protocol = 'salt') AS salt, count(*) FILTER (WHERE u.protocol = 'nitrate') AS no3,
+                   count(*) FILTER (WHERE u.protocol = 'sos_chem') AS chem
+            FROM usable_surveys u JOIN site_state s USING (site_id) WHERE s.state <> '' GROUP BY ALL""")
+        by_state = {}
+        for r in cells:
+            by_state.setdefault(r["state"], []).append([round(r["la"], 2), round(r["lo"], 2), r["bio"], r["salt"], r["no3"], r["chem"]])
+        for k, v in by_state.items():
+            (hd / f"{k}.json").write_text(json.dumps(v, separators=(",", ":")))
+    sg = HERE / "geo" / "states.json"
+    if sg.exists():
+        (out / "data" / "geo").mkdir(parents=True, exist_ok=True)
+        shutil.copy(sg, out / "data" / "geo" / "states.json")
     geo = HERE / "geo" / "lower48.json"
     if geo.exists():
         shutil.copy(geo, out / "data" / "lower48.json")
@@ -156,9 +185,10 @@ def write_watershed_data(db: DB, out: Path) -> None:
                     out.append(pts)
             return out
         gdir = out / "data" / "geo"
-        if gdir.exists():
-            shutil.rmtree(gdir)
-        gdir.mkdir(parents=True)
+        for f in gdir.glob("*.json") if gdir.exists() else []:
+            if f.name != "states.json":
+                f.unlink()
+        gdir.mkdir(parents=True, exist_ok=True)
         (gdir / "top.json").write_text(json.dumps({c: thin(r, 2) for c, r in geo.get(2, {}).items()}, separators=(",", ":")))
         reg = {}
         for c, r in geo.get(4, {}).items():

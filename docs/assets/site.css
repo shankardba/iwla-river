@@ -347,3 +347,7 @@ ol.next { margin: 0; padding-left: 22px; display: flex; flex-direction: column; 
 .ex-heat { pointer-events: none; }
 .ex-label.ch { fill: var(--accent); }
 .ex-legend i.area { border-radius: 2px; opacity: .7; }
+
+.ex-area.dim path { fill: transparent; stroke: var(--rule); }
+.ex-area.dim:hover path { stroke: var(--muted); fill: color-mix(in srgb, var(--muted) 10%, transparent); fill-opacity: 1; }
+.ex-view button[aria-pressed="true"] { background: color-mix(in srgb, var(--accent) 16%, transparent); }

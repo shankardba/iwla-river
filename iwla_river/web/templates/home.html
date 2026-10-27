@@ -14,9 +14,12 @@
       <kbd aria-hidden="true">/</kbd>
       <ul class="ex-results" id="ex-results" role="listbox" hidden></ul>
     </div>
+    <div class="ex-view seg" role="group" aria-label="View by">
+      <button type="button" data-view="w" aria-pressed="true">Watersheds</button><button type="button" data-view="s" aria-pressed="false">States</button>
+    </div>
     <div class="ex-tools-kind seg" role="group" aria-label="Sample type shown on the map"></div>
-    <label class="ex-select"><span>Colour watersheds by</span>
-      <select class="ex-colorby" aria-label="Colour watersheds by">
+    <label class="ex-select"><span>Colour by</span>
+      <select class="ex-colorby" aria-label="Colour areas by">
         <option value="gap">Sensitive animals vs expected</option>
         <option value="paved">Watershed paved</option>
         <option value="chloride">Chloride</option>
@@ -24,7 +27,7 @@
         <option value="surveys">Biological surveys</option>
       </select>
     </label>
-    <label class="ex-toggle"><input type="checkbox" class="ex-rings" checked> Shade watersheds</label>
+    <label class="ex-toggle"><input type="checkbox" class="ex-rings" checked> Shade areas</label>
   </div>
   <div class="app-main">
     <section class="app-map" aria-label="Map">

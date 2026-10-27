@@ -25,6 +25,7 @@
 
   let W8 = {}, SITES = {}, SERIES = {}, GEO = null, HEAT = [], SEARCH = null;
   let cur = "", site = null, sortKey = "bv", sortDir = -1, kind = "all", colorBy = "gap", showRings = true;
+  let view = "w", st = "", ST = {}, SGEO = null; const SHEAT = {};   // view by watersheds ("w") or states ("s"); st = state code
   const loaded = {};
 
   // ---------- data ----------
@@ -193,6 +194,11 @@
 
   function legend(code) {
     const parts = [];
+    if (code === "st") {
+      parts.push(`<span><i class="heat"></i>samples per ${st ? "5" : "25"} km cell, darker = more</span>`);
+      if (showRings) { const cb = COLOR_BY[colorBy]; parts.push(`<span class="lg-title">States: ${esc(cb.name)}</span>` + cb.bins.map(b => `<span><i class="area" style="background:${b[2]}"></i>${esc(b[3])}</span>`).join("") + '<span><i class="area" style="background:var(--nodata)"></i>no data</span>'); }
+      return parts.join("");
+    }
     if (code.length < 12) parts.push(`<span><i class="heat"></i>${code.length < 4 ? "samples per 25 km cell" : "samples per site"}, darker = more</span>`);
     if (code.length === 12) parts.push('<span><i style="background:var(--c4)"></i>biological site (click for history)</span><span><i style="background:var(--heat)"></i>salt, nitrate or chemistry only</span>');
     else if (showRings) {
@@ -221,7 +227,7 @@
   }
 
   function cards(x, parent) {
-    const pl = parent ? label(cur.slice(0, -2) || "") : "";
+    const pl = parent ? (view === "s" ? "United States" : label(cur.slice(0, -2) || "")) : "";
     const gapCls = !num(x.g) ? "neutral" : x.g < -0.04 ? "bad" : x.g > 0.04 ? "good" : "neutral";
     return `<div class="ex-cards">` +
       card("Sites with samples", fmt(x.s), `${fmt(x.bv)} biological surveys${x.fy ? `, ${x.fy}–${x.ly}` : ""}`, parent ? `${esc(pl)}: ${fmt(parent.s)} sites` : "") +
@@ -312,8 +318,102 @@
     return out;
   }
 
+  // ---------- states ----------
+  async function ensureStates() { if (!SGEO) { try { SGEO = (await fetch("data/geo/states.json").then(r => r.json())).states; } catch (e) { SGEO = {}; } } }
+  function inPoly(x, y, rings) {
+    let hit = false;
+    for (const ring of rings) for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+      const [xi, yi] = ring[i], [xj, yj] = ring[j];
+      if ((yi > y) !== (yj > y) && x < xj + (y - yj) * (xi - xj) / ((yi - yj) || 1e-12)) hit = !hit;
+    }
+    return hit;
+  }
+  function stateMap(abbr) {
+    const all = Object.keys(SGEO || {});
+    if (!all.length) return '<div class="ex-empty">State outlines could not be loaded.</div>';
+    const own = abbr ? SGEO[abbr].r : null;
+    const fit = (own || all.flatMap(k => SGEO[k].r)).flat().map(([lo, la]) => albers(la, lo));
+    const x0 = Math.min(...fit.map(q => q[0])), x1 = Math.max(...fit.map(q => q[0])), y0 = Math.min(...fit.map(q => q[1])), y1 = Math.max(...fit.map(q => q[1]));
+    const span = Math.max(x1 - x0, (y1 - y0) * W / H), sc = (W - (abbr ? 60 : 16)) / span;
+    const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, X = q => W / 2 + (q[0] - cx) * sc, Y = q => H / 2 - (q[1] - cy) * sc;
+    const pathOf = rings => rings.map(ring => {
+      let d = "", last = null;
+      ring.forEach(([lo, la], i) => { const q = albers(la, lo), x = X(q), y = Y(q); if (last && i < ring.length - 1 && Math.abs(x - last[0]) + Math.abs(y - last[1]) < 0.8) return; d += `${d ? "L" : "M"}${x.toFixed(1)} ${y.toFixed(1)}`; last = [x, y]; });
+      return d + "Z";
+    }).join("");
+    const centre = rings => {
+      let best = null, A = 0;
+      rings.forEach(r => {
+        const p = r.map(([lo, la]) => { const q = albers(la, lo); return [X(q), Y(q)]; });
+        let a = 0, sx = 0, sy = 0;
+        for (let i = 0; i < p.length - 1; i++) { const c = p[i][0] * p[i + 1][1] - p[i + 1][0] * p[i][1]; a += c; sx += (p[i][0] + p[i + 1][0]) * c; sy += (p[i][1] + p[i + 1][1]) * c; }
+        if (Math.abs(a) > A) { A = Math.abs(a); best = [sx / (3 * a), sy / (3 * a)]; }
+      });
+      return { p: best, area: A / 2 };
+    };
+    let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Map of ${abbr ? esc(SGEO[abbr].n) : "the states"}"><clipPath id="exclip"><rect width="${W}" height="${H}"/></clipPath><g clip-path="url(#exclip)">`;
+    const labels = [];
+    all.forEach(k => {
+      const x = ST[k], here = k === abbr, show = !abbr || here;
+      const fill = showRings && x ? colorOf(x) : "transparent";
+      s += `<a href="#st-${k}" data-st="${k}" data-code="st-${k}" class="ex-area${here ? " chapter" : ""}${show ? "" : " dim"}"><path d="${pathOf(SGEO[k].r)}" fill="${show ? fill : "transparent"}" fill-rule="evenodd"><title>${esc(SGEO[k].n)}${x ? `: ${fmt(x.s)} sites, ${fmt(x.bv)} biological surveys${num(x.g) ? `, ${pts(x.g)} sensitive vs expected` : ""}` : ": no samples"}. Click to zoom in.</title></path></a>`;
+      const c = centre(SGEO[k].r);
+      if (c.p) labels.push({ x: c.p[0], y: c.p[1], area: c.area, n: abbr ? SGEO[k].n : k, here });
+    });
+    // Heat: 25 km cells for the country; 5 km cells inside a state.
+    const step = abbr ? 0.05 : 0.25;
+    const cells = (abbr ? SHEAT[abbr] || [] : HEAT).filter(c => cellN(c, kind) > 0 && c[0] > 24 && c[0] < 50 && c[1] > -125 && c[1] < -66);
+    if (cells.length) {
+      const mx = Math.log(1 + Math.max(...cells.map(c => cellN(c, kind))));
+      const r = Math.max(1.6, Math.abs(X(albers(38, -96 - step)) - X(albers(38, -96))) * 0.62);
+      s += `<g class="ex-heat">` + cells.map(c => { const q = albers(c[0], c[1]), f = Math.log(1 + cellN(c, kind)) / mx; return `<circle cx="${X(q).toFixed(1)}" cy="${Y(q).toFixed(1)}" r="${r.toFixed(1)}" fill="var(--heat)" fill-opacity="${(0.2 + 0.7 * f).toFixed(2)}"/>`; }).join("") + `</g>`;
+    }
+    s += "</g>";
+    const boxes = [], free = (bx, by, bw, bh) => !boxes.some(b => bx < b[0] + b[2] && bx + bw > b[0] && by < b[1] + b[3] && by + bh > b[1]);
+    labels.sort((a, b) => (b.here ? 1 : 0) - (a.here ? 1 : 0) || b.area - a.area).forEach(l => {
+      const tw = l.n.length * 6.6 + 8;
+      if (!l.here && l.area < tw * 12) return;
+      if (l.x < tw / 2 || l.x > W - tw / 2 || l.y < 12 || l.y > H - 6 || !free(l.x - tw / 2, l.y - 7, tw, 14)) return;
+      boxes.push([l.x - tw / 2, l.y - 7, tw, 14]);
+      s += `<text class="ex-label${l.here ? " ch" : ""}" x="${l.x.toFixed(1)}" y="${(l.y + 4).toFixed(1)}" text-anchor="middle">${esc(l.n)}</text>`;
+    });
+    return s + "</svg>";
+  }
+  function stateTable(abbr) {
+    if (abbr) {
+      const rows = (ST[abbr] || {}).hb || [];
+      if (!rows.length) return '<p class="meta">No samples in this state.</p>';
+      return `<div class="tbl"><table class="ex-list"><thead><tr><th>Subbasin</th><th class="n">Sites here</th><th class="n">Bio surveys</th></tr></thead><tbody>` +
+        rows.map(([h, n, b]) => `<tr class="go" data-go="${h}" data-view-to="w"><td><span class="sw" style="border-color:${colorOf(w(h))}"></span><a href="#w${h}" data-go="${h}" data-view-to="w">${esc(label(h))}</a></td><td class="n">${fmt(n)}</td><td class="n">${fmt(b)}</td></tr>`).join("") + "</tbody></table></div>";
+    }
+    const rows = Object.keys(ST).map(k => ST[k]).sort((a, b) => (num(b[sortKey]) ? b[sortKey] : -1) - (num(a[sortKey]) ? a[sortKey] : -1));
+    return `<div class="tbl"><table class="ex-list"><thead><tr><th>State</th><th class="n">Sites</th><th class="n">Bio surveys</th><th class="n">Sensitive</th><th class="n">vs exp.</th></tr></thead><tbody>` +
+      rows.map(x => `<tr class="go" data-st="${x.c}" data-code="st-${x.c}"><td><span class="sw" style="border-color:${colorOf(x)}"></span><a href="#st-${x.c}" data-st="${x.c}">${esc(x.n)}</a></td><td class="n">${fmt(x.s)}</td><td class="n">${fmt(x.bv)}</td><td class="n">${pct(x.so)}</td><td class="n">${pts(x.g)}</td></tr>`).join("") + "</tbody></table></div>";
+  }
+  async function renderStates(push) {
+    await ensureStates();
+    if (st && !SHEAT[st]) { try { SHEAT[st] = await fetch(`data/states/${st}.json`).then(r => r.json()); } catch (e) { SHEAT[st] = []; } }
+    if (push) { try { history.replaceState(null, "", st ? `#st-${st}` : "#st"); } catch (e) { /* keep the old address */ } }
+    const x = st ? ST[st] || {} : w("") || {}, parent = st ? w("") : null;
+    $(".ex-map").innerHTML = stateMap(st);
+    $(".ex-legend").innerHTML = legend("st");
+    $(".ex-crumbs").innerHTML = st ? `<a href="#st" data-st="">United States</a><span class="sep" aria-hidden="true">›</span><span aria-current="location">${esc(x.n || st)}</span>` : `<span aria-current="location">United States</span>`;
+    $(".ex-head").innerHTML = `<h2 class="ex-title">${esc(st ? x.n || st : "United States")}</h2><p class="ex-sub">${st ? `State · ${st}` : "By state"}</p>` +
+      `<div class="ex-actions">${st ? `<button type="button" data-st="">↑ All states</button>` : `<button type="button" class="primary" data-st="MD">Maryland</button>`}` +
+      `${st && num(x.la) ? `<a class="btn" href="${gmaps(x.la, x.lo)}" target="_blank" rel="noopener">Google Maps ↗</a>` : ""}</div>`;
+    $(".ex-body").innerHTML = (st ? "" : `<p class="ex-intro">The same samples grouped by state. Click a state to zoom in; from a state, its subbasins open in the watershed view.</p>`) +
+      cards(x, parent) + `<h3 class="ex-h">${st ? `Subbasins with samples in ${esc(x.n || st)}` : "States"} <span class="meta">${st ? "click to open in the watershed view" : "click a row to zoom in"}</span></h3>` + stateTable(st);
+    $(".ex-panel").scrollTop = 0;
+  }
+
   // ---------- render ----------
   async function render(push) {
+    root.querySelectorAll("[data-view]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.view === view)));
+    if (view === "s") {
+      $(".ex-tools-kind").innerHTML = KINDS.map(([k, t]) => `<button type="button" data-kind="${k}" aria-pressed="${k === kind}">${t}</button>`).join("");
+      $(".ex-colorby").value = colorBy; $(".ex-colorby").disabled = !showRings; $(".ex-rings").checked = showRings;
+      return renderStates(push);
+    }
     await Promise.all([ensure(cur), ensureGeo(cur)]);
     if (push) { const h = site ? `#s${site}@${cur}` : `#w${cur || "US"}`; try { history.replaceState(null, "", h); } catch (e) { /* keep the old address */ } }
     const x = w(cur) || {}, parent = cur ? w(cur.slice(0, -2)) : null;
@@ -390,9 +490,12 @@
   // ---------- events ----------
   root.addEventListener("click", e => {
     const k = e.target.closest("[data-kind]"); if (k) { kind = k.dataset.kind; render(false); return; }
+    const v = e.target.closest("[data-view]"); if (v) { view = v.dataset.view; if (view === "s") st = ""; sortKey = "bv"; sortDir = -1; render(true); return; }
+    const vt = e.target.closest("[data-view-to]"); if (vt) { e.preventDefault(); view = "w"; go(vt.dataset.go); return; }
+    const sb = e.target.closest("[data-st]"); if (sb) { e.preventDefault(); view = "s"; st = sb.dataset.st; render(true); return; }
     const so = e.target.closest("[data-sort]"); if (so) { const key = so.dataset.sort; sortDir = sortKey === key ? -sortDir : key === "n" ? 1 : -1; sortKey = key; render(false); return; }
     if (e.target.closest(".maplink")) return;
-    const st = e.target.closest("[data-site]"); if (st) { e.preventDefault(); openSite(st.dataset.site, cur); return; }
+    const siteEl = e.target.closest("[data-site]"); if (siteEl) { e.preventDefault(); openSite(siteEl.dataset.site, cur); return; }
     const g = e.target.closest("[data-go]"); if (g) { e.preventDefault(); go(g.dataset.go); }
   });
   root.addEventListener("change", e => {
@@ -405,6 +508,9 @@
   root.addEventListener("mouseout", e => { const el = e.target.closest("[data-code]"); if (el) hl(el.dataset.code, false); });
 
   function fromHash() {
+    const t = location.hash.match(/^#st(?:-([A-Z]{2}))?$/);
+    if (t) { view = "s"; st = t[1] || ""; return; }
+    view = "w";
     const m = location.hash.match(/^#s(\d+)@(\d{12})$/), n = location.hash.match(/^#w(\d*|US)$/);
     if (m) { cur = m[2]; site = m[1]; } else { cur = n && n[1] !== "US" ? n[1] : ""; site = null; }
   }
@@ -412,7 +518,7 @@
 
   fetch("data/lower48.json").then(r => r.json()).then(g => { GEO = g; if (Object.keys(W8).length) render(false); }).catch(() => {});
   fetch("data/watersheds.json").then(r => r.json()).then(d => {
-    W8 = d.w; HEAT = d.heat || [];
+    W8 = d.w; HEAT = d.heat || []; ST = d.st || {};
     fromHash(); render(false);
   }).catch(() => { $(".ex-map").innerHTML = '<div class="ex-empty">The watershed data could not be loaded.</div>'; });
 })();
