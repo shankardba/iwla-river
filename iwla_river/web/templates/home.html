@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% import "_blocks.html" as ui with context %}
+{% block main %}
+<section class="hero">
+  <div class="eyebrow">Izaak Walton League · Rockville Chapter · Save Our Streams</div>
+  <h1>Great Seneca Creek Record</h1>
+  <p class="lede">{{ meta.chapter_surveys }} stream surveys at two sites between {{ meta.first_year }} and {{ meta.last_year }}, read against {{ meta.usable | fmt }} volunteer surveys nationwide. {% if by_id.expected and by_id.expected.page.status == 'concern' %}The creek's overall score has held steady, but it is losing pollution-sensitive animals faster than its setting explains.{% endif %}</p>
+  <p class="meta">Data as of {{ meta.snapshot }}</p>
+</section>
+
+<div class="numbers">
+  <div><b>{{ meta.chapter_surveys }}</b><span>chapter surveys</span></div>
+  <div><b>{{ meta.first_year }}–{{ meta.last_year }}</b><span>years on record</span></div>
+  <div><b>{{ meta.usable | fmt }}</b><span>usable surveys nationwide</span></div>
+  <div><b>{{ meta.sites | fmt }}</b><span>sites with data</span></div>
+</div>
+
+<section class="block">
+  <h2>Key findings</h2>
+  <div class="cards">
+    {% for f in key %}{{ ui.card(f, show_section=True) }}{% endfor %}
+  </div>
+</section>
+
+<section class="block">
+  <h2>Explore</h2>
+  <div class="sections">
+    {% for s in sections %}
+    <div class="sec">
+      <h3><a href="{{ s.url }}">{{ s.title }}</a></h3>
+      <p>{{ s.intro }}</p>
+      <ul>
+        {% for f in s.findings %}<li><span class="dot {{ f.page.status }}"></span><a href="{{ f.url }}">{{ f.title }}</a></li>{% endfor %}
+      </ul>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="block">
+  <h2>Next</h2>
+  <ol class="next">
+    <li>Tags drawn from volunteers' notes (storms, construction, spills) to look for local causes of the loss of sensitive animals.</li>
+    <li>Scanned paper data sheets for the years with no Hub record, and plain-English questions over the tables.</li>
+    <li>A scheduled refresh, with an alert when a new survey falls outside its expected range.</li>
+  </ol>
+</section>
+{% endblock %}

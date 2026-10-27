@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% import "_blocks.html" as ui with context %}
+{% block title %}{{ section.title }} · Great Seneca Creek Record{% endblock %}
+{% block description %}{{ section.intro }}{% endblock %}
+{% block main %}
+<nav class="crumbs" aria-label="Breadcrumb"><a href="index.html">Overview</a> <span>›</span> {{ section.title }}</nav>
+<section class="hero">
+  <h1>{{ section.title }}</h1>
+  <p class="lede">{{ section.intro }}</p>
+</section>
+<div class="cards list">
+  {% for f in section.findings %}{{ ui.card(f) }}{% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,44 @@
+{% macro status(s) %}<span class="pill {{ {'concern': 'bad', 'watch': 'warn', 'good': 'good'}.get(s, 'neutral') }}">{{ status_words.get(s, s) }}</span>{% endmacro %}
+
+{% macro cell(c) %}{% if c is mapping and c.pill is defined %}<span class="pill {{ c.pill }}">{{ c.text }}</span>{% else %}{{ c }}{% endif %}{% endmacro %}
+
+{% macro numbers(nums) %}
+{% set nums = nums | selectattr(1) | list %}
+{% if nums %}
+<div class="numbers">
+  {% for v, l in nums %}<div><b>{{ v }}</b><span>{{ l }}</span></div>{% endfor %}
+</div>
+{% endif %}
+{% endmacro %}
+
+{% macro blocks(list) %}
+{% for b in list %}
+  {% if b.kind == "text" %}
+    {% for p in b.paras %}<p>{{ p }}</p>{% endfor %}
+  {% elif b.kind == "chart" %}
+    {{ specs.append(b.spec) or "" }}
+    <figure><div class="chart" data-chart="{{ specs | length - 1 }}"></div>{% if b.caption %}<figcaption>{{ b.caption }}</figcaption>{% endif %}</figure>
+  {% elif b.kind == "table" %}
+    <div class="tbl"><table>
+      <thead><tr>{% for c in b.cols %}<th class="{{ 'n' if c.num }}">{{ c.h }}</th>{% endfor %}</tr></thead>
+      <tbody>{% for r in b.rows %}<tr>{% for c in r %}<td class="{{ 'n' if b.cols[loop.index0].num }}">{{ cell(c) }}</td>{% endfor %}</tr>{% endfor %}</tbody>
+    </table></div>
+    {% if b.note %}<p class="meta">{{ b.note }}</p>{% endif %}
+  {% elif b.kind == "links" %}
+    {% set ok = b["items"] | selectattr(0, "in", by_id) | list %}
+    {% if ok %}
+    <div class="related"><h3>Related</h3><ul>
+      {% for fid, why in ok %}<li><a href="{{ by_id[fid].url }}">{{ by_id[fid].title }}</a> <span class="meta">— {{ why }}</span></li>{% endfor %}
+    </ul></div>
+    {% endif %}
+  {% endif %}
+{% endfor %}
+{% endmacro %}
+
+{% macro card(f, show_section=False) %}
+<a class="card" href="{{ f.url }}">
+  <span class="card-top">{% if show_section %}<span class="eyebrow">{{ sections | selectattr("id", "equalto", f.section) | map(attribute="title") | first }}</span>{% endif %}{{ status(f.page.status) }}</span>
+  <h3>{{ f.title }}</h3>
+  <p>{{ f.page.headline }}</p>
+</a>
+{% endmacro %}

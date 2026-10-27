@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{% block title %}Great Seneca Creek Record{% endblock %}</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="{% block description %}What 20 years of Save Our Streams surveys say about Great Seneca Creek.{% endblock %}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-in">
+    <a class="brand" href="index.html">Great Seneca Creek Record</a>
+    <span class="brand-sub">IWLA Rockville Chapter · Save Our Streams</span>
+  </div>
+</header>
+<div class="layout">
+  <nav class="side" aria-label="All findings">
+    <details class="side-toggle" open>
+      <summary>Browse findings</summary>
+      <ul class="tree">
+        <li><a href="index.html" {% if page_name == "index.html" %}aria-current="page"{% endif %}>Overview</a></li>
+        {% for s in sections %}
+        <li class="tree-sec">
+          <a href="{{ s.url }}" {% if page_name == s.url %}aria-current="page"{% endif %}>{{ s.title }}</a>
+          <ul>
+            {% for f in s.findings %}
+            <li><a href="{{ f.url }}" {% if page_name == f.url %}aria-current="page"{% endif %}><span class="dot {{ f.page.status }}"></span>{{ f.title }}</a></li>
+            {% endfor %}
+          </ul>
+        </li>
+        {% endfor %}
+      </ul>
+    </details>
+  </nav>
+  <main class="main">
+    {% block main %}{% endblock %}
+    <footer class="foot">
+      <p class="meta">Data: <a href="https://www.cleanwaterhub.org/site/467">Clean Water Hub</a> (Izaak Walton League), snapshot {{ meta.snapshot }}; USGS NLDI; EPA StreamCat; Open-Meteo. No personal details are shown.</p>
+      <p class="meta">Code and methods: <a href="https://github.com/shankardba/iwla-river">github.com/shankardba/iwla-river</a> · Machine-readable index: <a href="findings.json">findings.json</a></p>
+    </footer>
+  </main>
+</div>
+<script type="application/json" id="chart-specs">__CHART_SPECS__</script>
+<script src="assets/charts.js"></script>
+<script>
+  // Open the finding tree on wide screens, keep it folded on phones.
+  (function () { var d = document.querySelector(".side-toggle"); if (d && window.matchMedia("(max-width: 860px)").matches) d.open = false; })();
+</script>
+</body>
+</html>

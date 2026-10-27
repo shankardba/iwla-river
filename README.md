@@ -54,7 +54,6 @@ Or one step at a time:
 
 Sites tested: the chapter sites plus every site within 30 km with at least 8 usable biological surveys over 5 or more years.
 
-The findings page (`python -m iwla_river.site`) writes `docs/index.html`, served by GitHub Pages at https://shankardba.github.io/iwla-river/.
 
 ## Phase 3: expected-score model
 
@@ -73,6 +72,48 @@ python -m iwla_river.model      # train, validate by site, observed minus expect
 | `residual_trends` | site and target | seasonal Kendall test on observed minus expected |
 
 Targets: share of animal groups found that are pollution-sensitive (comparable across forms) and the score as a percentile within its form. Model: gradient-boosted trees (scikit-learn `HistGradientBoostingRegressor`), five folds grouped by site. The year is never an input, so change over time stays in the gap.
+
+## The findings site
+
+`python -m iwla_river.site` builds a multi-page site into `docs/`, served by GitHub Pages at https://shankardba.github.io/iwla-river/.
+
+```
+docs/index.html                 overview: key findings and every section
+docs/<section>.html             a section and its findings
+docs/<section>--<finding>.html  one finding: headline, key figures, charts, tables, related findings
+docs/findings.json              machine-readable index of every finding
+```
+
+Code lives in `iwla_river/web/`:
+
+| Path | Role |
+| --- | --- |
+| `registry.py` | sections, findings and the content blocks a finding returns (`text`, `chart`, `table`, `links`) |
+| `findings/*.py` | one module per section; each finding is one decorated function |
+| `db.py` | read-only database access and shared lookups |
+| `assets/charts.js` | chart library: `time`, `bars`, `stack`, `hbars`, `strip`, `heat`, `dotrank`, drawn from specs |
+| `templates/` | page layout (Jinja2) |
+| `build.py` | runs every finding and writes the pages |
+
+### Adding a finding
+
+Write one function in the section's module (or a new module under `findings/`; it is picked up automatically):
+
+```python
+@finding("chemistry", "chloride-vs-insects", "Salt peaks and sensitive animals", order=30, key=False)
+def chloride_vs_insects(db):
+    rows = db.rows("SELECT ...")
+    if not rows:
+        return None                      # left out when its data is missing
+    return Page(
+        headline="One sentence with the result and its number.",
+        status="watch",                  # concern | watch | steady | good | info
+        numbers=[("145 mg/L", "winter peak")],
+        blocks=[text("..."), chart({"type": "time", ...}, "caption"), table([("Col",), ("Num", 1)], rows),
+                links([("road-salt", "why it matters")])])
+```
+
+It gets its own page, appears in its section, the sidebar tree and `findings.json`, and with `key=True` on the overview. A new section is one `section(...)` call. A new chart type is one function in `assets/charts.js`.
 
 ## Later phases
 

@@ -99,3 +99,20 @@ def test_build_tables(tmp_path):
 
     md = report.build_report(db)
     assert "## Chapter sites" in md and "A Person" not in md and "rain yesterday" not in md
+
+
+def test_site_builds_with_only_phase_1_tables(tmp_path):
+    """Findings whose tables are missing are left out; the rest still build."""
+    import json as _json
+    from iwla_river.web.build import build
+    snap = write_snapshot(tmp_path)
+    db = tmp_path / "river.duckdb"
+    clean.build(snap, db)
+    out = build(db, tmp_path / "site", tmp_path / "body")
+    index = _json.loads((out / "findings.json").read_text())
+    ids = {f["id"] for f in index["findings"]}
+    assert "data-quality" in ids and "expected" not in ids
+    home = (out / "index.html").read_text()
+    assert "How clean the data is" in home and "A Person" not in home and "rain yesterday" not in home
+    for f in index["findings"]:
+        assert (out / f["url"]).exists()

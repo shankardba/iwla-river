@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% import "_blocks.html" as ui with context %}
+{% block title %}{{ item.title }} · Great Seneca Creek Record{% endblock %}
+{% block description %}{{ item.page.headline }}{% endblock %}
+{% block main %}
+<nav class="crumbs" aria-label="Breadcrumb"><a href="index.html">Overview</a> <span>›</span> <a href="{{ section.url }}">{{ section.title }}</a> <span>›</span> {{ item.title }}</nav>
+<article class="finding">
+  <header class="hero">
+    <div class="eyebrow">{{ section.title }}</div>
+    <h1>{{ item.title }}</h1>
+    <p class="lede">{{ ui.status(item.page.status) }} {{ item.page.headline }}</p>
+  </header>
+  {{ ui.numbers(item.page.numbers) }}
+  {{ ui.blocks(item.page.blocks) }}
+  {% if item.page.method %}
+  <details class="method"><summary>How this was worked out</summary><p>{{ item.page.method }}</p></details>
+  {% endif %}
+  <nav class="pager" aria-label="More in {{ section.title }}">
+    {% if prev %}<a href="{{ prev.url }}"><span class="meta">Previous</span>{{ prev.title }}</a>{% else %}<span></span>{% endif %}
+    {% if next %}<a class="nx" href="{{ next.url }}"><span class="meta">Next</span>{{ next.title }}</a>{% endif %}
+  </nav>
+</article>
+{% endblock %}
