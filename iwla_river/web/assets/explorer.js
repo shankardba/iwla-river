@@ -95,9 +95,12 @@
                      tip: `${x.n || x.c} (${x.c}): ${fmt(x.s)} sites, ${fmt(x.bv)} biological surveys${x.g != null ? `, ${pts(x.g)} vs expected` : ""}. Click to zoom in.` }));
     }
     if (!items.length) return `<p class="meta">No sites to draw here.</p>`;
+    // Inside a basin, every site in view is drawn faintly behind the bubbles to show the watershed's shape.
+    const bg = !isSites && code.length >= 4 ? (SITES[huc4(code)] || []).filter(s => s[3].startsWith(code)) : [];
+    const bgp = bg.map(s => albers(s[1], s[2]));
     const p = items.map(i => albers(i.la, i.lo));
     // The whole country is framed by its outline; smaller units by their own sites.
-    const fit = code === "" && GEO ? GEO.border.flat().map(([lo, la]) => albers(la, lo)) : p;
+    const fit = code === "" && GEO ? GEO.border.flat().map(([lo, la]) => albers(la, lo)) : p.concat(bgp);
     let x0 = Math.min(...fit.map(q => q[0])), x1 = Math.max(...fit.map(q => q[0])), y0 = Math.min(...fit.map(q => q[1])), y1 = Math.max(...fit.map(q => q[1]));
     const span = Math.max(x1 - x0, (y1 - y0) * W / H, 0.004);
     const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, sc = (W - (code === "" ? 20 : 80)) / span;
@@ -115,10 +118,11 @@
       if (d.includes("L")) s += `<path d="${d}" fill="none" class="${kind === "border" ? "map-border" : "map-state"}"/>`;
     }
     s += "</g>";
+    bgp.forEach(q => s += `<circle cx="${X(q).toFixed(1)}" cy="${Y(q).toFixed(1)}" r="1.6" fill="var(--muted)" fill-opacity=".35"/>`);
     items.forEach((it, i) => {
       const dot = `<circle cx="${X(p[i]).toFixed(1)}" cy="${Y(p[i]).toFixed(1)}" r="${it.r.toFixed(1)}" fill="${it.color}" fill-opacity="${isSites ? 0.8 : 0.55}" stroke="var(--surface)" stroke-width="1"><title>${esc(it.tip)}</title></circle>`;
       s += it.href ? `<a href="${it.href}" target="_blank" rel="noopener">${dot}</a>` : `<a href="#w${it.code}" data-go="${it.code}">${dot}</a>`;
-      if (!isSites && it.r > 11 && items.length < 40) {
+      if (!isSites && (items.length <= 15 || (it.r > 11 && items.length < 40))) {
         const nm = (w(it.code) || {}).n || it.code;
         s += `<text class="t-note" x="${X(p[i]).toFixed(1)}" y="${(Y(p[i]) + it.r + 12).toFixed(1)}" text-anchor="middle">${esc(nm.length > 22 ? nm.slice(0, 21) + "…" : nm)}</text>`;
       }

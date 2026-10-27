@@ -186,11 +186,13 @@ def expected(db):
     recent = rows[-6:][::-1]
     word = {"below": ("bad", "below expected"), "above": ("good", "above expected"), "within": ("neutral", "within range")}
     declining = s1.get("verdict") == "declining"
+    firm = declining and s1["p"] < 0.05  # p from 0.05 to 0.1: a signal to watch, not a settled result
+    widening = "is widening" if firm else "appears to be widening"
     return Page(
-        headline=(f"Site 1 finds fewer pollution-sensitive animals than its setting predicts, and the gap is widening "
+        headline=(f"Site 1 finds fewer pollution-sensitive animals than its setting predicts, and the gap {widening} "
                   f"({pfmt(s1['p'])}, about {abs(round(100 * s1['slope_per_decade']))} percentage points a decade).") if declining
                  else f"Site 1 shows {s1.get('verdict')} against what its setting predicts ({pfmt(s1.get('p', 1))}).",
-        status="concern" if declining else "steady",
+        status="concern" if firm else "watch" if declining else "steady",
         numbers=[(f"{abs(round(100 * s1['slope_per_decade']))} pts", "per decade, widening gap at Site 1") if declining else ("—", ""),
                  (f"{below} of 3", "latest Site 1 surveys below the expected range")],
         blocks=[
@@ -199,10 +201,12 @@ def expected(db):
                  "change over time stays in the gap between what a site finds and what it should find."),
             chart(spec, "Observed minus expected share of pollution-sensitive groups. Expected values come from a model that never saw these sites. "
                         "Shaded band: the range 80% of held-out surveys fall in."),
-            text(f"At Site 1 the gap {'is widening' if declining else 'shows ' + str(s1.get('verdict'))} ({pfmt(s1.get('p', 1))}): "
+            text(f"At Site 1 the gap {widening if declining else 'shows ' + str(s1.get('verdict'))} ({pfmt(s1.get('p', 1))}): "
                  f"the loss of sensitive animals is {'not ' if declining else ''}explained by season, "
                  f"{'recent rain, ' if rain else ''}water temperature, flow or team. Site 2 shows {s2.get('verdict')} "
-                 f"({pfmt(s2.get('p', 1))}), and Site 1's overall score percentile shows {p1.get('verdict')} ({pfmt(p1.get('p', 1))})."),
+                 f"({pfmt(s2.get('p', 1))}), and Site 1's overall score percentile shows {p1.get('verdict')} ({pfmt(p1.get('p', 1))}).",
+                 "" if firm or not declining else "With p between 0.05 and 0.1 this is a signal to watch rather than proof; "
+                 "a few more years of surveys, ideally in the same season each year, would settle it."),
             text(f"Each new survey can be checked against its expected range as soon as it is entered. {alert}"),
             table([("Date",), ("Site",), ("Form",), ("Sensitive share found", 1), ("Expected range", 1), ("Status",)],
                   [[r["date"], LABEL[r["site_id"]], PROTO.get(r["protocol"], r["protocol"]), pct(r["observed"]),

@@ -240,12 +240,19 @@ def stage_huc(points, workers: int = 3) -> None:
         s.headers.update(UA)
         for digits, layer in HUC_LAYERS.items():
             want = sorted({c[:digits] for c in codes.values()} - set(names))
-            for i in range(0, len(want), 150):
-                chunk = want[i:i + 150]
+            for i in range(0, len(want), 80):
+                chunk = want[i:i + 80]
                 where = f"huc{digits} IN ({','.join(repr(c) for c in chunk)})"
-                r = s.post(f"{WBD}/{layer}/query", data={"where": where, "outFields": f"huc{digits},name",
-                                                          "returnGeometry": "false", "f": "json"}, timeout=120)
-                for f in r.json().get("features", []):
+                for attempt in range(4):  # this service takes GET only, and is sometimes slow
+                    try:
+                        r = s.get(f"{WBD}/{layer}/query", params={"where": where, "outFields": f"huc{digits},name",
+                                                                  "returnGeometry": "false", "f": "json"}, timeout=120)
+                        feats = r.json().get("features", [])
+                        break
+                    except (requests.RequestException, ValueError):
+                        feats = []
+                        time.sleep(5 * (attempt + 1))
+                for f in feats:
                     a = f["attributes"]
                     names[a[f"huc{digits}"]] = a["name"]
             _save("huc_names.json", names)

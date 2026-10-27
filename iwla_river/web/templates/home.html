@@ -4,7 +4,7 @@
 <section class="hero">
   <div class="eyebrow">Izaak Walton League · Rockville Chapter · Save Our Streams</div>
   <h1>Great Seneca Creek Record</h1>
-  <p class="lede">{{ meta.chapter_surveys }} stream surveys at two sites between {{ meta.first_year }} and {{ meta.last_year }}, read against {{ meta.usable | fmt }} volunteer surveys nationwide. {% if by_id.expected and by_id.expected.page.status == 'concern' %}The creek's overall score has held steady, but it is losing pollution-sensitive animals faster than its setting explains.{% endif %}</p>
+  <p class="lede">{{ meta.chapter_surveys }} stream surveys at two sites between {{ meta.first_year }} and {{ meta.last_year }}, read against {{ meta.usable | fmt }} volunteer surveys nationwide. {% if by_id.expected and by_id.expected.page.status == 'concern' %}The creek's overall score has held steady, but it is losing pollution-sensitive animals faster than its setting explains.{% elif by_id.expected and by_id.expected.page.status == 'watch' %}The creek's overall score has held steady, but its share of pollution-sensitive animals appears to be slipping below what its setting predicts.{% endif %}</p>
   <p class="meta">Data as of {{ meta.snapshot }}</p>
 </section>
 
