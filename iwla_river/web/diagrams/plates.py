@@ -33,7 +33,7 @@ def _flow(x0, y0, x1, y1, bend=0, p=""):
 
 
 # ---------------------------------------------------------------- 1. riffle
-def riffle(p="rf"):
+def riffle(p="rf", labels=True):
     W, H = 760, 340
     surf = [(0, 96), (120, 96), (200, 94), (240, 90), (280, 93), (320, 89), (360, 93), (400, 89), (440, 93), (480, 90), (520, 95), (600, 100), (760, 100)]
     bed = [(0, 236), (140, 226), (220, 200), (520, 198), (580, 232), (640, 262), (760, 266)]
@@ -68,6 +68,8 @@ def riffle(p="rf"):
     inner += shape(smooth([(-100, -100), (100, -100), (100, -40), (60, -18), (0, -8), (-60, -16), (-100, -36)]), p, "stone", sw=1)
     inner += place(bugs.mayfly(p), -42, -6, 0.62, 168) + place(bugs.caddis_case(p), 4, -2, 0.56, 186) + place(bugs.stonefly(p), 48, -10, 0.58, 194)
     s += lens(p, "stone", (346, 206), 6, (118, 162), 76, place(inner, 118, 168))
+    if not labels:  # artwork only, for the share card
+        return figure(p, W, H, "A riffle", s)
     # labels
     s += label((360, 91), (380, 34), "Riffle: fast, shallow water over stones", "where Save Our Streams samples")
     s += label((690, 140), (700, 72), "Pool: slower and deeper", anchor="end")

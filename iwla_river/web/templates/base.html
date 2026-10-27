@@ -5,7 +5,26 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>{% block title %}Great Seneca Creek Record{% endblock %}</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="description" content="{% block description %}What 20 years of Save Our Streams surveys say about Great Seneca Creek.{% endblock %}">
+{% set desc %}{% block description %}What 20 years of Save Our Streams surveys say about Great Seneca Creek.{% endblock %}{% endset %}
+{% set ttl %}{{ self.title() }}{% endset %}
+<link rel="icon" href="assets/icon.svg?v={{ share_v }}" type="image/svg+xml">
+<link rel="icon" href="assets/favicon-32.png?v={{ share_v }}" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="{{ site_url }}assets/apple-touch-icon.png?v={{ share_v }}">
+<meta name="description" content="{{ desc | trim }}">
+<meta name="theme-color" content="#1d6a86">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Great Seneca Creek Record">
+<meta property="og:title" content="{{ ttl | trim }}">
+<meta property="og:description" content="{{ desc | trim }}">
+<meta property="og:url" content="{{ site_url }}{{ '' if page_name == 'index.html' else page_name }}">
+<meta property="og:image" content="{{ site_url }}assets/og-image.png?v={{ share_v }}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Great Seneca Creek Record: a stream riffle with the animals volunteers count, IWLA Rockville Chapter, Save Our Streams">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ ttl | trim }}">
+<meta name="twitter:description" content="{{ desc | trim }}">
+<meta name="twitter:image" content="{{ site_url }}assets/og-image.png?v={{ share_v }}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;500&display=swap">

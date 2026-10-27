@@ -10,6 +10,9 @@ DB_PATH = DATA / "river.duckdb"
 REPORTS = ROOT / "reports"
 TAXA_MAP = Path(__file__).resolve().parent / "taxa_map.csv"
 
+# Public address of the findings site; link previews need absolute URLs.
+SITE_URL = "https://shankardba.github.io/iwla-river/"
+
 # Sites the Rockville Chapter monitors on Great Seneca Creek.
 CHAPTER_SITES = {467: "IWLA-R Site 1 (GRESENCRE7.6)", 468: "IWLA-R Site 2 (GRESENCRE7.52)"}
 # The chapter's Salt Watch and Nitrate Watch readings are filed under separate site entries.
