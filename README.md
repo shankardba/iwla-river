@@ -113,6 +113,8 @@ def chloride_vs_insects(db):
                 links([("road-salt", "why it matters")])])
 ```
 
+Diagrams: `iwla_river/web/diagrams/` draws static SVG at build time, after Omniscala's figure conventions (shaded forms named by tone, dot-and-leader labels, amber "not to scale" lenses, light and dark palettes in `site.css`). `bugs.py` holds field-guide drawings of the animal groups; `plates.py` holds the diagrams, each built from the data it shows. Add one with `diagram(plates.my_plate(...), "caption")` in a finding's blocks.
+
 It gets its own page, appears in its section, the sidebar tree and `findings.json`, and with `key=True` on the overview. A new section is one `section(...)` call. A new chart type is one function in `assets/charts.js`.
 
 ## Later phases

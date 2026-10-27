@@ -83,6 +83,11 @@ def pill(status: str, words: str) -> dict:
     return {"pill": status, "text": words}
 
 
+def diagram(svg: str, caption: str = "") -> dict:
+    """A drawn diagram (static SVG from iwla_river.web.diagrams)."""
+    return {"kind": "diagram", "svg": svg, "caption": caption}
+
+
 def links(items: list) -> dict:
     """Related findings: [(finding_id, why)]."""
     return {"kind": "links", "items": items}

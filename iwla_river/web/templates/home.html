@@ -8,6 +8,8 @@
   <p class="meta">Data as of {{ meta.snapshot }}</p>
 </section>
 
+{% if hero_svg %}<figure class="diagram">{{ hero_svg | safe }}<figcaption>Illustration. Animals in the lens are drawn far larger than true.</figcaption></figure>{% endif %}
+
 <div class="numbers">
   <div><b>{{ meta.chapter_surveys }}</b><span>chapter surveys</span></div>
   <div><b>{{ meta.first_year }}–{{ meta.last_year }}</b><span>years on record</span></div>

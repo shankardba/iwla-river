@@ -4,7 +4,8 @@ from __future__ import annotations
 
 from ... import config as C
 from ..db import CHEM, fmt, mean, year
-from ..registry import Page, chart, finding, links, section, table, text
+from ..diagrams import plates
+from ..registry import Page, chart, diagram, finding, links, section, table, text
 
 section("chemistry", "Water chemistry",
         "Chloride from road salt and nitrate from fertilizer and sewage, measured with Salt Watch and Nitrate Watch "
@@ -49,6 +50,7 @@ def road_salt(db):
         status="watch",
         numbers=[(f"{peak:.0f} mg/L", "highest winter chloride in the creek"), (f"{md:.0f} mg/L", "Maryland Salt Watch median")],
         blocks=[text(f"Since {year(cl[0]['date'])} the chapter has tested its creek and lake for chloride with Salt Watch strips."),
+                diagram(plates.salt("salt", peak, s_med, md), "Illustration of the path; the gauge uses the chapter's readings. The gill and ions in the lens are drawn far larger than true."),
                 chart(spec, "Salt Watch chloride readings from the chapter's own sampling points. Dashed line: EPA chronic aquatic-life criterion for chloride, 230 mg/L."),
                 text(f"Road salt shows up every winter: winter peaks were {wp}. All readings so far sit below the EPA's chronic "
                      f"aquatic-life level of 230 mg/L and below the Maryland Salt Watch median of {md:.0f} mg/L.",

@@ -86,7 +86,8 @@ def build(db_path=C.DB_PATH, out: Path = OUT, body_out: Path = BODY_OUT) -> Path
     for a in (HERE / "assets").iterdir():
         shutil.copy(a, out / "assets" / a.name)
 
-    pages = {"index.html": render("home.html", "index.html",
+    from .diagrams import plates
+    pages = {"index.html": render("home.html", "index.html", hero_svg=plates.riffle("home"),
                                   key=[i for s in sections for i in s["findings"] if i["key"]])}
     for s in sections:
         pages[s["url"]] = render("section.html", s["url"], section=s)

@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 from ..db import CHAPTER, LABEL, PROTO, fmt, mean, pct, pfmt, season, verdict_pill, year
-from ..registry import Page, chart, finding, links, pill, section, table, text
+from ..diagrams import plates
+from ..registry import Page, chart, diagram, finding, links, pill, section, table, text
 
 section("chapter", "Great Seneca Creek",
         "The Rockville Chapter's two monitoring sites on Great Seneca Creek in Germantown, Maryland, "
@@ -86,6 +87,8 @@ def species_mix(db):
     spec = {"type": "heat", "title": f"Fewer {' and '.join(drops)}; more {' and '.join(rises)}",
             "subtitle": f"Share of surveys finding each group, {first} to {last}",
             "cols": periods, "colNotes": [f"{n_per[p]} surveys" for p in periods], "blocks": blocks_spec}
+    plate = plates.community("mix", [{"taxon": k, "tolerance": v["tol"], "early": share(v, first), "late": share(v, last)}
+                                     for k, v in taxa.items()], first, last)
     return Page(
         headline=f"Between {first} and {last}, {drops[0]} and {drops[1]} became rarer while {rises[0]} and {rises[1]} became regulars.",
         status="watch",
@@ -98,6 +101,7 @@ def species_mix(db):
                  f"and dobsonflies ({sh('dobsonflies')}) became regulars.",
                  f"Each site's surveys now share fewer groups with its first five years (average similarity before and since 2013: {d}).",
                  "Some of this may come from changes in who sorts and identifies the animals, which the survey records cannot show."),
+            diagram(plate, "Field-guide drawings, illustrative and not to scale. Bars: share of SOS surveys at the two chapter sites finding each group."),
             links([("trend-tests", "whether the shift is statistically clear"), ("expected", "whether season, weather or team explain it")]),
         ])
 
@@ -234,11 +238,18 @@ def score_parts(db):
                 "legend": [{"name": n, "color": "accent", "opacity": o, "shape": "square"} for _, n, o in keys] if i == 0 else [],
                 "y": {"max": top, "ticks": [0, 15, 30]}, "height": 250 if i == 0 else 190, "maxBar": 22, "bars": bars_}
         charts.append(chart(spec, "Sub-scores from each survey, stacked. Darker = more sensitive to pollution." if i == 1 else ""))
+    latest = [r for r in sos if r["site_id"] == 467][-1]
+    groups = db.rows(f"""SELECT t.taxon, t.tolerance FROM taxa t JOIN usable_surveys u USING (survey_uid)
+                         WHERE u.site_id = 467 AND u.protocol = 'sos_bio' AND u.survey_date = DATE '{latest['date']}' AND t.present
+                         ORDER BY t.tolerance, t.taxon""")
+    build_svg = plates.score_build("score", {"site": LABEL[467], "date": latest["date"], "groups": groups,
+                                             "sens": latest["sens"], "less": latest["less"], "tol": latest["tol"], "total": latest["total"]})
     return Page(
         headline=f"Pollution-sensitive animals drive the swings: they add {min(sens):.0f} to {max(sens):.0f} points per survey.",
         status="info",
         blocks=[text("The SOS score counts three points for each pollution-sensitive group found, two for each less-sensitive "
-                     "group and one for each tolerant group."), *charts,
+                     "group and one for each tolerant group."),
+                diagram(build_svg, "Site 1's most recent SOS survey. Drawings are illustrative and not to scale."), *charts,
                 text("Finding or missing one or two sensitive groups such as mayflies, stoneflies or riffle beetles moves the total "
                      "by several points. Tolerant animals such as midges and worms add little in any year, which is a good sign."),
                 links([("species-mix", "which groups are being found less often")])])

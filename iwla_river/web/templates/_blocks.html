@@ -18,6 +18,8 @@
   {% elif b.kind == "chart" %}
     {{ specs.append(b.spec) or "" }}
     <figure><div class="chart" data-chart="{{ specs | length - 1 }}"></div>{% if b.caption %}<figcaption>{{ b.caption }}</figcaption>{% endif %}</figure>
+  {% elif b.kind == "diagram" %}
+    <figure class="diagram">{{ b.svg | safe }}{% if b.caption %}<figcaption>{{ b.caption }}</figcaption>{% endif %}</figure>
   {% elif b.kind == "table" %}
     <div class="tbl"><table>
       <thead><tr>{% for c in b.cols %}<th class="{{ 'n' if c.num }}">{{ c.h }}</th>{% endfor %}</tr></thead>

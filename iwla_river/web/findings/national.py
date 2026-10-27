@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 from ..db import PROTO, fmt, pct
-from ..registry import Page, chart, finding, links, section, table, text
+from ..diagrams import plates
+from ..registry import Page, chart, diagram, finding, links, section, table, text
 
 section("national", "National picture",
         "What thousands of volunteer surveys across the country show, and the expected-score model trained on them "
@@ -39,6 +40,7 @@ def paving(db):
                  (f"{ctx.get('ws_forest_pct', 0):.0f}%", "of it forest")],
         blocks=[text("Stream ecologists call this the urban stream syndrome: the more of a watershed is paved or roofed, the faster "
                      "rain runs off it, carrying heat, salt and sediment, and the fewer pollution-sensitive animals live downstream."),
+                diagram(plates.watershed("ws", ib, ctx), "Illustration of two watersheds; the figures under each come from the national surveys, the bar from EPA StreamCat (NLCD 2019)."),
                 chart(spec, "All usable biological surveys with watershed land cover (EPA StreamCat, NLCD 2019). Observed averages, not model output."),
                 text(f"The watershed above the chapter's sites is {ci:.1f}% paved and roofed, in the band where losses usually start to "
                      "show. Paving there grew only from 11.8% to 12.8% between 2001 and 2019 (StreamCat), so the next step is to look for "
@@ -54,6 +56,9 @@ def model(db):
     ms = next(m for m in mm if m["target"] == "sensitive_share")
     imp = db.rows("""SELECT "group", r2_drop FROM model_importance WHERE target = 'sensitive_share' AND r2_drop > -0.01 ORDER BY r2_drop DESC""")
     rain = ms["rain_coverage"] > 0.5
+    gap_rows = db.rows("""SELECT (year(survey_date) // 5) * 5 AS period, median(resid) AS gap FROM expected
+                          WHERE site_id = 467 AND target = 'sensitive_share' GROUP BY 1 ORDER BY 1""")
+    flow_svg = plates.model_flow("mf", ms, [(f"{r['period']}–{str(min(r['period'] + 4, int(db.snapshot()[:4])))[2:]}", r["gap"]) for r in gap_rows])
     spec = {"type": "hbars", "title": f"{imp[0]['group']} carries most of the prediction",
             "rows": [{"label": r["group"], "value": r["r2_drop"], "valueLabel": f"{r['r2_drop']:.2f}",
                       "color": "accent" if i == 0 else "grey", "opacity": 1 if i == 0 else 0.6} for i, r in enumerate(imp)]}
@@ -61,7 +66,8 @@ def model(db):
         headline=f"Trained on {fmt(ms['surveys'])} surveys at {fmt(ms['sites'])} sites, it explains {round(100 * ms['r2'])}% of the variation at sites it never saw.",
         status="info",
         numbers=[(f"{ms['r2']:.2f}", "held-out R², sensitive share"), (f"{max(0, ms['baseline_r2']):.2f}", "season and form alone")],
-        blocks=[text("For every usable biological survey, the model predicts what it should find given its season, survey form, "
+        blocks=[diagram(flow_svg, "How the model is used. The line is Site 1's median gap in each five-year period."),
+                text("For every usable biological survey, the model predicts what it should find given its season, survey form, "
                      "watershed (paved and urban share, forest, farmland, soils, elevation, climate), "
                      f"{'rain and air temperature in the week before, ' if rain else ''}water temperature, flow and team. "
                      "It never sees the year, so change over time stays in the gap between observed and expected.",
