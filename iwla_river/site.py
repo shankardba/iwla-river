@@ -105,6 +105,24 @@ def collect(db_path=C.DB_PATH) -> dict:
         "mdChloride": rows(con, """
             SELECT round(median(c.value)) AS median FROM chemistry c JOIN usable_surveys s USING (survey_uid)
             WHERE c.protocol = 'salt' AND c.parameter = 'chloride' AND s.state = 'MD'""")[0]["median"],
+        # ---- phase 3 ----
+        "modelMetrics": rows(con, "SELECT * FROM model_metrics"),
+        "importance": rows(con, """SELECT target, "group", r2_drop FROM model_importance ORDER BY target, r2_drop DESC"""),
+        "expected": rows(con, f"""
+            SELECT target, site_id, protocol, survey_date::DATE AS date, observed, expected, exp_lo, exp_hi, resid, outside
+            FROM expected WHERE site_id IN ({chapter}) ORDER BY date"""),
+        "residTrends": rows(con, """SELECT target, site_id, is_chapter_site, n, mean_resid, p, slope_per_decade, verdict
+                                    FROM residual_trends"""),
+        "imperv": rows(con, """
+            WITH b AS (
+              SELECT e.target, e.observed, e.site_id, c.ws_impervious_pct AS imp,
+                CASE WHEN imp < 2 THEN 0 WHEN imp < 5 THEN 1 WHEN imp < 10 THEN 2
+                     WHEN imp < 15 THEN 3 WHEN imp < 25 THEN 4 ELSE 5 END AS bin
+              FROM expected e JOIN site_context c USING (site_id) WHERE c.ws_impervious_pct IS NOT NULL)
+            SELECT target, bin, ['0–2%', '2–5%', '5–10%', '10–15%', '15–25%', '25% +'][bin + 1] AS label,
+                   count(*) AS surveys, count(DISTINCT site_id) AS sites, avg(observed) AS mean
+            FROM b GROUP BY ALL ORDER BY target, bin"""),
+        "context": rows(con, f"SELECT * FROM site_context WHERE site_id IN ({chapter}) ORDER BY site_id"),
         "totals": rows(con, """
             SELECT count(*) FILTER (WHERE usable) AS usable_surveys,
                    count(DISTINCT site_id) FILTER (WHERE usable) AS sites_with_data,

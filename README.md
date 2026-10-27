@@ -56,8 +56,25 @@ Sites tested: the chapter sites plus every site within 30 km with at least 8 usa
 
 The findings page (`python -m iwla_river.site`) writes `docs/index.html`, served by GitHub Pages at https://shankardba.github.io/iwla-river/.
 
+## Phase 3: expected-score model
+
+```
+python -m iwla_river.enrich     # watershed land cover (USGS NLDI + EPA StreamCat) and 7-day rainfall (Open-Meteo); cached in data/cache
+python -m iwla_river.model      # train, validate by site, observed minus expected
+```
+
+| Table | One row per | Notes |
+| --- | --- | --- |
+| `site_context` | site | NHDPlus COMID; watershed % paved, urban, forest, crop, hay, wetland; elevation, soils, 1981–2010 climate, road crossings, population |
+| `survey_weather` | survey | rain over 1, 3 and 7 days and mean air maximum over 7 days before the survey |
+| `expected` | survey and target | observed, expected (from a model that never saw the site), gap, 80% expected range, below/within/above |
+| `model_metrics` | target | held-out R² and error, against season-and-form averages |
+| `model_importance` | target and input group | drop in held-out R² when the group is scrambled |
+| `residual_trends` | site and target | seasonal Kendall test on observed minus expected |
+
+Targets: share of animal groups found that are pollution-sensitive (comparable across forms) and the score as a percentile within its form. Model: gradient-boosted trees (scikit-learn `HistGradientBoostingRegressor`), five folds grouped by site. The year is never an input, so change over time stays in the gap.
+
 ## Later phases
 
-3. Expected-score model trained on national data; observed minus expected over time.
 4. Language layer: tag free-text notes, read scanned data sheets, answer questions.
 5. Dashboard, scheduled refresh on the home server, alerts.
