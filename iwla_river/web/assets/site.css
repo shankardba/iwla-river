@@ -73,11 +73,13 @@ p { margin: 0; max-width: 68ch; }
 /* top bar */
 .topbar { background: var(--surface); border-bottom: 1px solid var(--rule); position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; }
 body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--surface); }
-.topbar-in { max-width: 1200px; margin: 0 auto; padding-block: 12px;
+.topbar-in { max-width: 1200px; margin: 0 auto; padding-block: 8px;
   padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
-  display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; }
-.brand { font: 700 17px/1.2 var(--display); color: var(--ink); text-decoration: none; }
-.brand-sub { font: 13px/1.2 var(--display); color: var(--muted); }
+  display: flex; gap: 14px; align-items: center; min-height: 58px; }
+.brand-wrap { display: flex; align-items: baseline; gap: 12px; min-width: 0; }
+.brand { font: 700 17px/1.2 var(--display); color: var(--ink); text-decoration: none; white-space: nowrap; }
+.brand-sub { font: 13px/1.2 var(--display); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+@media (max-width: 560px) { .brand-sub { display: none; } }
 
 /* page layout: reading column; the findings panel is closed by default and opens beside it (wide) or over it (narrow) */
 .nav-btn { display: inline-flex; align-items: center; gap: 6px; font: 600 14px/1 var(--display); color: var(--ink);

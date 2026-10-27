@@ -29,6 +29,8 @@ CACHE = C.DATA / "cache"
 NLDI = "https://api.water.usgs.gov/nldi/linked-data/comid/position"
 STREAMCAT = "https://api.epa.gov/StreamCat/streams/metrics"
 METEO = "https://archive-api.open-meteo.com/v1/archive"
+WBD = "https://hydro.nationalmap.gov/arcgis/rest/services/wbd/MapServer"
+HUC_LAYERS = {2: 1, 4: 2, 6: 3, 8: 4, 10: 5, 12: 6}  # digits -> WBD map layer
 UA = {"User-Agent": "iwla-river research (read-only)"}
 
 # Watershed metrics (NLCD 2019 land cover, soils, 1981-2010 climate, road crossings, population).
@@ -151,6 +153,82 @@ def stage_rain(rows, workers: int = 4) -> None:
     _save("rain.json", cache)
 
 
+def stage_huc(points, workers: int = 4) -> None:
+    """USGS Watershed Boundary Dataset: the 12-digit hydrologic unit (HUC12) each site sits in."""
+    cache = _load("huc.json")
+    todo = [(sid, la, lo) for sid, la, lo in points if str(sid) not in cache]
+    print(f"huc: {len(todo)} sites to look up ({len(cache)} cached)", flush=True)
+    lock = threading.Lock()
+    next_slot = [time.monotonic()]
+
+    def wait_turn():
+        with lock:
+            now = time.monotonic()
+            slot = max(now, next_slot[0])
+            next_slot[0] = slot + 0.12  # at most about 8 requests a second
+        time.sleep(max(0.0, slot - now))
+
+    def fetch(item):
+        sid, la, lo = item
+        params = {"geometry": f"{lo},{la}", "geometryType": "esriGeometryPoint", "inSR": 4326,
+                  "spatialRel": "esriSpatialRelIntersects", "outFields": "huc12", "returnGeometry": "false", "f": "json"}
+        for attempt in range(4):
+            wait_turn()
+            try:
+                r = requests.get(f"{WBD}/6/query", params=params, timeout=60, headers=UA)
+                feats = r.json().get("features", []) if r.ok else None
+            except (requests.RequestException, ValueError):
+                feats = None
+            if feats is not None:
+                return sid, feats[0]["attributes"]["huc12"] if feats else ""
+            time.sleep(5 * (attempt + 1))
+        return sid, None
+
+    done = 0
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        for sid, huc in pool.map(fetch, todo):
+            if huc is not None:
+                cache[str(sid)] = huc
+            done += 1
+            if done % 500 == 0:
+                _save("huc.json", cache)
+                print(f"  huc {done}/{len(todo)} at {dt.datetime.now():%H:%M}", flush=True)
+    _save("huc.json", cache)
+
+    # Names for every level of each unit found.
+    names = _load("huc_names.json")
+    codes = {k: v for k, v in cache.items() if v}
+    with requests.Session() as s:
+        s.headers.update(UA)
+        for digits, layer in HUC_LAYERS.items():
+            want = sorted({c[:digits] for c in codes.values()} - set(names))
+            for i in range(0, len(want), 150):
+                chunk = want[i:i + 150]
+                where = f"huc{digits} IN ({','.join(repr(c) for c in chunk)})"
+                r = s.post(f"{WBD}/{layer}/query", data={"where": where, "outFields": f"huc{digits},name",
+                                                          "returnGeometry": "false", "f": "json"}, timeout=120)
+                for f in r.json().get("features", []):
+                    a = f["attributes"]
+                    names[a[f"huc{digits}"]] = a["name"]
+            _save("huc_names.json", names)
+            print(f"  names: level {digits}, {len(want)} looked up", flush=True)
+
+
+def write_huc(con) -> None:
+    huc = _load("huc.json")
+    names = _load("huc_names.json")
+    rows = [{"site_id": int(k), "huc12": v, **{f"huc{d}": v[:d] for d in (2, 4, 6, 8, 10)}} for k, v in huc.items() if v]
+    nm = [{"huc": k, "digits": len(k), "name": v} for k, v in names.items()]
+    for name, df in {"site_huc": pd.DataFrame(rows), "huc_names": pd.DataFrame(nm)}.items():
+        if df.empty:
+            continue
+        con.execute(f"DROP TABLE IF EXISTS {name}")
+        con.register("df", df)
+        con.execute(f"CREATE TABLE {name} AS SELECT * FROM df")
+        con.unregister("df")
+    print({"site_huc": len(rows), "huc_names": len(nm)})
+
+
 def write_tables(con) -> None:
     comid = _load("comid.json")
     sc = _load("streamcat.json")
@@ -194,7 +272,7 @@ def write_tables(con) -> None:
 
 def main(argv=None) -> None:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--stage", default="comid,streamcat,rain")
+    ap.add_argument("--stage", default="comid,streamcat,rain,huc")
     args = ap.parse_args(argv)
     stages = args.stage.split(",")
     # Read what the fetches need, then close: fetching can take an hour and must not lock the database.
@@ -202,14 +280,25 @@ def main(argv=None) -> None:
         sites = bio_sites(con)
         rows = con.execute("""SELECT DISTINCT lat, lon, survey_date FROM features
                               WHERE lat IS NOT NULL AND survey_date >= DATE '1950-01-01'""").fetchall()
+        points = con.execute("""SELECT DISTINCT site_id, lat, lon FROM usable_surveys
+                                WHERE lat IS NOT NULL AND lon IS NOT NULL""").fetchall()
     if "comid" in stages:
         stage_comid(sites)
     if "streamcat" in stages:
         stage_streamcat()
     if "rain" in stages:
         stage_rain(rows)
-    with duckdb.connect(str(C.DB_PATH)) as con:
-        write_tables(con)
+    if "huc" in stages:
+        stage_huc(points)
+    for attempt in range(10):  # another step may hold the database for a moment
+        try:
+            with duckdb.connect(str(C.DB_PATH)) as con:
+                if stages != ["huc"]:
+                    write_tables(con)
+                write_huc(con)
+            break
+        except duckdb.IOException:
+            time.sleep(15)
 
 
 if __name__ == "__main__":
