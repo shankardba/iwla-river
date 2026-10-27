@@ -28,7 +28,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="assets/site.css">
+<link rel="stylesheet" href="assets/site.css?v={{ asset_v["site.css"] }}">
 </head>
 <body>
 <header class="topbar">
@@ -70,8 +70,8 @@
   </main>
 </div>
 <script type="application/json" id="chart-specs">__CHART_SPECS__</script>
-<script src="assets/charts.js"></script>
-<script src="assets/explorer.js"></script>
+<script src="assets/charts.js?v={{ asset_v["charts.js"] }}"></script>
+<script src="assets/explorer.js?v={{ asset_v["explorer.js"] }}"></script>
 <script>
   // Findings panel: closed by default; the viewer's choice is remembered on wide screens.
   (function () {

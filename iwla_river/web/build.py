@@ -126,7 +126,9 @@ def build(db_path=C.DB_PATH, out: Path = OUT, body_out: Path = BODY_OUT) -> Path
                       trim_blocks=True, lstrip_blocks=True)
     env.filters["fmt"] = fmt
     from .share import SHARE_VERSION
-    common = {"sections": sections, "meta": meta, "status_words": STATUS_WORDS, "by_id": by_id,
+    import hashlib
+    asset_v = {a.name: hashlib.sha1(a.read_bytes()).hexdigest()[:8] for a in (HERE / "assets").iterdir() if a.is_file()}
+    common = {"sections": sections, "meta": meta, "status_words": STATUS_WORDS, "by_id": by_id, "asset_v": asset_v,
               "site_url": C.SITE_URL, "share_v": SHARE_VERSION}
 
     def render(template: str, name: str, **ctx) -> str:
