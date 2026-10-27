@@ -8,7 +8,12 @@
   <p class="meta">Data as of {{ meta.snapshot }}</p>
 </section>
 
-{% if hero_svg %}<figure class="diagram">{{ hero_svg | safe }}<figcaption>Illustration. Animals in the lens are drawn far larger than true.</figcaption></figure>{% endif %}
+{% if explorer_chapter is not none %}
+<section class="block home-explorer">
+  <p class="meta">Where samples are taken, by watershed. Filter by sample type, click a ring to zoom into a watershed, or jump to Great Seneca Creek.</p>
+  {{ ui.explorer(explorer_chapter) }}
+</section>
+{% endif %}
 
 <div class="numbers">
   <div><b>{{ meta.chapter_surveys }}</b><span>chapter surveys</span></div>
@@ -38,6 +43,14 @@
     {% endfor %}
   </div>
 </section>
+
+{% if hero_svg %}
+<section class="block">
+  <h2>How volunteers sample</h2>
+  <p>Save Our Streams volunteers work in riffles, the fast, shallow, stony stretches of a stream. They stir the stones upstream of a net and count the animals that wash in.</p>
+  <figure class="diagram">{{ hero_svg | safe }}<figcaption>Illustration. Animals in the lens are drawn far larger than true.</figcaption></figure>
+</section>
+{% endif %}
 
 <section class="block">
   <h2>Next</h2>

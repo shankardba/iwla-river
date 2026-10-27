@@ -81,7 +81,16 @@ def write_watershed_data(db: DB, out: Path) -> None:
     top[""] = pack({"code": "", "name": "United States", "sites": us["sites"], "bio_surveys": bio, **{k: so[k] for k in ("so", "se", "g")}}) | \
         {"so": round(so["so"], 3), "se": round(so["se"], 3), "g": round(so["g"], 3)}
     (out / "data" / "huc4").mkdir(parents=True, exist_ok=True)
-    (out / "data" / "watersheds.json").write_text(json.dumps({"w": top}, separators=(",", ":")))
+    # Heat cells of a quarter degree (about 25 km) by sample type: aggregated, so no single site is located by them.
+    heat = db.rows("""
+        SELECT round(lat * 4) / 4 AS la, round(lon * 4) / 4 AS lo,
+               count(*) FILTER (WHERE protocol IN ('sos_bio', 'va_rocky', 'va_muddy')) AS bio,
+               count(*) FILTER (WHERE protocol = 'salt') AS salt,
+               count(*) FILTER (WHERE protocol = 'nitrate') AS no3,
+               count(*) FILTER (WHERE protocol = 'sos_chem') AS chem
+        FROM usable_surveys WHERE lat IS NOT NULL AND lon IS NOT NULL GROUP BY 1, 2""")
+    heat = [[r["la"], r["lo"], r["bio"], r["salt"], r["no3"], r["chem"]] for r in heat]
+    (out / "data" / "watersheds.json").write_text(json.dumps({"w": top, "heat": heat}, separators=(",", ":")))
     geo = HERE / "geo" / "lower48.json"
     if geo.exists():
         shutil.copy(geo, out / "data" / "lower48.json")
@@ -89,7 +98,9 @@ def write_watershed_data(db: DB, out: Path) -> None:
         SELECT h.huc12, u.site_id, round(any_value(u.lat), 5) AS lat, round(any_value(u.lon), 5) AS lon,
                count(*) FILTER (WHERE u.protocol IN ('sos_bio', 'va_rocky', 'va_muddy')) AS bio,
                count(*) FILTER (WHERE u.protocol NOT IN ('sos_bio', 'va_rocky', 'va_muddy')) AS other,
-               left(coalesce(any_value(u.site_name), ''), 40) AS name, any_value(st.water_source) AS water_source
+               left(coalesce(any_value(u.site_name), ''), 40) AS name, any_value(st.water_source) AS water_source,
+               count(*) FILTER (WHERE u.protocol = 'salt') AS salt, count(*) FILTER (WHERE u.protocol = 'nitrate') AS no3,
+               count(*) FILTER (WHERE u.protocol = 'sos_chem') AS chem
         FROM usable_surveys u JOIN site_huc h USING (site_id) LEFT JOIN sites st USING (site_id)
         GROUP BY h.huc12, u.site_id""")
     from .db import public_site
@@ -101,7 +112,8 @@ def write_watershed_data(db: DB, out: Path) -> None:
             small.setdefault(r["code"][:4], {})[r["code"]] = pack(r)
     by4 = {}
     for s in sites:
-        by4.setdefault(s["huc12"][:4], []).append([s["site_id"], s["lat"], s["lon"], s["huc12"], s["bio"], s["other"], s["name"]])
+        by4.setdefault(s["huc12"][:4], []).append([s["site_id"], s["lat"], s["lon"], s["huc12"], s["bio"], s["other"], s["name"],
+                                                   s["salt"], s["no3"], s["chem"]])
     for p in (out / "data" / "huc4").glob("*.json"):
         p.unlink()
     for h in set(small) | set(by4):
@@ -149,7 +161,9 @@ def build(db_path=C.DB_PATH, out: Path = OUT, body_out: Path = BODY_OUT) -> Path
         shutil.copy(a, out / "assets" / a.name)
 
     from .diagrams import plates
+    from .findings.watersheds import chapter_huc, complete
     pages = {"index.html": render("home.html", "index.html", hero_svg=plates.riffle("home"),
+                                  explorer_chapter=(chapter_huc(db) or "") if complete(db) else None,
                                   key=[i for s in sections for i in s["findings"] if i["key"]])}
     for s in sections:
         pages[s["url"]] = render("section.html", s["url"], section=s)

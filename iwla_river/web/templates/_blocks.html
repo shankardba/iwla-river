@@ -11,6 +11,18 @@
 {% endif %}
 {% endmacro %}
 
+{% macro explorer(chapter) %}
+<div class="explorer" id="explorer" data-chapter="{{ chapter }}">
+  <nav class="ex-crumbs" aria-label="Watershed path"></nav>
+  <h2 class="ex-title"></h2>
+  <div class="ex-actions"></div>
+  <figure><div class="ex-controls"></div><div class="ex-map chart"><p class="meta">Loading watersheds…</p></div><div class="ex-legend"></div></figure>
+  <div class="tbl ex-metrics"></div>
+  <h3 class="ex-kids-title"></h3>
+  <div class="tbl ex-kids"></div>
+</div>
+{% endmacro %}
+
 {% macro blocks(list) %}
 {% for b in list %}
   {% if b.kind == "text" %}
@@ -21,15 +33,7 @@
   {% elif b.kind == "diagram" %}
     <figure class="diagram">{{ b.svg | safe }}{% if b.caption %}<figcaption>{{ b.caption }}</figcaption>{% endif %}</figure>
   {% elif b.kind == "explorer" %}
-    <div class="explorer" id="explorer" data-chapter="{{ b.chapter }}">
-      <nav class="ex-crumbs" aria-label="Watershed path"></nav>
-      <h2 class="ex-title"></h2>
-      <div class="ex-actions"></div>
-      <figure><div class="ex-map chart"><p class="meta">Loading watersheds…</p></div><div class="ex-legend"></div></figure>
-      <div class="tbl ex-metrics"></div>
-      <h3 class="ex-kids-title"></h3>
-      <div class="tbl ex-kids"></div>
-    </div>
+    {{ explorer(b.chapter) }}
   {% elif b.kind == "table" %}
     <div class="tbl"><table>
       <thead><tr>{% for c in b.cols %}<th class="{{ 'n' if c.num }}">{{ c.h }}</th>{% endfor %}</tr></thead>

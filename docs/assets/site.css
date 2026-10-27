@@ -19,6 +19,7 @@
 
 /* Diagram palette: named for what it shows (after Omniscala's TONE); light values, dark twins below. */
 :root {
+  --heat: #d9480f;
   --dg-line: #3b3a33; --dg-flow: #2a7fa6; --dg-nts: #b45309; --dg-sky: #e6f1f5;
   --dg-water: #9fd0e4; --dg-water-deep: #4a90b0; --dg-stone: #a7a294; --dg-stone-dark: #77736a; --dg-sand: #d9c9a3;
   --dg-soil: #9a7b55; --dg-leaf: #6fa35a; --dg-leaf-dark: #3f7a3a; --dg-bark: #7a5a3c; --dg-grass: #8dbb63;
@@ -28,6 +29,7 @@
   --dg-grey: #8e9590; --dg-beige: #d8ccb0; --dg-accent: #1d6a86;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --heat: #ff8a3d;
   --dg-line: #d8d2c2; --dg-flow: #7cc7e6; --dg-nts: #ffb547; --dg-sky: #18272c;
   --dg-water: #2f6f8c; --dg-water-deep: #1a4257; --dg-stone: #7d796f; --dg-stone-dark: #5a574f; --dg-sand: #8f8266;
   --dg-soil: #6e5638; --dg-leaf: #5e8f4a; --dg-leaf-dark: #3e6a35; --dg-bark: #6a4e34; --dg-grass: #5f8a44;
@@ -36,6 +38,7 @@
   --dg-green: #6f9a4a; --dg-tan: #b8a47c; --dg-rust: #a85a44; --dg-pink: #c98585; --dg-blood: #c0464d;
   --dg-grey: #8a918c; --dg-beige: #b9ae94; --dg-accent: #5fb3d3; } }
 :root[data-theme="dark"] {
+  --heat: #ff8a3d;
   --dg-line: #d8d2c2; --dg-flow: #7cc7e6; --dg-nts: #ffb547; --dg-sky: #18272c;
   --dg-water: #2f6f8c; --dg-water-deep: #1a4257; --dg-stone: #7d796f; --dg-stone-dark: #5a574f; --dg-sand: #8f8266;
   --dg-soil: #6e5638; --dg-leaf: #5e8f4a; --dg-leaf-dark: #3e6a35; --dg-bark: #6a4e34; --dg-grass: #5f8a44;
@@ -203,3 +206,13 @@ ol.next { margin: 0; padding-left: 22px; display: flex; flex-direction: column; 
 .ex-kids tr.go:hover td { background: color-mix(in srgb, var(--accent) 6%, transparent); }
 .ex-map svg a circle { cursor: pointer; }
 .ex-map svg a:hover circle { stroke: var(--ink); stroke-width: 1.5; fill-opacity: .9; }
+.ex-controls { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
+.ex-seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--rule); border-radius: 7px; overflow: hidden; }
+.ex-seg button { font: 600 12.5px/1 var(--display); padding: 7px 10px; border: 0; border-right: 1px solid var(--rule); background: var(--surface); color: var(--muted); cursor: pointer; }
+.ex-seg button:last-child { border-right: 0; }
+.ex-seg button[aria-pressed="true"] { background: color-mix(in srgb, var(--heat) 16%, transparent); color: var(--ink); }
+.ex-seg button:focus-visible, .ex-toggle input:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.ex-toggle { font: 13px/1 var(--display); color: var(--muted); display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+.ex-legend i.heat { background: var(--heat); opacity: .75; border-radius: 2px; }
+.ex-legend i.ring { background: transparent; border: 2px solid; width: 8px; height: 8px; }
+.ex-label { font: 600 11.5px var(--display); fill: var(--ink); paint-order: stroke; stroke: var(--surface); stroke-width: 3px; stroke-linejoin: round; }
