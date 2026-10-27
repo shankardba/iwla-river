@@ -55,8 +55,8 @@ def build_report(db_path=C.DB_PATH) -> str:
             "A survey is usable when it has a date, is not deleted or archived, and is not a duplicate.", "",
             md_table(q("""
                 SELECT protocol, count(*) AS records, sum(usable::int) AS usable,
-                       sum((survey_date IS NULL)::int) AS no_date, sum(is_deleted::int) AS deleted,
-                       sum(is_archived::int) AS archived, sum((duplicate_of IS NOT NULL)::int) AS duplicates,
+                       sum((survey_date IS NULL)::int) AS no_date, sum(date_invalid::int) AS bad_date,
+                       sum(is_deleted::int) AS deleted, sum(is_archived::int) AS archived, sum((duplicate_of IS NOT NULL)::int) AS duplicates,
                        count(DISTINCT site_id) AS sites,
                        min(survey_date) FILTER (WHERE usable)::varchar AS first,
                        max(survey_date) FILTER (WHERE usable)::varchar AS last

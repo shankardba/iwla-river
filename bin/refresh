@@ -5,3 +5,4 @@ cd "$(dirname "$0")/.."
 .venv/bin/python -m iwla_river.pull "$@"
 .venv/bin/python -m iwla_river.clean
 .venv/bin/python -m iwla_river.report
+.venv/bin/python -m iwla_river.site

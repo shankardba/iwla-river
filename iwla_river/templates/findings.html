@@ -1,0 +1,338 @@
+<title>Great Seneca Creek Record</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="What 20 years of Save Our Streams surveys say about Great Seneca Creek, and how clean the data is.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column like a field notebook; charts run the full column width. */
+:root {
+  --bg: #f5f7f6;
+  --surface: #ffffff;
+  --ink: #17262b;
+  --muted: #5b6b70;
+  --rule: #d9e1e0;
+  --accent: #1d6a86;
+  --grey: #9aa7a8;
+  --good: #3f7d4e;
+  --warn: #b7791f;
+  --bad: #b4473a;
+  --c1: #1d6a86; --c2: #c08a2b; --c3: #6b8f3c; --c4: #8a5a8f;
+  --display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --body: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f1719; --surface: #152023; --ink: #e3ebea; --muted: #9db0b2; --rule: #2a3a3d;
+  --accent: #5fb3d3; --grey: #6f8083; --good: #6fb67f; --warn: #e0a84a; --bad: #e07a6c;
+  --c1: #5fb3d3; --c2: #e0a84a; --c3: #9cc46a; --c4: #c296c7; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #0f1719; --surface: #152023; --ink: #e3ebea; --muted: #9db0b2; --rule: #2a3a3d;
+  --accent: #5fb3d3; --grey: #6f8083; --good: #6fb67f; --warn: #e0a84a; --bad: #e07a6c;
+  --c1: #5fb3d3; --c2: #e0a84a; --c3: #9cc46a; --c4: #c296c7; color-scheme: dark; }
+
+body { background: var(--bg); color: var(--ink); font: 17px/1.6 var(--body); }
+.wrap { max-width: 880px; margin: 0 auto; padding-block: 40px 64px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; flex-direction: column; gap: 56px; }
+header { display: flex; flex-direction: column; gap: 12px; }
+.eyebrow { font: 600 12px/1.4 var(--display); letter-spacing: .09em; text-transform: uppercase; color: var(--accent); }
+h1 { font: 700 clamp(32px, 6vw, 52px)/1.05 var(--display); margin: 0; letter-spacing: -.01em; text-wrap: balance; }
+h2 { font: 600 24px/1.2 var(--display); margin: 0; text-wrap: balance; }
+h3 { font: 600 16px/1.3 var(--display); margin: 0; }
+p { margin: 0; max-width: 66ch; }
+.lede { font-size: 19px; color: var(--ink); }
+.meta { font: 13px/1.5 var(--mono); color: var(--muted); }
+section { display: flex; flex-direction: column; gap: 16px; }
+.num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+.glance { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; background: var(--rule);
+  border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; }
+.glance div { background: var(--surface); padding: 16px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.glance b { font: 600 28px/1.1 var(--mono); font-variant-numeric: tabular-nums; }
+.glance span { font: 13px/1.4 var(--display); color: var(--muted); }
+@media (max-width: 640px) { .glance { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+figure { margin: 0; background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding: 16px; display: flex; flex-direction: column; gap: 8px; }
+figure svg { width: 100%; height: auto; display: block; }
+figcaption { font: 12px/1.5 var(--mono); color: var(--muted); }
+svg text { font-family: var(--display); }
+.t-title { font-size: 15px; font-weight: 600; fill: var(--ink); }
+.t-sub, .t-axis { font-size: 12px; fill: var(--muted); }
+.t-label { font-size: 12px; fill: var(--ink); }
+.t-note { font-size: 11.5px; fill: var(--muted); }
+.grid { stroke: var(--rule); }
+.axis { stroke: var(--grey); }
+.ref { stroke: var(--muted); stroke-dasharray: 5 4; stroke-width: 1.5; fill: none; }
+
+.tbl { overflow-x: auto; border: 1px solid var(--rule); border-radius: 6px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font: 14px/1.4 var(--display); }
+th, td { padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--rule); white-space: nowrap; }
+th { font-weight: 600; font-size: 12px; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+td.n, th.n { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; }
+tr:last-child td { border-bottom: 0; }
+.pill { display: inline-block; padding: 1px 8px; border-radius: 999px; font: 600 12px/1.6 var(--display); }
+.pill.good { color: var(--good); background: color-mix(in srgb, var(--good) 14%, transparent); }
+.pill.warn { color: var(--warn); background: color-mix(in srgb, var(--warn) 16%, transparent); }
+.pill.bad { color: var(--bad); background: color-mix(in srgb, var(--bad) 14%, transparent); }
+ol.next { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 6px; max-width: 66ch; }
+.callout { border-left: 3px solid var(--warn); padding: 4px 0 4px 16px; }
+footer { border-top: 1px solid var(--rule); padding-top: 16px; display: flex; flex-direction: column; gap: 6px; }
+a { color: var(--accent); }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Izaak Walton League · Rockville Chapter · Save Our Streams</div>
+    <h1>Great Seneca Creek Record</h1>
+    <p class="lede" id="lede"></p>
+    <p class="meta" id="meta"></p>
+  </header>
+
+  <div class="glance" id="glance" aria-label="At a glance"></div>
+
+  <section>
+    <h2>Stream health has held steady</h2>
+    <p id="trend-text"></p>
+    <figure><div id="chart-trend"></div><figcaption>Clean Water Hub, SOS Biological surveys at the two chapter sites. One dot per survey; dashed lines are the mean of each period.</figcaption></figure>
+  </section>
+
+  <section>
+    <h2>What moves the score</h2>
+    <p id="parts-text"></p>
+    <figure><div id="chart-parts"></div><figcaption>Sub-scores from each survey, stacked. Darker = more sensitive to pollution.</figcaption></figure>
+    <p id="season-text"></p>
+    <figure><div id="chart-season"></div><figcaption>Spring = March to June, summer = July to September, fall = October to February.</figcaption></figure>
+  </section>
+
+  <section>
+    <h2>The chapter changed survey forms in 2024</h2>
+    <p id="va-text"></p>
+    <div class="tbl" id="tbl-va"></div>
+  </section>
+
+  <section>
+    <h2>Data quality</h2>
+    <p id="temp-text"></p>
+    <figure><div id="chart-temp"></div><figcaption>Water temperature as entered, chapter sites. The Hub stores no unit.</figcaption></figure>
+    <p>Every record in the national tables, by survey form. A survey is usable when it has a date, is not deleted or archived, and is not a duplicate of another record.</p>
+    <div class="tbl" id="tbl-protocols"></div>
+    <p>How often the context needed for modelling is filled in, biological surveys nationwide (% of usable surveys).</p>
+    <div class="tbl" id="tbl-complete"></div>
+  </section>
+
+  <section>
+    <h2>Neighbours for comparison</h2>
+    <p>Hub sites within 15 km of the chapter's teaching site. Sites with many surveys can show whether a change at Great Seneca Creek is local or shared across the area.</p>
+    <div class="tbl" id="tbl-nearby"></div>
+  </section>
+
+  <section>
+    <h2>The wider dataset</h2>
+    <p id="nat-text"></p>
+    <figure><div id="chart-years"></div><figcaption>Usable surveys per year, all Hub sites, by survey form (2000 on).</figcaption></figure>
+  </section>
+
+  <section>
+    <h2>Next</h2>
+    <ol class="next">
+      <li>Per-survey features (species-group counts, sensitive share, diversity), trends and turning points for the chapter sites, with neighbouring sites alongside.</li>
+      <li>A model trained on the national surveys that predicts the expected score for each season, flow and setting; the chapter's observed-minus-expected line over time.</li>
+      <li>Tags drawn from volunteers' notes (storms, construction, spills), scanned paper data sheets, and plain-English questions over the tables.</li>
+      <li>This page refreshed on a schedule, with an alert when a survey falls outside its expected range.</li>
+    </ol>
+  </section>
+
+  <footer>
+    <p class="meta" id="foot"></p>
+    <p class="meta">Source: <a href="https://www.cleanwaterhub.org/site/467">Clean Water Hub</a> (Izaak Walton League). Water temperature: readings up to 32 are taken as °C, 41 and up as °F and converted, 32 to 41 left blank. No personal details are shown.</p>
+  </footer>
+</div>
+
+<script>
+const D = __DATA__;
+const $ = id => document.getElementById(id);
+const fmt = n => n == null ? "" : Number(n).toLocaleString("en-US");
+const mean = a => a.reduce((s, x) => s + x, 0) / a.length;
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[c]));
+const t = d => Date.parse(d);
+const year = d => Number(String(d).slice(0, 4));
+const label = id => (D.chapterSites.find(s => s.site_id === id) || {}).label || String(id);
+const season = d => { const m = Number(d.slice(5, 7)); return m >= 3 && m <= 6 ? "Spring" : m <= 9 && m >= 7 ? "Summer" : "Fall"; };
+const PROTO = { sos_bio: "SOS Biological", va_rocky: "VA SOS rocky bottom", va_muddy: "VA SOS muddy bottom",
+  sos_chem: "SOS Chemical", salt: "Salt Watch", nitrate: "Nitrate Watch" };
+
+function table(el, cols, rows) {
+  const head = cols.map(c => `<th class="${c.n ? "n" : ""}">${esc(c.h)}</th>`).join("");
+  const body = rows.map(r => "<tr>" + cols.map(c => `<td class="${c.n ? "n" : ""}">${c.html ? c.f(r) : esc(c.f(r))}</td>`).join("") + "</tr>").join("");
+  $(el).innerHTML = `<table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`;
+}
+
+// ---------- header and glance ----------
+const sos = D.sos, early = sos.filter(r => r.date < "2013-01-01"), late = sos.filter(r => r.date >= "2013-01-01");
+const mE = mean(early.map(r => r.total)), mL = mean(late.map(r => r.total));
+const chapterCount = sos.length + D.va.length;
+const firstY = year(sos[0].date), lastY = Math.max(...[...sos, ...D.va].map(r => year(r.date)));
+$("lede").textContent = `${chapterCount} usable stream surveys at two sites between ${firstY} and ${lastY} show a creek whose health has neither improved nor declined. Season, team and the survey form explain much of the swing from one survey to the next.`;
+$("meta").textContent = `Data as of ${D.snapshot} · phase 1 of the iwla-river analysis`;
+$("foot").textContent = `Built from the Clean Water Hub snapshot of ${D.snapshot}.`;
+$("glance").innerHTML = [
+  [chapterCount, "usable chapter surveys"],
+  [`${firstY}–${lastY}`, "years on record"],
+  [`${mE.toFixed(1)} → ${mL.toFixed(1)}`, `mean score, before and since 2013`],
+  [fmt(D.totals.usable_surveys), "usable surveys nationwide"],
+].map(([b, s]) => `<div><b>${esc(b)}</b><span>${esc(s)}</span></div>`).join("");
+
+// ---------- chart: score over time ----------
+(function trend() {
+  const W = 760, H = 330, L = 48, R = 24, T = 56, B = 40;
+  const x0 = t(`${firstY}-01-01`), x1 = t(`${lastY + 1}-01-01`);
+  const X = d => L + (t(d) - x0) / (x1 - x0) * (W - L - R), Y = v => T + (1 - v / 30) * (H - T - B);
+  const ys = [0, 10, 20, 30], yrs = [];
+  for (let y = Math.ceil(firstY / 5) * 5; y <= lastY + 1; y += 5) yrs.push(y);
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="SOS score per survey at the chapter sites">`;
+  s += `<text class="t-title" x="0" y="18">Scores held near ${mE.toFixed(1)} before 2013 and ${mL.toFixed(1)} since</text>`;
+  D.chapterSites.forEach((c, i) => {
+    s += `<circle cx="${W - 190 + i * 90}" cy="38" r="5" fill="${i ? "var(--grey)" : "var(--accent)"}"/><text class="t-label" x="${W - 180 + i * 90}" y="42">${esc(c.label)}</text>`;
+  });
+  ys.forEach(v => s += `<line class="grid" x1="${L}" x2="${W - R}" y1="${Y(v)}" y2="${Y(v)}"/><text class="t-axis" x="${L - 8}" y="${Y(v) + 4}" text-anchor="end">${v}</text>`);
+  yrs.forEach(y => s += `<text class="t-axis" x="${X(`${y}-01-01`)}" y="${H - 14}" text-anchor="middle">${y}</text>`);
+  s += `<line class="ref" x1="${X(`${firstY}-01-01`)}" x2="${X("2012-12-31")}" y1="${Y(mE)}" y2="${Y(mE)}"/>`;
+  s += `<line class="ref" x1="${X("2013-01-01")}" x2="${X(`${lastY}-12-31`)}" y1="${Y(mL)}" y2="${Y(mL)}"/>`;
+  sos.forEach(r => s += `<circle cx="${X(r.date)}" cy="${Y(r.total)}" r="5" fill="${r.site_id === 467 ? "var(--accent)" : "var(--grey)"}" fill-opacity=".85"><title>${label(r.site_id)}, ${r.date}: score ${r.total}</title></circle>`);
+  const gaps = [];
+  for (let y = firstY; y <= Math.max(...sos.map(r => year(r.date))); y++) if (!sos.some(r => year(r.date) === y)) gaps.push(y);
+  if (gaps.length) s += `<text class="t-note" x="${L}" y="${H}">No SOS survey in ${gaps.join(", ")}</text>`;
+  $("chart-trend").innerHTML = s + "</svg>";
+  const pairs = [];
+  const byDate = {};
+  sos.forEach(r => (byDate[r.date] ||= {})[r.site_id] = r.total);
+  Object.values(byDate).forEach(v => { if (v[467] != null && v[468] != null) pairs.push(Math.abs(v[467] - v[468])); });
+  $("trend-text").textContent = `The SOS score adds up the pollution-sensitive, less-sensitive and tolerant animals found in a survey. Single surveys range from ${Math.min(...sos.map(r => r.total))} to ${Math.max(...sos.map(r => r.total))}, but the average has not moved. The two sites, a few hundred metres apart and sampled on the same day ${pairs.length} times, differ by ${mean(pairs).toFixed(1)} points on average: a change smaller than that is within sampling noise.`;
+})();
+
+// ---------- chart: sub-scores ----------
+(function parts() {
+  const W = 760, rowH = 150, L = 48, R = 16, T = 40;
+  const sites = D.chapterSites.map(c => ({ ...c, rows: sos.filter(r => r.site_id === c.site_id) }));
+  const H = T + sites.length * (rowH + 36);
+  const max = Math.max(...sos.map(r => r.total));
+  const top = Math.ceil(max / 10) * 10;
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Sub-scores per survey">`;
+  const sensRange = [Math.min(...sos.map(r => r.sens)), Math.max(...sos.map(r => r.sens))];
+  const tolRange = [Math.min(...sos.map(r => r.tol)), Math.max(...sos.map(r => r.tol))];
+  s += `<text class="t-title" x="0" y="18">Sensitive animals swing from ${sensRange[0]} to ${sensRange[1]} points; tolerant ones stay at ${tolRange[0]}–${tolRange[1]}</text>`;
+  const keys = [["sens", "Sensitive", 1], ["less", "Less sensitive", .55], ["tol", "Tolerant", .25]];
+  keys.forEach(([, n, o], i) => s += `<rect x="${W - 330 + i * 110}" y="28" width="12" height="12" fill="var(--accent)" fill-opacity="${o}"/><text class="t-label" x="${W - 314 + i * 110}" y="38">${n}</text>`);
+  sites.forEach((site, k) => {
+    const y0 = T + 16 + k * (rowH + 36), n = site.rows.length, band = (W - L - R) / Math.max(n, 1), bw = Math.min(band * .7, 22);
+    const Y = v => y0 + rowH - v / top * rowH;
+    s += `<text class="t-label" x="${L}" y="${y0 - 2}" font-weight="600">${esc(site.label)}</text>`;
+    [0, top / 2, top].forEach(v => s += `<line class="grid" x1="${L}" x2="${W - R}" y1="${Y(v)}" y2="${Y(v)}"/><text class="t-axis" x="${L - 8}" y="${Y(v) + 4}" text-anchor="end">${v}</text>`);
+    let lastYr = null;
+    site.rows.forEach((r, i) => {
+      const x = L + i * band + (band - bw) / 2; let acc = 0;
+      keys.forEach(([key, nm, o]) => { const v = r[key] || 0; s += `<rect x="${x}" y="${Y(acc + v)}" width="${bw}" height="${Y(acc) - Y(acc + v)}" fill="var(--accent)" fill-opacity="${o}"><title>${site.label}, ${r.date}: ${nm.toLowerCase()} ${v} of ${r.total}</title></rect>`; acc += v; });
+      const yr = year(r.date);
+      if (lastYr === null || yr - lastYr >= 2) { s += `<text class="t-axis" x="${x + bw / 2}" y="${y0 + rowH + 16}" text-anchor="middle">${yr}</text>`; lastYr = yr; }
+    });
+  });
+  $("chart-parts").innerHTML = s + "</svg>";
+  $("parts-text").textContent = `Most of the swing comes from the pollution-sensitive animals such as mayflies, stoneflies and riffle beetles. They count three points each per group found, so finding or missing one or two groups moves the total by several points. Tolerant animals such as midges and worms add little in any year, which is a good sign for the stream.`;
+})();
+
+// ---------- chart: season ----------
+(function seasons() {
+  const W = 760, H = 250, L = 120, R = 24, T = 50;
+  const groups = ["Spring", "Summer", "Fall"].map(n => ({ n, v: sos.filter(r => season(r.date) === n).map(r => r.total) }));
+  const X = v => L + v / 30 * (W - L - R), rowH = (H - T - 30) / 3;
+  const sp = mean(groups[0].v), su = mean(groups[1].v);
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Score by season">`;
+  s += `<text class="t-title" x="0" y="18">Spring surveys average ${(sp - su).toFixed(1)} points more than summer ones</text>`;
+  [0, 10, 20, 30].forEach(v => s += `<line class="grid" x1="${X(v)}" x2="${X(v)}" y1="${T - 8}" y2="${H - 30}"/><text class="t-axis" x="${X(v)}" y="${H - 12}" text-anchor="middle">${v}</text>`);
+  groups.forEach((g, i) => {
+    const cy = T + rowH * i + rowH / 2, m = mean(g.v);
+    s += `<text class="t-label" x="0" y="${cy + 4}">${g.n}</text><text class="t-note" x="58" y="${cy + 4}">${g.v.length} surveys</text>`;
+    g.v.forEach((v, j) => s += `<circle cx="${X(v)}" cy="${cy + ((j % 5) - 2) * 4}" r="4.5" fill="var(--grey)" fill-opacity=".7"><title>${g.n}: ${v}</title></circle>`);
+    s += `<line x1="${X(m)}" x2="${X(m)}" y1="${cy - 16}" y2="${cy + 16}" stroke="var(--accent)" stroke-width="3"/><text class="t-label" x="${X(m) + 8}" y="${cy - 10}" fill="var(--accent)">${m.toFixed(1)}</text>`;
+  });
+  $("chart-season").innerHTML = s + "</svg>";
+  $("season-text").textContent = `Season matters too. Many insects emerge as adults by mid-summer, which likely leaves fewer larvae in the riffles, and summer flows are lower and warmer. Comparing a spring survey with a summer one can show a change that is only the calendar, so trend work in phase 2 compares like seasons.`;
+})();
+
+// ---------- Virginia form ----------
+(function va() {
+  const cls = c => /^accept/i.test(c || "") ? "good" : /gray/i.test(c || "") ? "warn" : "bad";
+  table("tbl-va", [
+    { h: "Date", f: r => r.date }, { h: "Site", f: r => label(r.site_id) },
+    { h: "VA score (0–12)", n: 1, f: r => r.mms }, { h: "Rating", html: 1, f: r => `<span class="pill ${cls(r.cond)}">${esc(r.cond)}</span>` },
+    { h: "SOS score same day", n: 1, f: r => (sos.find(x => x.date === r.date && x.site_id === r.site_id) || {}).total ?? "—" },
+  ], D.va);
+  const both = D.va.filter(r => sos.some(x => x.date === r.date && x.site_id === r.site_id));
+  $("va-text").textContent = `From ${D.va.length ? year(D.va[0].date) : "2024"} the chapter has also used the Virginia Save Our Streams form, which scores 0 to 12 and rates a stream Acceptable (9 and up), Gray Zone (8) or Unacceptable (7 and below). The Hub's own site page charts only the older form, so these surveys do not show there. The two scales cannot be compared directly; ${both.length ? `${both.length === 1 ? "one survey was" : both.length + " surveys were"} scored on both forms the same day, a first calibration point` : "no survey has been scored on both forms yet"}. The Virginia form also counts each animal, which the analysis can use for diversity measures.`;
+})();
+
+// ---------- temperature ----------
+(function temps() {
+  const rows = D.chapterTemps, W = 760, H = 260, L = 48, R = 24, T = 56, B = 40;
+  if (!rows.length) return;
+  const x0 = t(`${year(rows[0].date)}-01-01`), x1 = t(`${Math.max(...rows.map(r => year(r.date))) + 1}-01-01`);
+  const X = d => L + (t(d) - x0) / (x1 - x0) * (W - L - R), Y = v => T + (1 - v / 90) * (H - T - B);
+  const f = rows.filter(r => r.rule === "fahrenheit_converted"), firstF = f.length ? year(f[0].date) : null;
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Water temperature as entered">`;
+  s += `<text class="t-title" x="0" y="18">${firstF ? `Readings jump from Celsius to Fahrenheit in ${firstF}` : "Water temperature as entered"}</text>`;
+  [["Read as °C", "var(--accent)"], ["Read as °F, converted", "var(--warn)"], ["Unclear, left blank", "var(--bad)"]].forEach(([n, c], i) =>
+    s += `<circle cx="${W - 450 + i * 150}" cy="38" r="5" fill="${c}"/><text class="t-label" x="${W - 440 + i * 150}" y="42">${n}</text>`);
+  [0, 30, 60, 90].forEach(v => s += `<line class="grid" x1="${L}" x2="${W - R}" y1="${Y(v)}" y2="${Y(v)}"/><text class="t-axis" x="${L - 8}" y="${Y(v) + 4}" text-anchor="end">${v}</text>`);
+  for (let y = Math.ceil(year(rows[0].date) / 5) * 5; y <= year(rows.at(-1).date) + 1; y += 5) s += `<text class="t-axis" x="${X(`${y}-01-01`)}" y="${H - 14}" text-anchor="middle">${y}</text>`;
+  rows.forEach(r => { const c = r.rule === "celsius" ? "var(--accent)" : r.rule === "fahrenheit_converted" ? "var(--warn)" : "var(--bad)";
+    s += `<circle cx="${X(r.date)}" cy="${Y(r.raw)}" r="5" fill="${c}"><title>${label(r.site_id)}, ${r.date}: entered ${r.raw}${r.c != null ? ` → ${r.c} °C` : ""}</title></circle>`; });
+  $("chart-temp").innerHTML = s + "</svg>";
+  const nat = D.temps.filter(r => r.rule === "fahrenheit_converted").reduce((a, r) => a + r.n, 0);
+  const amb = D.temps.filter(r => r.rule === "ambiguous").reduce((a, r) => a + r.n, 0);
+  $("temp-text").textContent = `The Hub has no unit field for water temperature. At the chapter sites, entries move from Celsius (under 30) to what can only be Fahrenheit (50 to 80) from ${firstF ?? "the 2010s"}, sometimes on the same day at the two sites. Nationwide ${fmt(nat)} readings were converted from Fahrenheit and ${fmt(amb)} were left blank as unclear. Without this fix any temperature trend would be meaningless.`;
+})();
+
+table("tbl-protocols", [
+  { h: "Survey form", f: r => PROTO[r.protocol] || r.protocol }, { h: "Records", n: 1, f: r => fmt(r.records) },
+  { h: "Usable", n: 1, f: r => fmt(r.usable) }, { h: "No usable date", n: 1, f: r => fmt(r.no_date) },
+  { h: "Deleted", n: 1, f: r => fmt(r.deleted) }, { h: "Duplicates", n: 1, f: r => fmt(r.duplicates) },
+  { h: "Sites", n: 1, f: r => fmt(r.sites) }, { h: "Span", f: r => r.first ? `${year(r.first)}–${year(r.last)}` : "" },
+], D.protocols);
+table("tbl-complete", [
+  { h: "Survey form", f: r => PROTO[r.protocol] || r.protocol }, { h: "Usable", n: 1, f: r => fmt(r.usable) },
+  { h: "Water temp", n: 1, f: r => r.temp + "%" }, { h: "Flow", n: 1, f: r => r.flow + "%" },
+  { h: "Weather", n: 1, f: r => r.weather + "%" }, { h: "Team size", n: 1, f: r => r.team + "%" },
+], D.completeness);
+table("tbl-nearby", [
+  { h: "Site", f: r => r.site_name || `Site ${r.site_id}` }, { h: "Stream", f: r => r.stream || "" },
+  { h: "Distance", n: 1, f: r => `${r.km} km` }, { h: "Surveys", n: 1, f: r => fmt(r.surveys) },
+  { h: "Latest", f: r => r.last || "—" },
+], D.nearby);
+
+// ---------- national by year ----------
+(function years() {
+  const protos = [...new Set(D.byYear.map(r => r.protocol))];
+  const yrs = [...new Set(D.byYear.map(r => r.year))].sort((a, b) => a - b);
+  const tot = y => D.byYear.filter(r => r.year === y).reduce((a, r) => a + r.n, 0);
+  const max = Math.max(...yrs.map(tot)), step = max > 4000 ? 2000 : max > 1000 ? 500 : 100, top = Math.ceil(max / step) * step;
+  const W = 760, H = 320, L = 56, R = 16, T = 64, B = 36, band = (W - L - R) / yrs.length, bw = band * .72;
+  const Y = v => T + (1 - v / top) * (H - T - B);
+  const color = p => `var(--c${protos.indexOf(p) % 4 + 1})`;
+  const peak = yrs.reduce((a, y) => tot(y) > tot(a) ? y : a, yrs[0]);
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Usable surveys per year by form">`;
+  s += `<text class="t-title" x="0" y="18">Volunteer monitoring took off after 2017, peaking at ${fmt(tot(peak))} surveys in ${peak}</text>`;
+  protos.forEach((p, i) => s += `<rect x="${(i % 3) * 200}" y="${32 + Math.floor(i / 3) * 18}" width="12" height="12" fill="${color(p)}"/><text class="t-label" x="${(i % 3) * 200 + 16}" y="${42 + Math.floor(i / 3) * 18}">${esc(PROTO[p] || p)}</text>`);
+  for (let v = 0; v <= top; v += step) s += `<line class="grid" x1="${L}" x2="${W - R}" y1="${Y(v)}" y2="${Y(v)}"/><text class="t-axis" x="${L - 8}" y="${Y(v) + 4}" text-anchor="end">${fmt(v)}</text>`;
+  yrs.forEach((y, i) => {
+    const x = L + i * band + (band - bw) / 2; let acc = 0;
+    protos.forEach(p => { const n = (D.byYear.find(r => r.year === y && r.protocol === p) || {}).n || 0;
+      if (n) s += `<rect x="${x}" y="${Y(acc + n)}" width="${bw}" height="${Y(acc) - Y(acc + n)}" fill="${color(p)}"><title>${y}, ${PROTO[p] || p}: ${fmt(n)}</title></rect>`; acc += n; });
+    if (y % 5 === 0) s += `<text class="t-axis" x="${x + bw / 2}" y="${H - 14}" text-anchor="middle">${y}</text>`;
+  });
+  $("chart-years").innerHTML = s + "</svg>";
+  const bio = D.protocols.filter(r => ["sos_bio", "va_rocky", "va_muddy"].includes(r.protocol)).reduce((a, r) => a + r.usable, 0);
+  $("nat-text").textContent = `The chapter's record is small on its own, but the Hub holds ${fmt(D.totals.usable_surveys)} usable surveys from ${fmt(D.totals.sites_with_data)} sites. Of these, ${fmt(bio)} are biological surveys: enough to train a model of what a healthy score looks like for a given season and setting, which phase 3 will use to judge the chapter's sites against.`;
+})();
+</script>

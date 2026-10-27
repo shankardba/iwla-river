@@ -279,8 +279,13 @@ def build(snapshot: Path, db_path: Path = C.DB_PATH) -> dict:
     }
     frames["surveys"] = mark_duplicates(frames["surveys"], frames["taxa"], frames["chemistry"])
     s = frames["surveys"]
+    # Dates before the program began (1969) or after the snapshot are typing errors.
+    parsed = pd.to_datetime(s.survey_date, errors="coerce", format="%Y-%m-%d")
+    s["date_invalid"] = s.survey_date.notna() & (
+        parsed.isna() | (parsed < "1969-01-01") | (parsed > pd.Timestamp(snapshot.name))
+    )
+    s["survey_date"] = parsed.where(~s.date_invalid).dt.date
     s["usable"] = s.survey_date.notna() & ~s.is_deleted & ~s.is_archived & s.duplicate_of.isna()
-    s["survey_date"] = pd.to_datetime(s.survey_date, errors="coerce").dt.date
     s["site_id"] = s.site_id.astype("Int64")
     s["is_chapter_site"] = s.site_id.isin(list(C.CHAPTER_SITES))
     frames["sites"]["site_id"] = frames["sites"].site_id.astype("Int64")
