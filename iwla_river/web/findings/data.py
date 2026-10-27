@@ -73,7 +73,8 @@ def methods(db):
                     ["Clean Water Hub (Izaak Walton League)", "Every Save Our Streams survey: biological, chemical, Virginia SOS, Salt Watch, Nitrate Watch"],
                     ["USGS NLDI", "The NHDPlus stream segment each site sits on"],
                     ["EPA StreamCat", "Watershed land cover (NLCD 2019), soils, elevation, 1981–2010 climate, road crossings, population"],
-                    ["Open-Meteo archive", "Daily rainfall and air temperature for the week before each survey"]]),
+                    ["Open-Meteo archive", "Daily rainfall and air temperature for the week before each survey"],
+                    ["Google Maps (links only)", "Every map dot and site name opens the spot in Google Maps; no map tiles are loaded here"]]),
                 text("Personal details (emails, phone numbers, names) are removed when the data is downloaded and never appear here.",
                      "Trends use the seasonal Kendall test, which compares a survey only with surveys from the same season in other "
                      "years, with Sen slopes and at least 10 same-season comparisons. Turning points use a permutation test. Species "

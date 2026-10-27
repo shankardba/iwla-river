@@ -1,6 +1,6 @@
 {% macro status(s) %}<span class="pill {{ {'concern': 'bad', 'watch': 'warn', 'good': 'good'}.get(s, 'neutral') }}">{{ status_words.get(s, s) }}</span>{% endmacro %}
 
-{% macro cell(c) %}{% if c is mapping and c.pill is defined %}<span class="pill {{ c.pill }}">{{ c.text }}</span>{% else %}{{ c }}{% endif %}{% endmacro %}
+{% macro cell(c) %}{% if c is mapping and c.pill is defined %}<span class="pill {{ c.pill }}">{{ c.text }}</span>{% elif c is mapping and c.href is defined %}<a href="{{ c.href }}" target="_blank" rel="noopener">{{ c.text }}</a>{% else %}{{ c }}{% endif %}{% endmacro %}
 
 {% macro numbers(nums) %}
 {% set nums = nums | selectattr(1) | list %}

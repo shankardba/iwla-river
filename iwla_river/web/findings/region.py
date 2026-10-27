@@ -6,7 +6,7 @@ import math
 
 from ... import config as C
 from ..db import CHAPTER, fmt, pfmt, year
-from ..registry import Page, chart, finding, links, section, table, text
+from ..registry import Page, chart, finding, gmaps, links, maplink, section, table, text
 
 section("region", "Neighbouring streams",
         f"Every Clean Water Hub site within {C.NEIGHBOUR_KM} km of the chapter with a long enough record, most of them "
@@ -20,6 +20,7 @@ def neighbour_trends(db):
     if not rows:
         return None
     rows.sort(key=lambda r: (-r["slope_per_decade"], r["p"]))
+    ll = {r["site_id"]: r for r in db.rows("SELECT site_id, lat, lon FROM sites WHERE lat IS NOT NULL")}
     imp = sum(r["verdict"] == "improving" for r in rows)
     dec = sum(r["verdict"] == "declining" for r in rows)
     va = sum(r["state"] == "VA" for r in rows)
@@ -30,6 +31,7 @@ def neighbour_trends(db):
             "legend": [{"name": "Improving", "color": "good"}, {"name": "No clear trend", "color": "grey"}, {"name": "Declining", "color": "bad"}],
             "x": {"min": -lim, "max": lim, "ticks": list(range(-lim, lim + 1, step)), "label": "change in score per decade"},
             "rows": [{"label": r["stream"] or r["site_name"], "note": f"{r['km']} km", "x": r["slope_per_decade"],
+                      "href": gmaps(ll[r["site_id"]]["lat"], ll[r["site_id"]]["lon"]) if r["site_id"] in ll else None,
                       "color": color.get(r["verdict"], "grey"),
                       "tip": f"{r['site_name']} ({r['stream']}), {r['n']} surveys {year(r['first'])}–{year(r['last'])}: "
                              f"{r['slope_per_decade']:.1f} per decade, {pfmt(r['p'])}"} for r in rows]}
@@ -51,7 +53,7 @@ def neighbour_trends(db):
 def nearby_sites(db):
     rows = db.rows(f"""
         WITH c AS (SELECT lat, lon FROM sites WHERE site_id = 467), d AS (
-          SELECT s.site_id, s.site_name, s.stream,
+          SELECT s.site_id, s.site_name, s.stream, s.lat, s.lon,
             round(6371 * 2 * asin(sqrt(pow(sin(radians(s.lat - c.lat) / 2), 2) +
               cos(radians(c.lat)) * cos(radians(s.lat)) * pow(sin(radians(s.lon - c.lon) / 2), 2))), 1) AS km
           FROM sites s, c WHERE s.lat IS NOT NULL AND s.site_id NOT IN ({CHAPTER}))
@@ -65,8 +67,8 @@ def nearby_sites(db):
     return Page(
         headline=f"{len(rows)} other Hub sites within 10 km have usable surveys, mostly salt and nitrate readings.",
         status="info",
-        blocks=[text("Sites with many surveys can show whether a change at Great Seneca Creek is local or shared across the area. "
+        blocks=[text("Site names open in Google Maps. Sites with many surveys can show whether a change at Great Seneca Creek is local or shared across the area. "
                      "The chapter's own Salt Watch and Nitrate Watch points appear here too, filed as separate sites."),
                 table([("Site",), ("Stream",), ("Distance", 1), ("Surveys", 1), ("Forms",), ("Latest",)],
-                      [[r["site_name"] or f"Site {r['site_id']}", r["stream"] or "", f"{r['km']} km", fmt(r["surveys"]),
+                      [[maplink(r["site_name"] or f"Site {r['site_id']}", r["lat"], r["lon"]), r["stream"] or "", f"{r['km']} km", fmt(r["surveys"]),
                         ", ".join(names.get(f.strip(), f) for f in (r["forms"] or "").split(",")), r["last"] or "—"] for r in rows])])

@@ -180,12 +180,30 @@
     if (x.label) s += `<text class="t-axis" x="${X((x.min + x.max) / 2)}" y="${T + n * rowH + 34}" text-anchor="middle">${esc(x.label)}</text>`;
     spec.rows.forEach((r, i) => {
       const cy = T + i * rowH + rowH / 2;
-      s += `<text class="t-label" x="0" y="${cy + 4}">${esc(r.label)}</text><text class="t-note" x="${L - 12}" y="${cy + 4}" text-anchor="end">${esc(r.note || "")}</text><circle cx="${X(r.x)}" cy="${cy}" r="5" fill="${col(r.color)}">${tip(r.tip)}</circle>`;
+      const lab = `<text class="t-label" x="0" y="${cy + 4}">${esc(r.label)}</text>`;
+      s += (r.href ? `<a href="${esc(r.href)}" target="_blank" rel="noopener">${lab}</a>` : lab) + `<text class="t-note" x="${L - 12}" y="${cy + 4}" text-anchor="end">${esc(r.note || "")}</text><circle cx="${X(r.x)}" cy="${cy}" r="5" fill="${col(r.color)}">${tip(r.tip)}</circle>`;
     });
     return svg(spec, H, s);
   }
 
-  const DRAW = { time, bars, stack, hbars, strip, heat, dotrank };
+  // ---------- map: projected points; each can open in Google Maps ----------
+  function map(spec) {
+    const hd = header(spec), T = hd.top, H = T + spec.height + 24;
+    let s = hd.s + `<g transform="translate(0 ${T})">`;
+    (spec.rings || []).forEach(r => s += `<circle cx="${r.cx}" cy="${r.cy}" r="${r.r}" fill="none" class="grid" stroke-dasharray="3 4"/><text class="t-note" x="${r.cx + r.r * 0.71 + 4}" y="${r.cy - r.r * 0.71 - 4}">${esc(r.label)}</text>`);
+    spec.points.forEach(p => {
+      if (!p.href && p.ll) p.href = `https://www.google.com/maps/search/?api=1&query=${p.ll[0]},${p.ll[1]}`;
+      if (!p.color && p.c) p.color = p.c;
+      const dot = `<circle cx="${p.x}" cy="${p.y}" r="${p.r || 3}" fill="${col(p.color)}" fill-opacity="${p.opacity ?? spec.opacity ?? 0.75}"${p.ring ? ` stroke="var(--ink)" stroke-width="1.5"` : ""}>${tip(p.tip)}</circle>`;
+      s += p.href ? `<a href="${esc(p.href)}" target="_blank" rel="noopener">${dot}</a>` : dot;
+    });
+    (spec.labels || []).forEach(l => s += `<line x1="${l.x}" y1="${l.y}" x2="${l.tx}" y2="${l.ty}" style="stroke:var(--ink)" stroke-width=".9"/><circle cx="${l.x}" cy="${l.y}" r="2.4" style="fill:var(--ink)"/><text class="dg-name" x="${l.tx + (l.anchor === "end" ? -4 : 4)}" y="${l.ty + 4}" text-anchor="${l.anchor || "start"}">${esc(l.text)}</text>${l.sub ? `<text class="dg-sub" x="${l.tx + (l.anchor === "end" ? -4 : 4)}" y="${l.ty + 19}" text-anchor="${l.anchor || "start"}">${esc(l.sub)}</text>` : ""}`);
+    s += `</g>`;
+    if (spec.note) s += `<text class="t-note" x="0" y="${H - 4}">${esc(spec.note)}</text>`;
+    return svg(spec, H, s);
+  }
+
+  const DRAW = { time, bars, stack, hbars, strip, heat, dotrank, map };
   document.querySelectorAll(".chart[data-chart]").forEach(el => {
     const spec = SPECS[Number(el.dataset.chart)];
     try { el.innerHTML = DRAW[spec.type](spec); }

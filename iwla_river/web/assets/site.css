@@ -127,6 +127,9 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .numbers span { font: 13px/1.4 var(--display); color: var(--muted); }
 figure { margin: 0; background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding: 16px; display: flex; flex-direction: column; gap: 8px; }
 .chart svg { width: 100%; height: auto; display: block; }
+.chart a circle { cursor: pointer; }
+.chart a:hover circle { stroke: var(--ink); stroke-width: 1.5; fill-opacity: 1; }
+.chart a text { fill: var(--accent); text-decoration: underline; }
 figcaption { font: 12px/1.5 var(--mono); color: var(--muted); }
 svg text { font-family: var(--display); }
 .t-title { font-size: 15px; font-weight: 600; fill: var(--ink); }

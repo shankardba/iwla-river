@@ -79,6 +79,15 @@ def table(cols: list, rows: list, note: str = "") -> dict:
             "rows": rows, "note": note}
 
 
+def maplink(words: str, lat, lon) -> dict:
+    """Table cell linking to the spot in Google Maps."""
+    return {"href": gmaps(lat, lon), "text": words} if lat is not None and lon is not None else words
+
+
+def gmaps(lat, lon) -> str:
+    return f"https://www.google.com/maps/search/?api=1&query={lat:.5f},{lon:.5f}"
+
+
 def pill(status: str, words: str) -> dict:
     return {"pill": status, "text": words}
 
