@@ -79,14 +79,17 @@ Targets: share of animal groups found that are pollution-sensitive (comparable a
 
 ## The findings site
 
-`python -m iwla_river.site` builds a multi-page site into `docs/`, served by GitHub Pages at https://shankardba.github.io/iwla-river/.
+`python -m iwla_river.site` builds the site into `docs/`, served by GitHub Pages at https://shankardba.github.io/iwla-river/. It is organised as a tool, with a top menu (a full-screen sheet on phones):
 
-```
-docs/index.html                 overview: key findings and every section
-docs/<section>.html             a section and its findings
-docs/<section>--<finding>.html  one finding: headline, key figures, charts, tables, related findings
-docs/findings.json              machine-readable index of every finding
-```
+| Menu | Page | What it is |
+| --- | --- | --- |
+| Explore | `index.html` | The workspace: map of where samples are taken (heat, filter by sample type), watershed rings coloured by a chosen measure, and a panel with each watershed's figures against its parent, what is inside it, and each biological site's survey history. Search with `/`. Every view has its own link (`#w<huc>`, `#s<site>@<huc12>`). |
+| Findings | `findings.html`, `<section>.html`, `<section>--<finding>.html` | Every result, by section, each with its evidence and method; finding pages have an "In this section" list. |
+| Great Seneca Creek | `chapter.html` | The chapter's own sites. |
+| Data | `data--*.html` | Data quality, temperature units, sources and methods, downloads. |
+| About | `about.html` | How volunteers sample, how to use the tool, sources and privacy. |
+
+Data files for Explore live in `docs/data/` (`watersheds.json`, `huc4/<code>.json` with sites and site histories, `search.json`, `lower48.json`, `watershed_metrics.csv`).
 
 Code lives in `iwla_river/web/`:
 

@@ -26,125 +26,158 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="assets/site.css?v=80f28218">
+<link rel="stylesheet" href="assets/site.css?v=709852cb">
 </head>
-<body>
+<body class="">
 <header class="topbar">
   <div class="topbar-in">
-    <button class="nav-btn" id="nav-btn" type="button" aria-controls="side" aria-expanded="false">
-      <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-      <span>Findings</span>
+    <a class="brand" href="index.html" aria-label="Great Seneca Creek Record, home">
+      <img src="assets/icon.svg?v=1" alt="" width="26" height="26">
+      <span class="brand-name">Great Seneca Creek Record</span>
+    </a>
+    <nav class="mainnav" aria-label="Main">
+      <ul>
+        <li><a class="nav-link" href="index.html" >Explore</a></li>
+        <li class="has-menu">
+          <button class="nav-link" type="button" aria-expanded="false" aria-controls="menu-findings"
+>Findings<svg viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></button>
+          <div class="menu mega" id="menu-findings" hidden>
+            <a class="menu-all" href="findings.html">All findings <span class="meta">every result on one page</span></a>
+            <div class="mega-cols">
+              <div class="mega-col">
+                <a class="mega-head" href="chapter.html">Great Seneca Creek</a>
+                <ul><li><a href="chapter--expected.html" ><span class="dot watch"></span>Compared with what its setting predicts</a></li><li><a href="chapter--score-trend.html" ><span class="dot steady"></span>The score has held steady</a></li><li><a href="chapter--species-mix.html" ><span class="dot watch"></span>The mix of animals is shifting</a></li><li><a href="chapter--trend-tests.html" ><span class="dot concern"></span>Trend tests</a></li><li><a href="chapter--score-parts.html" ><span class="dot info"></span>What moves the score</a></li><li><a href="chapter--season.html" aria-current="page"><span class="dot info"></span>Season matters</a></li><li><a href="chapter--survey-forms.html" ><span class="dot info"></span>The chapter changed survey forms in 2024</a></li></ul>
+              </div>
+              <div class="mega-col">
+                <a class="mega-head" href="watersheds.html">Watersheds</a>
+                <ul><li><a href="watersheds--great-seneca.html" ><span class="dot info"></span>Great Seneca Creek within its watersheds</a></li></ul>
+              </div>
+              <div class="mega-col">
+                <a class="mega-head" href="chemistry.html">Water chemistry</a>
+                <ul><li><a href="chemistry--road-salt.html" ><span class="dot watch"></span>Road salt reaches the creek every winter</a></li><li><a href="chemistry--nitrate.html" ><span class="dot good"></span>Nitrate stays low</a></li></ul>
+              </div>
+              <div class="mega-col">
+                <a class="mega-head" href="region.html">Neighbouring streams</a>
+                <ul><li><a href="region--local-map.html" ><span class="dot info"></span>Map of sites around the creek</a></li><li><a href="region--neighbour-trends.html" ><span class="dot good"></span>Streams across the Potomac are mostly improving</a></li><li><a href="region--nearby-sites.html" ><span class="dot info"></span>Sites nearby</a></li></ul>
+              </div>
+              <div class="mega-col">
+                <a class="mega-head" href="national.html">National picture</a>
+                <ul><li><a href="national--map.html" ><span class="dot info"></span>Where volunteers monitor</a></li><li><a href="national--paving.html" ><span class="dot info"></span>Paved watersheds lose sensitive animals</a></li><li><a href="national--model.html" ><span class="dot info"></span>How the expected-score model works</a></li><li><a href="national--monitoring-growth.html" ><span class="dot info"></span>Volunteer monitoring took off after 2017</a></li></ul>
+              </div>
+            </div>
+          </div>
+        </li>
+        <li><a class="nav-link" href="chapter.html" aria-current="page">Great Seneca Creek</a></li>
+        <li class="has-menu">
+          <button class="nav-link" type="button" aria-expanded="false" aria-controls="menu-data" >Data<svg viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></button>
+          <div class="menu" id="menu-data" hidden>
+            <ul><li><a href="data--data-quality.html" ><b>How clean the data is</b><span class="meta">83,297 of 88,511 records (94%) are usable after removing undated,...</span></a></li><li><a href="data--temperature-units.html" ><b>Water temperature switches units</b><span class="meta">The Hub stores no temperature unit; chapter readings switch from °C...</span></a></li><li><a href="data--methods.html" ><b>Sources and methods</b><span class="meta">Built from a Clean Water Hub snapshot of 2026-10-27, with public...</span></a></li><li><a href="data--downloads.html" ><b>Downloads</b><span class="meta">Watershed-level figures and every finding, free to download.</span></a></li></ul>
+          </div>
+        </li>
+        <li><a class="nav-link" href="about.html" >About</a></li>
+      </ul>
+    </nav>
+    <button class="menu-btn" id="menu-btn" type="button" aria-expanded="false" aria-controls="sheet" aria-label="Open the menu">
+      <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
     </button>
-    <div class="brand-wrap">
-      <a class="brand" href="index.html">Great Seneca Creek Record</a>
-      <span class="brand-sub">IWLA Rockville Chapter · Save Our Streams</span>
-    </div>
   </div>
 </header>
-<div class="layout">
-  <nav class="side" id="side" aria-label="All findings">
-    <div class="side-head"><span>All findings</span><button class="side-close" id="side-close" type="button" aria-label="Close the findings panel">×</button></div>
-      <ul class="tree">
-        <li><a href="index.html" >Overview</a></li>
-        <li class="tree-sec">
-          <a href="chapter.html" >Great Seneca Creek</a>
-          <ul>
-            <li><a href="chapter--expected.html" ><span class="dot watch"></span>Compared with what its setting predicts</a></li>
-            <li><a href="chapter--score-trend.html" ><span class="dot steady"></span>The score has held steady</a></li>
-            <li><a href="chapter--species-mix.html" ><span class="dot watch"></span>The mix of animals is shifting</a></li>
-            <li><a href="chapter--trend-tests.html" ><span class="dot concern"></span>Trend tests</a></li>
-            <li><a href="chapter--score-parts.html" ><span class="dot info"></span>What moves the score</a></li>
-            <li><a href="chapter--season.html" aria-current="page"><span class="dot info"></span>Season matters</a></li>
-            <li><a href="chapter--survey-forms.html" ><span class="dot info"></span>The chapter changed survey forms in 2024</a></li>
-          </ul>
-        </li>
-        <li class="tree-sec">
-          <a href="watersheds.html" >Watersheds</a>
-          <ul>
-            <li><a href="watersheds--explorer.html" ><span class="dot info"></span>Watershed explorer</a></li>
-            <li><a href="watersheds--great-seneca.html" ><span class="dot info"></span>Great Seneca Creek within its watersheds</a></li>
-          </ul>
-        </li>
-        <li class="tree-sec">
-          <a href="chemistry.html" >Water chemistry</a>
-          <ul>
-            <li><a href="chemistry--road-salt.html" ><span class="dot watch"></span>Road salt reaches the creek every winter</a></li>
-            <li><a href="chemistry--nitrate.html" ><span class="dot good"></span>Nitrate stays low</a></li>
-          </ul>
-        </li>
-        <li class="tree-sec">
-          <a href="region.html" >Neighbouring streams</a>
-          <ul>
-            <li><a href="region--local-map.html" ><span class="dot info"></span>Map of sites around the creek</a></li>
-            <li><a href="region--neighbour-trends.html" ><span class="dot good"></span>Streams across the Potomac are mostly improving</a></li>
-            <li><a href="region--nearby-sites.html" ><span class="dot info"></span>Sites nearby</a></li>
-          </ul>
-        </li>
-        <li class="tree-sec">
-          <a href="national.html" >National picture</a>
-          <ul>
-            <li><a href="national--map.html" ><span class="dot info"></span>Where volunteers monitor</a></li>
-            <li><a href="national--paving.html" ><span class="dot info"></span>Paved watersheds lose sensitive animals</a></li>
-            <li><a href="national--model.html" ><span class="dot info"></span>How the expected-score model works</a></li>
-            <li><a href="national--monitoring-growth.html" ><span class="dot info"></span>Volunteer monitoring took off after 2017</a></li>
-          </ul>
-        </li>
-        <li class="tree-sec">
-          <a href="data.html" >Data and methods</a>
-          <ul>
-            <li><a href="data--data-quality.html" ><span class="dot info"></span>How clean the data is</a></li>
-            <li><a href="data--temperature-units.html" ><span class="dot info"></span>Water temperature switches units</a></li>
-            <li><a href="data--methods.html" ><span class="dot info"></span>Sources and methods</a></li>
-          </ul>
-        </li>
-      </ul>
+
+<div class="sheet" id="sheet" hidden>
+  <div class="sheet-head"><span class="brand-name">Menu</span><button class="sheet-close" id="sheet-close" type="button" aria-label="Close the menu">×</button></div>
+  <nav aria-label="Main (phone)">
+    <a class="sheet-top" href="index.html">Explore the map</a>
+    <a class="sheet-top" href="findings.html">All findings</a>
+    <details open>
+      <summary>Great Seneca Creek</summary>
+      <ul><li><a href="chapter.html">Section overview</a></li><li><a href="chapter--expected.html"><span class="dot watch"></span>Compared with what its setting predicts</a></li><li><a href="chapter--score-trend.html"><span class="dot steady"></span>The score has held steady</a></li><li><a href="chapter--species-mix.html"><span class="dot watch"></span>The mix of animals is shifting</a></li><li><a href="chapter--trend-tests.html"><span class="dot concern"></span>Trend tests</a></li><li><a href="chapter--score-parts.html"><span class="dot info"></span>What moves the score</a></li><li><a href="chapter--season.html"><span class="dot info"></span>Season matters</a></li><li><a href="chapter--survey-forms.html"><span class="dot info"></span>The chapter changed survey forms in 2024</a></li></ul>
+    </details>
+    <details >
+      <summary>Watersheds</summary>
+      <ul><li><a href="watersheds.html">Section overview</a></li><li><a href="watersheds--great-seneca.html"><span class="dot info"></span>Great Seneca Creek within its watersheds</a></li></ul>
+    </details>
+    <details >
+      <summary>Water chemistry</summary>
+      <ul><li><a href="chemistry.html">Section overview</a></li><li><a href="chemistry--road-salt.html"><span class="dot watch"></span>Road salt reaches the creek every winter</a></li><li><a href="chemistry--nitrate.html"><span class="dot good"></span>Nitrate stays low</a></li></ul>
+    </details>
+    <details >
+      <summary>Neighbouring streams</summary>
+      <ul><li><a href="region.html">Section overview</a></li><li><a href="region--local-map.html"><span class="dot info"></span>Map of sites around the creek</a></li><li><a href="region--neighbour-trends.html"><span class="dot good"></span>Streams across the Potomac are mostly improving</a></li><li><a href="region--nearby-sites.html"><span class="dot info"></span>Sites nearby</a></li></ul>
+    </details>
+    <details >
+      <summary>National picture</summary>
+      <ul><li><a href="national.html">Section overview</a></li><li><a href="national--map.html"><span class="dot info"></span>Where volunteers monitor</a></li><li><a href="national--paving.html"><span class="dot info"></span>Paved watersheds lose sensitive animals</a></li><li><a href="national--model.html"><span class="dot info"></span>How the expected-score model works</a></li><li><a href="national--monitoring-growth.html"><span class="dot info"></span>Volunteer monitoring took off after 2017</a></li></ul>
+    </details>
+    <details >
+      <summary>Data and methods</summary>
+      <ul><li><a href="data.html">Section overview</a></li><li><a href="data--data-quality.html"><span class="dot info"></span>How clean the data is</a></li><li><a href="data--temperature-units.html"><span class="dot info"></span>Water temperature switches units</a></li><li><a href="data--methods.html"><span class="dot info"></span>Sources and methods</a></li><li><a href="data--downloads.html"><span class="dot info"></span>Downloads</a></li></ul>
+    </details>
+    <a class="sheet-top" href="about.html">About</a>
   </nav>
-  <div class="scrim" id="scrim" hidden></div>
-  <main class="main">
-<nav class="crumbs" aria-label="Breadcrumb"><a href="index.html">Overview</a> <span>›</span> <a href="chapter.html">Great Seneca Creek</a> <span>›</span> Season matters</nav>
-<article class="finding">
-  <header class="hero">
-    <div class="eyebrow">Great Seneca Creek</div>
-    <h1>Season matters</h1>
-    <p class="lede"><span class="pill neutral">Context</span> Spring surveys average 2.6 points more than summer ones, so trends must compare like seasons.</p>
-  </header>
-  
-      
+</div>
+
+<div class="page with-side">
+  <nav class="local" aria-label="In Great Seneca Creek">
+    <a class="local-head" href="chapter.html">Great Seneca Creek</a>
+    <ul><li><a href="chapter--expected.html" ><span class="dot watch"></span>Compared with what its setting predicts</a></li><li><a href="chapter--score-trend.html" ><span class="dot steady"></span>The score has held steady</a></li><li><a href="chapter--species-mix.html" ><span class="dot watch"></span>The mix of animals is shifting</a></li><li><a href="chapter--trend-tests.html" ><span class="dot concern"></span>Trend tests</a></li><li><a href="chapter--score-parts.html" ><span class="dot info"></span>What moves the score</a></li><li><a href="chapter--season.html" aria-current="page"><span class="dot info"></span>Season matters</a></li><li><a href="chapter--survey-forms.html" ><span class="dot info"></span>The chapter changed survey forms in 2024</a></li></ul>
+  </nav>
+  <article class="finding">
+    <nav class="crumbs" aria-label="Breadcrumb"><a href="findings.html">Findings</a><span>›</span><a href="chapter.html">Great Seneca Creek</a></nav>
+    <header class="hero">
+      <h1>Season matters</h1>
+      <p class="lede"><span class="pill neutral">Context</span> Spring surveys average 2.6 points more than summer ones, so trends must compare like seasons.</p>
+    </header>
+    
+        
     <figure><div class="chart" data-chart="0"></div><figcaption>Spring = March to June, summer = July to September, fall = October to February.</figcaption></figure>
 <p>Many insects emerge as adults by mid-summer, which likely leaves fewer larvae in the riffles, and summer flows are lower and warmer. Comparing a spring survey with a summer one can show a change that is only the calendar, so every trend on this site compares like seasons.</p>    <div class="related"><h3>Related</h3><ul>
 <li><a href="chapter--trend-tests.html">Trend tests</a> <span class="meta">— the season-aware trend tests</span></li>    </ul></div>
 
-  <nav class="pager" aria-label="More in Great Seneca Creek">
-<a href="chapter--score-parts.html"><span class="meta">Previous</span>What moves the score</a><a class="nx" href="chapter--survey-forms.html"><span class="meta">Next</span>The chapter changed survey forms in 2024</a>  </nav>
-</article>
-    <footer class="foot">
-      <p class="meta">Data: <a href="https://www.cleanwaterhub.org/site/467">Clean Water Hub</a> (Izaak Walton League), snapshot 2026-10-27; USGS NLDI; EPA StreamCat; Open-Meteo. No personal details are shown.</p>
-      <p class="meta">Code and methods: <a href="https://github.com/shankardba/iwla-river">github.com/shankardba/iwla-river</a> · Machine-readable index: <a href="findings.json">findings.json</a></p>
-    </footer>
-  </main>
+    <nav class="pager" aria-label="More in Great Seneca Creek">
+<a href="chapter--score-parts.html"><span class="meta">← Previous</span>What moves the score</a><a class="nx" href="chapter--survey-forms.html"><span class="meta">Next →</span>The chapter changed survey forms in 2024</a>    </nav>
+  </article>
 </div>
+
+<footer class="foot">
+  <div class="foot-in">
+    <p class="meta">Data: <a href="https://www.cleanwaterhub.org/">Clean Water Hub</a> (Izaak Walton League), snapshot 2026-10-27; USGS Watershed Boundary Dataset and NLDI; EPA StreamCat; Open-Meteo; US Census Bureau boundaries. No personal details are shown.</p>
+    <p class="meta"><a href="https://github.com/shankardba/iwla-river">Code and methods</a> · <a href="data--downloads.html">Downloads</a> · <a href="about.html">About</a></p>
+  </div>
+</footer>
 <script type="application/json" id="chart-specs">[{"type": "strip", "title": "Spring surveys average 2.6 points more than summer ones", "x": {"min": 0, "max": 30, "ticks": [0, 10, 20, 30]}, "groups": [{"label": "Spring", "sub": "18 surveys", "mean": 17.88888888888889, "meanLabel": "17.9", "values": [{"v": 18.0, "tip": "Spring 2005-05-24: 18"}, {"v": 22.0, "tip": "Spring 2007-03-27: 22"}, {"v": 16.0, "tip": "Spring 2007-03-27: 16"}, {"v": 20.0, "tip": "Spring 2008-04-26: 20"}, {"v": 19.0, "tip": "Spring 2009-04-19: 19"}, {"v": 17.0, "tip": "Spring 2009-04-22: 17"}, {"v": 21.0, "tip": "Spring 2010-04-23: 21"}, {"v": 17.0, "tip": "Spring 2011-05-14: 17"}, {"v": 17.0, "tip": "Spring 2011-05-14: 17"}, {"v": 13.0, "tip": "Spring 2012-05-19: 13"}, {"v": 12.0, "tip": "Spring 2018-04-15: 12"}, {"v": 19.0, "tip": "Spring 2018-06-30: 19"}, {"v": 16.0, "tip": "Spring 2022-05-01: 16"}, {"v": 12.0, "tip": "Spring 2022-05-01: 12"}, {"v": 26.0, "tip": "Spring 2023-05-21: 26"}, {"v": 23.0, "tip": "Spring 2023-05-21: 23"}, {"v": 17.0, "tip": "Spring 2024-05-26: 17"}, {"v": 17.0, "tip": "Spring 2024-05-26: 17"}]}, {"label": "Summer", "sub": "15 surveys", "mean": 15.333333333333334, "meanLabel": "15.3", "values": [{"v": 14.0, "tip": "Summer 2007-07-07: 14"}, {"v": 18.0, "tip": "Summer 2008-07-19: 18"}, {"v": 18.0, "tip": "Summer 2008-07-19: 18"}, {"v": 13.0, "tip": "Summer 2009-07-10: 13"}, {"v": 15.0, "tip": "Summer 2010-07-17: 15"}, {"v": 14.0, "tip": "Summer 2015-07-12: 14"}, {"v": 18.0, "tip": "Summer 2015-07-12: 18"}, {"v": 9.0, "tip": "Summer 2016-07-17: 9"}, {"v": 12.0, "tip": "Summer 2019-07-14: 12"}, {"v": 15.0, "tip": "Summer 2019-07-14: 15"}, {"v": 16.0, "tip": "Summer 2022-07-24: 16"}, {"v": 18.0, "tip": "Summer 2022-07-24: 18"}, {"v": 14.0, "tip": "Summer 2023-07-16: 14"}, {"v": 14.0, "tip": "Summer 2024-07-14: 14"}, {"v": 22.0, "tip": "Summer 2024-09-15: 22"}]}, {"label": "Fall", "sub": "10 surveys", "mean": 15.8, "meanLabel": "15.8", "values": [{"v": 24.0, "tip": "Fall 2005-10-01: 24"}, {"v": 13.0, "tip": "Fall 2006-11-08: 13"}, {"v": 10.0, "tip": "Fall 2007-10-06: 10"}, {"v": 16.0, "tip": "Fall 2008-10-18: 16"}, {"v": 16.0, "tip": "Fall 2008-10-18: 16"}, {"v": 17.0, "tip": "Fall 2008-10-18: 17"}, {"v": 15.0, "tip": "Fall 2009-10-10: 15"}, {"v": 10.0, "tip": "Fall 2010-10-16: 10"}, {"v": 24.0, "tip": "Fall 2021-10-24: 24"}, {"v": 13.0, "tip": "Fall 2021-10-24: 13"}]}]}]</script>
 <script src="assets/charts.js?v=4f2d43b7"></script>
-<script src="assets/explorer.js?v=6eaed82f"></script>
+<script src="assets/explorer.js?v=51248372"></script>
 <script>
-  // Findings panel: closed by default; the viewer's choice is remembered on wide screens.
+  // Menus: click to open, Escape or an outside click closes; one open at a time. Phones: a full-screen sheet.
   (function () {
-    var root = document.documentElement, btn = document.getElementById("nav-btn"),
-        scrim = document.getElementById("scrim"), narrow = window.matchMedia("(max-width: 960px)");
-    function set(open, remember) {
-      root.classList.toggle("nav-open", open);
-      btn.setAttribute("aria-expanded", String(open));
-      scrim.hidden = !(open && narrow.matches);
-      if (remember && !narrow.matches) { try { localStorage.setItem("iwla-nav", open ? "1" : "0"); } catch (e) {} }
+    var btns = document.querySelectorAll(".has-menu > button");
+    function closeAll(except) {
+      btns.forEach(function (b) { if (b !== except) { b.setAttribute("aria-expanded", "false"); document.getElementById(b.getAttribute("aria-controls")).hidden = true; } });
     }
-    var saved = null;
-    try { saved = localStorage.getItem("iwla-nav"); } catch (e) {}
-    set(saved === "1" && !narrow.matches, false);
-    btn.addEventListener("click", function () { set(!root.classList.contains("nav-open"), true); });
-    document.getElementById("side-close").addEventListener("click", function () { set(false, true); btn.focus(); });
-    scrim.addEventListener("click", function () { set(false, false); });
-    document.addEventListener("keydown", function (e) { if (e.key === "Escape" && root.classList.contains("nav-open")) { set(false, true); btn.focus(); } });
-    narrow.addEventListener("change", function () { set(false, false); });
+    btns.forEach(function (b) {
+      var m = document.getElementById(b.getAttribute("aria-controls"));
+      b.addEventListener("click", function (e) {
+        e.stopPropagation();
+        var open = b.getAttribute("aria-expanded") === "true";
+        closeAll(b); b.setAttribute("aria-expanded", String(!open)); m.hidden = open;
+        if (!open && e.detail === 0) { var first = m.querySelector("a"); if (first) first.focus(); }
+      });
+    });
+    document.addEventListener("click", function (e) { if (!e.target.closest(".has-menu")) closeAll(); });
+    var sheet = document.getElementById("sheet"), mb = document.getElementById("menu-btn");
+    function setSheet(open) {
+      sheet.hidden = !open; mb.setAttribute("aria-expanded", String(open));
+      document.documentElement.classList.toggle("sheet-open", open);
+      if (open) sheet.querySelector("a").focus(); else mb.focus();
+    }
+    document.addEventListener("keydown", function (e) {
+      if (e.key !== "Escape") return;
+      var openBtn = document.querySelector('.has-menu > button[aria-expanded="true"]');
+      closeAll(); if (openBtn) openBtn.focus();
+      if (!sheet.hidden) setSheet(false);
+    });
+    mb.addEventListener("click", function () { setSheet(true); });
+    document.getElementById("sheet-close").addEventListener("click", function () { setSheet(false); });
   })();
 </script>
 </body>

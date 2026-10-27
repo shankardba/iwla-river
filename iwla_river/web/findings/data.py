@@ -82,3 +82,25 @@ def methods(db):
                      "The expected-score model is gradient-boosted trees validated with five folds grouped by site, so each "
                      "expected value comes from a model that never saw that site.",
                      "Code, tests and the full method notes: github.com/shankardba/iwla-river.")])
+
+
+@finding("data", "downloads", "Downloads", order=40)
+def downloads(db):
+    import os
+    from ... import config as C
+    docs = C.ROOT / "docs"
+    def size(p):
+        f = docs / p
+        return f"{f.stat().st_size / 1e6:.1f} MB" if f.exists() and f.stat().st_size > 1e6 else (f"{f.stat().st_size / 1e3:.0f} KB" if f.exists() else "")
+    rows = [
+        [{"href": "data/watershed_metrics.csv", "text": "watershed_metrics.csv"}, "Every watershed at every level: sites, surveys, sensitive share found and expected, gap and its trend, paved, forest, chloride, nitrate", size("data/watershed_metrics.csv")],
+        [{"href": "findings.json", "text": "findings.json"}, "Every finding on this site: title, headline, status and key figures", size("findings.json")],
+        [{"href": "data/watersheds.json", "text": "watersheds.json"}, "Regions to subbasins and the sample heat cells, as used by Explore", size("data/watersheds.json")],
+    ]
+    return Page(
+        headline="Watershed-level figures and every finding, free to download.",
+        status="info",
+        blocks=[table([("File",), ("What it holds",), ("Size", 1)], rows),
+                text("Downloads are aggregates. Site-level records stay with the Izaak Walton League's Clean Water Hub, "
+                     "where volunteers entered them; many sites are home taps and are not republished here.",
+                     "Code that rebuilds everything from the Hub: github.com/shankardba/iwla-river.")])

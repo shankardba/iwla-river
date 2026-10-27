@@ -1,63 +1,59 @@
 {% extends "base.html" %}
 {% import "_blocks.html" as ui with context %}
-{% block main %}
-<section class="hero">
-  <div class="eyebrow">Izaak Walton League · Rockville Chapter · Save Our Streams</div>
-  <h1>Great Seneca Creek Record</h1>
-  <p class="lede">{{ meta.chapter_surveys }} stream surveys at two sites between {{ meta.first_year }} and {{ meta.last_year }}, read against {{ meta.usable | fmt }} volunteer surveys nationwide. {% if by_id.expected and by_id.expected.page.status == 'concern' %}The creek's overall score has held steady, but it is losing pollution-sensitive animals faster than its setting explains.{% elif by_id.expected and by_id.expected.page.status == 'watch' %}The creek's overall score has held steady, but its share of pollution-sensitive animals appears to be slipping below what its setting predicts.{% endif %}</p>
-  <p class="meta">Data as of {{ meta.snapshot }}</p>
-</section>
-
+{% block title %}Great Seneca Creek Record · Explore{% endblock %}
+{% block body_class %}is-app{% endblock %}
+{% block body %}
 {% if explorer_chapter is not none %}
-<section class="block home-explorer">
-  <p class="meta">Where samples are taken, by watershed. Filter by sample type, click a ring to zoom into a watershed, or jump to Great Seneca Creek.</p>
-  {{ ui.explorer(explorer_chapter) }}
-</section>
-{% endif %}
-
-<div class="numbers">
-  <div><b>{{ meta.chapter_surveys }}</b><span>chapter surveys</span></div>
-  <div><b>{{ meta.first_year }}–{{ meta.last_year }}</b><span>years on record</span></div>
-  <div><b>{{ meta.usable | fmt }}</b><span>usable surveys nationwide</span></div>
-  <div><b>{{ meta.sites | fmt }}</b><span>sites with data</span></div>
-</div>
-
-<section class="block">
-  <h2>Key findings</h2>
-  <div class="cards">
-    {% for f in key %}{{ ui.card(f, show_section=True) }}{% endfor %}
-  </div>
-</section>
-
-<section class="block">
-  <h2>Explore</h2>
-  <div class="sections">
-    {% for s in sections %}
-    <div class="sec">
-      <h3><a href="{{ s.url }}">{{ s.title }}</a></h3>
-      <p>{{ s.intro }}</p>
-      <ul>
-        {% for f in s.findings %}<li><span class="dot {{ f.page.status }}"></span><a href="{{ f.url }}">{{ f.title }}</a></li>{% endfor %}
-      </ul>
+<div class="app" id="explorer" data-chapter="{{ explorer_chapter }}">
+  <h1 class="sr-only">Explore Save Our Streams data by watershed</h1>
+  <div class="app-bar">
+    <div class="ex-search" role="search">
+      <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M13 13l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <input type="search" id="ex-q" placeholder="Search a watershed, stream or site" autocomplete="off" spellcheck="false"
+             role="combobox" aria-label="Search watersheds and biological sites" aria-autocomplete="list" aria-expanded="false" aria-controls="ex-results">
+      <kbd aria-hidden="true">/</kbd>
+      <ul class="ex-results" id="ex-results" role="listbox" hidden></ul>
     </div>
-    {% endfor %}
+    <div class="ex-tools-kind seg" role="group" aria-label="Sample type shown on the map"></div>
+    <label class="ex-select"><span>Colour rings by</span>
+      <select class="ex-colorby" aria-label="Colour rings by">
+        <option value="gap">Sensitive animals vs expected</option>
+        <option value="paved">Watershed paved</option>
+        <option value="chloride">Chloride</option>
+        <option value="score">Score percentile</option>
+        <option value="surveys">Biological surveys</option>
+      </select>
+    </label>
+    <label class="ex-toggle"><input type="checkbox" class="ex-rings" checked> Rings</label>
   </div>
-</section>
-
-{% if hero_svg %}
-<section class="block">
-  <h2>How volunteers sample</h2>
-  <p>Save Our Streams volunteers work in riffles, the fast, shallow, stony stretches of a stream. They stir the stones upstream of a net and count the animals that wash in.</p>
-  <figure class="diagram">{{ hero_svg | safe }}<figcaption>Illustration. Animals in the lens are drawn far larger than true.</figcaption></figure>
-</section>
+  <div class="app-main">
+    <section class="app-map" aria-label="Map">
+      <div class="ex-map"><div class="ex-empty">Loading the map…</div></div>
+      <div class="ex-legend"></div>
+    </section>
+    <aside class="ex-panel" aria-label="Details" aria-live="polite">
+      <nav class="ex-crumbs" aria-label="Watershed path"></nav>
+      <div class="ex-head"></div>
+      <div class="ex-body"></div>
+    </aside>
+  </div>
+</div>
 {% endif %}
 
-<section class="block">
-  <h2>Next</h2>
-  <ol class="next">
-    <li>Tags drawn from volunteers' notes (storms, construction, spills) to look for local causes of the loss of sensitive animals.</li>
-    <li>Scanned paper data sheets for the years with no Hub record, and plain-English questions over the tables.</li>
-    <li>A scheduled refresh, with an alert when a new survey falls outside its expected range.</li>
-  </ol>
-</section>
+<div class="page home-below">
+  <section class="block">
+    <div class="block-head"><h2>What the data shows</h2><a class="more" href="findings.html">All findings →</a></div>
+    <div class="cards">
+      {% for f in key %}{{ ui.card(f, show_section=True) }}{% endfor %}
+    </div>
+  </section>
+  <section class="block">
+    <div class="numbers">
+      <div><b>{{ meta.usable | fmt }}</b><span>usable samples nationwide</span></div>
+      <div><b>{{ meta.sites | fmt }}</b><span>sites with samples</span></div>
+      <div><b>{{ meta.chapter_surveys }}</b><span>surveys at the chapter's two sites</span></div>
+      <div><b>{{ meta.first_year }}–{{ meta.last_year }}</b><span>years of the chapter's record</span></div>
+    </div>
+  </section>
+</div>
 {% endblock %}

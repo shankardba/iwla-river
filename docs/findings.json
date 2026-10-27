@@ -100,16 +100,6 @@
   },
   {
    "section": "watersheds",
-   "id": "explorer",
-   "title": "Watershed explorer",
-   "url": "watersheds--explorer.html",
-   "key": true,
-   "headline": "Explore 3,433 subwatersheds with surveys, from US regions down to the chapter's own Great Seneca Creek.",
-   "status": "info",
-   "numbers": []
-  },
-  {
-   "section": "watersheds",
    "id": "great-seneca",
    "title": "Great Seneca Creek within its watersheds",
    "url": "watersheds--great-seneca.html",
@@ -289,6 +279,16 @@
    "url": "data--methods.html",
    "key": false,
    "headline": "Built from a Clean Water Hub snapshot of 2026-10-27, with public land-cover and weather data.",
+   "status": "info",
+   "numbers": []
+  },
+  {
+   "section": "data",
+   "id": "downloads",
+   "title": "Downloads",
+   "url": "data--downloads.html",
+   "key": false,
+   "headline": "Watershed-level figures and every finding, free to download.",
    "status": "info",
    "numbers": []
   }

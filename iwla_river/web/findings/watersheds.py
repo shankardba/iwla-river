@@ -7,8 +7,8 @@ from ..db import fmt, pct
 from ..registry import Page, finding, links, section, table, text
 
 section("watersheds", "Watersheds",
-        "Zoom from the whole country into nested USGS watersheds, from regions down to small subwatersheds, "
-        "and compare each one's stream health, land and water chemistry with the unit around it.", order=15)
+        "How the chapter's creek compares with each larger watershed it sits inside. To zoom through every "
+        "watershed in the country, use Explore.", order=15)
 
 LEVEL = {2: "Region", 4: "Subregion", 6: "Basin", 8: "Subbasin", 10: "Watershed", 12: "Subwatershed"}
 
@@ -28,8 +28,7 @@ def chapter_huc(db):
     return db.one("SELECT huc12 FROM site_huc WHERE site_id = 467")
 
 
-@finding("watersheds", "explorer", "Watershed explorer", order=10, key=True)
-def explorer(db):
+def explorer(db):  # retired: the Explore page (index.html) is the explorer now
     if not complete(db):
         return None
     huc = chapter_huc(db) or ""
@@ -75,4 +74,5 @@ def great_seneca(db):
                       [[f"{LEVEL[r['digits']]} ({r['code']})", r["name"] or "—", fmt(r["sites"]), fmt(r["bio_surveys"]),
                         num(r["sens_obs"], pct), num(r["sens_exp"], pct), gv(r), num(r["imperv"], lambda v: f"{v:.1f}%"),
                         num(r["cl_median"], lambda v: f"{v:.0f} mg/L")] for r in rows]),
-                links([("explorer", "zoom in and out from here"), ("expected", "the chapter's own sites against expectations")])])
+                text("Open Explore to zoom from any of these units to its neighbours."),
+                links([("expected", "the chapter's own sites against expectations")])])

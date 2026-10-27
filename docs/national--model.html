@@ -26,92 +26,111 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="assets/site.css?v=80f28218">
+<link rel="stylesheet" href="assets/site.css?v=709852cb">
 </head>
-<body>
+<body class="">
 <header class="topbar">
   <div class="topbar-in">
-    <button class="nav-btn" id="nav-btn" type="button" aria-controls="side" aria-expanded="false">
-      <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-      <span>Findings</span>
+    <a class="brand" href="index.html" aria-label="Great Seneca Creek Record, home">
+      <img src="assets/icon.svg?v=1" alt="" width="26" height="26">
+      <span class="brand-name">Great Seneca Creek Record</span>
+    </a>
+    <nav class="mainnav" aria-label="Main">
+      <ul>
+        <li><a class="nav-link" href="index.html" >Explore</a></li>
+        <li class="has-menu">
+          <button class="nav-link" type="button" aria-expanded="false" aria-controls="menu-findings"
+data-current>Findings<svg viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></button>
+          <div class="menu mega" id="menu-findings" hidden>
+            <a class="menu-all" href="findings.html">All findings <span class="meta">every result on one page</span></a>
+            <div class="mega-cols">
+              <div class="mega-col">
+                <a class="mega-head" href="chapter.html">Great Seneca Creek</a>
+                <ul><li><a href="chapter--expected.html" ><span class="dot watch"></span>Compared with what its setting predicts</a></li><li><a href="chapter--score-trend.html" ><span class="dot steady"></span>The score has held steady</a></li><li><a href="chapter--species-mix.html" ><span class="dot watch"></span>The mix of animals is shifting</a></li><li><a href="chapter--trend-tests.html" ><span class="dot concern"></span>Trend tests</a></li><li><a href="chapter--score-parts.html" ><span class="dot info"></span>What moves the score</a></li><li><a href="chapter--season.html" ><span class="dot info"></span>Season matters</a></li><li><a href="chapter--survey-forms.html" ><span class="dot info"></span>The chapter changed survey forms in 2024</a></li></ul>
+              </div>
+              <div class="mega-col">
+                <a class="mega-head" href="watersheds.html">Watersheds</a>
+                <ul><li><a href="watersheds--great-seneca.html" ><span class="dot info"></span>Great Seneca Creek within its watersheds</a></li></ul>
+              </div>
+              <div class="mega-col">
+                <a class="mega-head" href="chemistry.html">Water chemistry</a>
+                <ul><li><a href="chemistry--road-salt.html" ><span class="dot watch"></span>Road salt reaches the creek every winter</a></li><li><a href="chemistry--nitrate.html" ><span class="dot good"></span>Nitrate stays low</a></li></ul>
+              </div>
+              <div class="mega-col">
+                <a class="mega-head" href="region.html">Neighbouring streams</a>
+                <ul><li><a href="region--local-map.html" ><span class="dot info"></span>Map of sites around the creek</a></li><li><a href="region--neighbour-trends.html" ><span class="dot good"></span>Streams across the Potomac are mostly improving</a></li><li><a href="region--nearby-sites.html" ><span class="dot info"></span>Sites nearby</a></li></ul>
+              </div>
+              <div class="mega-col">
+                <a class="mega-head" href="national.html">National picture</a>
+                <ul><li><a href="national--map.html" ><span class="dot info"></span>Where volunteers monitor</a></li><li><a href="national--paving.html" ><span class="dot info"></span>Paved watersheds lose sensitive animals</a></li><li><a href="national--model.html" aria-current="page"><span class="dot info"></span>How the expected-score model works</a></li><li><a href="national--monitoring-growth.html" ><span class="dot info"></span>Volunteer monitoring took off after 2017</a></li></ul>
+              </div>
+            </div>
+          </div>
+        </li>
+        <li><a class="nav-link" href="chapter.html" >Great Seneca Creek</a></li>
+        <li class="has-menu">
+          <button class="nav-link" type="button" aria-expanded="false" aria-controls="menu-data" >Data<svg viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></button>
+          <div class="menu" id="menu-data" hidden>
+            <ul><li><a href="data--data-quality.html" ><b>How clean the data is</b><span class="meta">83,297 of 88,511 records (94%) are usable after removing undated,...</span></a></li><li><a href="data--temperature-units.html" ><b>Water temperature switches units</b><span class="meta">The Hub stores no temperature unit; chapter readings switch from °C...</span></a></li><li><a href="data--methods.html" ><b>Sources and methods</b><span class="meta">Built from a Clean Water Hub snapshot of 2026-10-27, with public...</span></a></li><li><a href="data--downloads.html" ><b>Downloads</b><span class="meta">Watershed-level figures and every finding, free to download.</span></a></li></ul>
+          </div>
+        </li>
+        <li><a class="nav-link" href="about.html" >About</a></li>
+      </ul>
+    </nav>
+    <button class="menu-btn" id="menu-btn" type="button" aria-expanded="false" aria-controls="sheet" aria-label="Open the menu">
+      <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
     </button>
-    <div class="brand-wrap">
-      <a class="brand" href="index.html">Great Seneca Creek Record</a>
-      <span class="brand-sub">IWLA Rockville Chapter · Save Our Streams</span>
-    </div>
   </div>
 </header>
-<div class="layout">
-  <nav class="side" id="side" aria-label="All findings">
-    <div class="side-head"><span>All findings</span><button class="side-close" id="side-close" type="button" aria-label="Close the findings panel">×</button></div>
-      <ul class="tree">
-        <li><a href="index.html" >Overview</a></li>
-        <li class="tree-sec">
-          <a href="chapter.html" >Great Seneca Creek</a>
-          <ul>
-            <li><a href="chapter--expected.html" ><span class="dot watch"></span>Compared with what its setting predicts</a></li>
-            <li><a href="chapter--score-trend.html" ><span class="dot steady"></span>The score has held steady</a></li>
-            <li><a href="chapter--species-mix.html" ><span class="dot watch"></span>The mix of animals is shifting</a></li>
-            <li><a href="chapter--trend-tests.html" ><span class="dot concern"></span>Trend tests</a></li>
-            <li><a href="chapter--score-parts.html" ><span class="dot info"></span>What moves the score</a></li>
-            <li><a href="chapter--season.html" ><span class="dot info"></span>Season matters</a></li>
-            <li><a href="chapter--survey-forms.html" ><span class="dot info"></span>The chapter changed survey forms in 2024</a></li>
-          </ul>
-        </li>
-        <li class="tree-sec">
-          <a href="watersheds.html" >Watersheds</a>
-          <ul>
-            <li><a href="watersheds--explorer.html" ><span class="dot info"></span>Watershed explorer</a></li>
-            <li><a href="watersheds--great-seneca.html" ><span class="dot info"></span>Great Seneca Creek within its watersheds</a></li>
-          </ul>
-        </li>
-        <li class="tree-sec">
-          <a href="chemistry.html" >Water chemistry</a>
-          <ul>
-            <li><a href="chemistry--road-salt.html" ><span class="dot watch"></span>Road salt reaches the creek every winter</a></li>
-            <li><a href="chemistry--nitrate.html" ><span class="dot good"></span>Nitrate stays low</a></li>
-          </ul>
-        </li>
-        <li class="tree-sec">
-          <a href="region.html" >Neighbouring streams</a>
-          <ul>
-            <li><a href="region--local-map.html" ><span class="dot info"></span>Map of sites around the creek</a></li>
-            <li><a href="region--neighbour-trends.html" ><span class="dot good"></span>Streams across the Potomac are mostly improving</a></li>
-            <li><a href="region--nearby-sites.html" ><span class="dot info"></span>Sites nearby</a></li>
-          </ul>
-        </li>
-        <li class="tree-sec">
-          <a href="national.html" >National picture</a>
-          <ul>
-            <li><a href="national--map.html" ><span class="dot info"></span>Where volunteers monitor</a></li>
-            <li><a href="national--paving.html" ><span class="dot info"></span>Paved watersheds lose sensitive animals</a></li>
-            <li><a href="national--model.html" aria-current="page"><span class="dot info"></span>How the expected-score model works</a></li>
-            <li><a href="national--monitoring-growth.html" ><span class="dot info"></span>Volunteer monitoring took off after 2017</a></li>
-          </ul>
-        </li>
-        <li class="tree-sec">
-          <a href="data.html" >Data and methods</a>
-          <ul>
-            <li><a href="data--data-quality.html" ><span class="dot info"></span>How clean the data is</a></li>
-            <li><a href="data--temperature-units.html" ><span class="dot info"></span>Water temperature switches units</a></li>
-            <li><a href="data--methods.html" ><span class="dot info"></span>Sources and methods</a></li>
-          </ul>
-        </li>
-      </ul>
+
+<div class="sheet" id="sheet" hidden>
+  <div class="sheet-head"><span class="brand-name">Menu</span><button class="sheet-close" id="sheet-close" type="button" aria-label="Close the menu">×</button></div>
+  <nav aria-label="Main (phone)">
+    <a class="sheet-top" href="index.html">Explore the map</a>
+    <a class="sheet-top" href="findings.html">All findings</a>
+    <details >
+      <summary>Great Seneca Creek</summary>
+      <ul><li><a href="chapter.html">Section overview</a></li><li><a href="chapter--expected.html"><span class="dot watch"></span>Compared with what its setting predicts</a></li><li><a href="chapter--score-trend.html"><span class="dot steady"></span>The score has held steady</a></li><li><a href="chapter--species-mix.html"><span class="dot watch"></span>The mix of animals is shifting</a></li><li><a href="chapter--trend-tests.html"><span class="dot concern"></span>Trend tests</a></li><li><a href="chapter--score-parts.html"><span class="dot info"></span>What moves the score</a></li><li><a href="chapter--season.html"><span class="dot info"></span>Season matters</a></li><li><a href="chapter--survey-forms.html"><span class="dot info"></span>The chapter changed survey forms in 2024</a></li></ul>
+    </details>
+    <details >
+      <summary>Watersheds</summary>
+      <ul><li><a href="watersheds.html">Section overview</a></li><li><a href="watersheds--great-seneca.html"><span class="dot info"></span>Great Seneca Creek within its watersheds</a></li></ul>
+    </details>
+    <details >
+      <summary>Water chemistry</summary>
+      <ul><li><a href="chemistry.html">Section overview</a></li><li><a href="chemistry--road-salt.html"><span class="dot watch"></span>Road salt reaches the creek every winter</a></li><li><a href="chemistry--nitrate.html"><span class="dot good"></span>Nitrate stays low</a></li></ul>
+    </details>
+    <details >
+      <summary>Neighbouring streams</summary>
+      <ul><li><a href="region.html">Section overview</a></li><li><a href="region--local-map.html"><span class="dot info"></span>Map of sites around the creek</a></li><li><a href="region--neighbour-trends.html"><span class="dot good"></span>Streams across the Potomac are mostly improving</a></li><li><a href="region--nearby-sites.html"><span class="dot info"></span>Sites nearby</a></li></ul>
+    </details>
+    <details open>
+      <summary>National picture</summary>
+      <ul><li><a href="national.html">Section overview</a></li><li><a href="national--map.html"><span class="dot info"></span>Where volunteers monitor</a></li><li><a href="national--paving.html"><span class="dot info"></span>Paved watersheds lose sensitive animals</a></li><li><a href="national--model.html"><span class="dot info"></span>How the expected-score model works</a></li><li><a href="national--monitoring-growth.html"><span class="dot info"></span>Volunteer monitoring took off after 2017</a></li></ul>
+    </details>
+    <details >
+      <summary>Data and methods</summary>
+      <ul><li><a href="data.html">Section overview</a></li><li><a href="data--data-quality.html"><span class="dot info"></span>How clean the data is</a></li><li><a href="data--temperature-units.html"><span class="dot info"></span>Water temperature switches units</a></li><li><a href="data--methods.html"><span class="dot info"></span>Sources and methods</a></li><li><a href="data--downloads.html"><span class="dot info"></span>Downloads</a></li></ul>
+    </details>
+    <a class="sheet-top" href="about.html">About</a>
   </nav>
-  <div class="scrim" id="scrim" hidden></div>
-  <main class="main">
-<nav class="crumbs" aria-label="Breadcrumb"><a href="index.html">Overview</a> <span>›</span> <a href="national.html">National picture</a> <span>›</span> How the expected-score model works</nav>
-<article class="finding">
-  <header class="hero">
-    <div class="eyebrow">National picture</div>
-    <h1>How the expected-score model works</h1>
-    <p class="lede"><span class="pill neutral">Context</span> Trained on 7,332 surveys at 1,162 sites, it explains 39% of the variation at sites it never saw.</p>
-  </header>
-  <div class="numbers">
+</div>
+
+<div class="page with-side">
+  <nav class="local" aria-label="In National picture">
+    <a class="local-head" href="national.html">National picture</a>
+    <ul><li><a href="national--map.html" ><span class="dot info"></span>Where volunteers monitor</a></li><li><a href="national--paving.html" ><span class="dot info"></span>Paved watersheds lose sensitive animals</a></li><li><a href="national--model.html" aria-current="page"><span class="dot info"></span>How the expected-score model works</a></li><li><a href="national--monitoring-growth.html" ><span class="dot info"></span>Volunteer monitoring took off after 2017</a></li></ul>
+  </nav>
+  <article class="finding">
+    <nav class="crumbs" aria-label="Breadcrumb"><a href="findings.html">Findings</a><span>›</span><a href="national.html">National picture</a></nav>
+    <header class="hero">
+      <h1>How the expected-score model works</h1>
+      <p class="lede"><span class="pill neutral">Context</span> Trained on 7,332 surveys at 1,162 sites, it explains 39% of the variation at sites it never saw.</p>
+    </header>
+    <div class="numbers">
 <div><b>0.39</b><span>held-out R², sensitive share</span></div><div><b>0.02</b><span>season and form alone</span></div></div>
 
-      <figure class="diagram"><svg class="dg" viewBox="0 0 760 300" role="img" aria-label="How the expected-score model works"><defs><radialGradient id="mf-water" cx="35%" cy="30%" r="80%"><stop offset="0" style="stop-color:color-mix(in srgb, var(--dg-water) 62%, white)"/><stop offset=".55" style="stop-color:var(--dg-water)"/><stop offset="1" style="stop-color:color-mix(in srgb, var(--dg-water) 70%, black)"/></radialGradient><radialGradient id="mf-water-deep" cx="35%" cy="30%" r="80%"><stop offset="0" style="stop-color:color-mix(in srgb, var(--dg-water-deep) 62%, white)"/><stop offset=".55" style="stop-color:var(--dg-water-deep)"/><stop offset="1" style="stop-color:color-mix(in srgb, var(--dg-water-deep) 70%, black)"/></radialGradient><radialGradient id="mf-stone" cx="35%" cy="30%" r="80%"><stop offset="0" style="stop-color:color-mix(in srgb, var(--dg-stone) 62%, white)"/><stop offset=".55" style="stop-color:var(--dg-stone)"/><stop offset="1" style="stop-color:color-mix(in srgb, var(--dg-stone) 70%, black)"/></radialGradient><radialGradient id="mf-stone-dark" cx="35%" cy="30%" r="80%"><stop offset="0" style="stop-color:color-mix(in srgb, var(--dg-stone-dark) 62%, white)"/><stop offset=".55" style="stop-color:var(--dg-stone-dark)"/><stop offset="1" style="stop-color:color-mix(in srgb, var(--dg-stone-dark) 70%, black)"/></radialGradient><radialGradient id="mf-sand" cx="35%" cy="30%" r="80%"><stop offset="0" style="stop-color:color-mix(in srgb, var(--dg-sand) 62%, white)"/><stop offset=".55" style="stop-color:var(--dg-sand)"/><stop offset="1" style="stop-color:color-mix(in srgb, var(--dg-sand) 70%, black)"/></radialGradient><radialGradient id="mf-soil" cx="35%" cy="30%" r="80%"><stop offset="0" style="stop-color:color-mix(in srgb, var(--dg-soil) 62%, white)"/><stop offset=".55" style="stop-color:var(--dg-soil)"/><stop offset="1" style="stop-color:color-mix(in srgb, var(--dg-soil) 70%, black)"/></radialGradient><radialGradient id="mf-leaf" cx="35%" cy="30%" r="80%"><stop offset="0" style="stop-color:color-mix(in srgb, var(--dg-leaf) 62%, white)"/><stop offset=".55" style="stop-color:var(--dg-leaf)"/><stop offset="1" style="stop-color:color-mix(in srgb, var(--dg-leaf) 70%, black)"/></radialGradient><radialGradient id="mf-leaf-dark" cx="35%" cy="30%" r="80%"><stop offset="0" style="stop-color:color-mix(in srgb, var(--dg-leaf-dark) 62%, white)"/><stop offset=".55" style="stop-color:var(--dg-leaf-dark)"/><stop offset="1" style="stop-color:color-mix(in srgb, var(--dg-leaf-dark) 70%, black)"/></radialGradient><radialGradient id="mf-bark" cx="35%" cy="30%" r="80%"><stop offset="0" style="stop-color:color-mix(in srgb, var(--dg-bark) 62%, white)"/><stop offset=".55" style="stop-color:var(--dg-bark)"/><stop offset="1" style="stop-color:color-mix(in srgb, var(--dg-bark) 70%, black)"/></radialGradient><radialGradient id="mf-grass" cx="35%" cy="30%" r="80%"><stop offset="0" style="stop-color:color-mix(in srgb, var(--dg-grass) 62%, white)"/><stop offset=".55" style="stop-color:var(--dg-grass)"/><stop offset="1" style="stop-color:color-mix(in srgb, var(--dg-grass) 70%, black)"/></radialGradient><radialGradient id="mf-roof" cx="35%" cy="30%" r="80%"><stop offset="0" style="stop-color:color-mix(in srgb, var(--dg-roof) 62%, white)"/><stop offset=".55" style="stop-color:var(--dg-roof)"/><stop offset="1" style="stop-color:color-mix(in srgb, var(--dg-roof) 70%, black)"/></radialGradient><radialGradient id="mf-wall" cx="35%" cy="30%" r="80%"><stop offset="0" style="stop-color:color-mix(in srgb, var(--dg-wall) 62%, white)"/><stop offset=".55" style="stop-color:var(--dg-wall)"/><stop offset="1" style="stop-color:color-mix(in srgb, var(--dg-wall) 70%, black)"/></radialGradient><radialGradient id="mf-road" cx="35%" cy="30%" r="80%"><stop offset="0" style="stop-color:color-mix(in srgb, var(--dg-road) 62%, white)"/><stop offset=".55" style="stop-color:var(--dg-road)"/><stop offset="1" style="stop-color:color-mix(in srgb, var(--dg-road) 70%, black)"/></radialGradient><radialGradient id="mf-snow" cx="35%" cy="30%" r="80%"><stop offset="0" style="stop-color:color-mix(in srgb, var(--dg-snow) 62%, white)"/><stop offset=".55" style="stop-color:var(--dg-snow)"/><stop offset="1" style="stop-color:color-mix(in srgb, var(--dg-snow) 70%, black)"/></radialGradient><radialGradient id="mf-salt" cx="35%" cy="30%" r="80%"><stop offset="0" style="stop-color:color-mix(in srgb, var(--dg-salt) 62%, white)"/><stop offset=".55" style="stop-color:var(--dg-salt)"/><stop offset="1" style="stop-color:color-mix(in srgb, var(--dg-salt) 70%, black)"/></radialGradient><radialGradient id="mf-olive" cx="35%" cy="30%" r="80%"><stop offset="0" style="stop-color:color-mix(in srgb, var(--dg-olive) 62%, white)"/><stop offset=".55" style="stop-color:var(--dg-olive)"/><stop offset="1" style="stop-color:color-mix(in srgb, var(--dg-olive) 70%, black)"/></radialGradient><radialGradient id="mf-amber" cx="35%" cy="30%" r="80%"><stop offset="0" style="stop-color:color-mix(in srgb, var(--dg-amber) 62%, white)"/><stop offset=".55" style="stop-color:var(--dg-amber)"/><stop offset="1" style="stop-color:color-mix(in srgb, var(--dg-amber) 70%, black)"/></radialGradient><radialGradient id="mf-brown" cx="35%" cy="30%" r="80%"><stop offset="0" style="stop-color:color-mix(in srgb, var(--dg-brown) 62%, white)"/><stop offset=".55" style="stop-color:var(--dg-brown)"/><stop offset="1" style="stop-color:color-mix(in srgb, var(--dg-brown) 70%, black)"/></radialGradient><radialGradient id="mf-dark" cx="35%" cy="30%" r="80%"><stop offset="0" style="stop-color:color-mix(in srgb, var(--dg-dark) 62%, white)"/><stop offset=".55" style="stop-color:var(--dg-dark)"/><stop offset="1" style="stop-color:color-mix(in srgb, var(--dg-dark) 70%, black)"/></radialGradient><radialGradient id="mf-copper" cx="35%" cy="30%" r="80%"><stop offset="0" style="stop-color:color-mix(in srgb, var(--dg-copper) 62%, white)"/><stop offset=".55" style="stop-color:var(--dg-copper)"/><stop offset="1" style="stop-color:color-mix(in srgb, var(--dg-copper) 70%, black)"/></radialGradient><radialGradient id="mf-green" cx="35%" cy="30%" r="80%"><stop offset="0" style="stop-color:color-mix(in srgb, var(--dg-green) 62%, white)"/><stop offset=".55" style="stop-color:var(--dg-green)"/><stop offset="1" style="stop-color:color-mix(in srgb, var(--dg-green) 70%, black)"/></radialGradient><radialGradient id="mf-tan" cx="35%" cy="30%" r="80%"><stop offset="0" style="stop-color:color-mix(in srgb, var(--dg-tan) 62%, white)"/><stop offset=".55" style="stop-color:var(--dg-tan)"/><stop offset="1" style="stop-color:color-mix(in srgb, var(--dg-tan) 70%, black)"/></radialGradient><radialGradient id="mf-rust" cx="35%" cy="30%" r="80%"><stop offset="0" style="stop-color:color-mix(in srgb, var(--dg-rust) 62%, white)"/><stop offset=".55" style="stop-color:var(--dg-rust)"/><stop offset="1" style="stop-color:color-mix(in srgb, var(--dg-rust) 70%, black)"/></radialGradient><radialGradient id="mf-pink" cx="35%" cy="30%" r="80%"><stop offset="0" style="stop-color:color-mix(in srgb, var(--dg-pink) 62%, white)"/><stop offset=".55" style="stop-color:var(--dg-pink)"/><stop offset="1" style="stop-color:color-mix(in srgb, var(--dg-pink) 70%, black)"/></radialGradient><radialGradient id="mf-blood" cx="35%" cy="30%" r="80%"><stop offset="0" style="stop-color:color-mix(in srgb, var(--dg-blood) 62%, white)"/><stop offset=".55" style="stop-color:var(--dg-blood)"/><stop offset="1" style="stop-color:color-mix(in srgb, var(--dg-blood) 70%, black)"/></radialGradient><radialGradient id="mf-grey" cx="35%" cy="30%" r="80%"><stop offset="0" style="stop-color:color-mix(in srgb, var(--dg-grey) 62%, white)"/><stop offset=".55" style="stop-color:var(--dg-grey)"/><stop offset="1" style="stop-color:color-mix(in srgb, var(--dg-grey) 70%, black)"/></radialGradient><radialGradient id="mf-beige" cx="35%" cy="30%" r="80%"><stop offset="0" style="stop-color:color-mix(in srgb, var(--dg-beige) 62%, white)"/><stop offset=".55" style="stop-color:var(--dg-beige)"/><stop offset="1" style="stop-color:color-mix(in srgb, var(--dg-beige) 70%, black)"/></radialGradient><radialGradient id="mf-accent" cx="35%" cy="30%" r="80%"><stop offset="0" style="stop-color:color-mix(in srgb, var(--dg-accent) 62%, white)"/><stop offset=".55" style="stop-color:var(--dg-accent)"/><stop offset="1" style="stop-color:color-mix(in srgb, var(--dg-accent) 70%, black)"/></radialGradient><linearGradient id="mf-wcol" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--dg-water)"/><stop offset="1" style="stop-color:var(--dg-water-deep)"/></linearGradient><linearGradient id="mf-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--dg-sky)"/><stop offset="1" style="stop-color:var(--surface)"/></linearGradient><marker id="mf-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--dg-flow)"/></marker><marker id="mf-arrow-ink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--muted)"/></marker></defs><text class="dg-big" x="0" y="18" text-anchor="start" >How each survey is judged against what its setting predicts</text><rect x="0" y="44" width="190" height="26" rx="13" style="fill:var(--bg);stroke:var(--rule)"/><text class="dg-sub" x="12" y="61" text-anchor="start" >Season</text><path d="M190 57 C215 57 215 150 236 150" fill="none" style="stroke:var(--rule)" stroke-width="1.2"/><rect x="0" y="78" width="190" height="26" rx="13" style="fill:var(--bg);stroke:var(--rule)"/><text class="dg-sub" x="12" y="95" text-anchor="start" >Survey form</text><path d="M190 91 C215 91 215 150 236 150" fill="none" style="stroke:var(--rule)" stroke-width="1.2"/><rect x="0" y="112" width="190" height="26" rx="13" style="fill:var(--bg);stroke:var(--rule)"/><text class="dg-sub" x="12" y="129" text-anchor="start" >Watershed land cover</text><path d="M190 125 C215 125 215 150 236 150" fill="none" style="stroke:var(--rule)" stroke-width="1.2"/><rect x="0" y="146" width="190" height="26" rx="13" style="fill:var(--bg);stroke:var(--rule)"/><text class="dg-sub" x="12" y="163" text-anchor="start" >Soil, elevation, climate</text><path d="M190 159 C215 159 215 150 236 150" fill="none" style="stroke:var(--rule)" stroke-width="1.2"/><rect x="0" y="180" width="190" height="26" rx="13" style="fill:var(--bg);stroke:var(--rule)"/><text class="dg-sub" x="12" y="197" text-anchor="start" >Recent rain and heat</text><path d="M190 193 C215 193 215 150 236 150" fill="none" style="stroke:var(--rule)" stroke-width="1.2"/><rect x="0" y="214" width="190" height="26" rx="13" style="fill:var(--bg);stroke:var(--rule)"/><text class="dg-sub" x="12" y="231" text-anchor="start" >Water temperature and flow</text><path d="M190 227 C215 227 215 150 236 150" fill="none" style="stroke:var(--rule)" stroke-width="1.2"/><rect x="0" y="248" width="190" height="26" rx="13" style="fill:var(--bg);stroke:var(--rule)"/><text class="dg-sub" x="12" y="265" text-anchor="start" >Team size</text><path d="M190 261 C215 261 215 150 236 150" fill="none" style="stroke:var(--rule)" stroke-width="1.2"/><rect x="238" y="104" width="190" height="92" rx="10" style="fill:var(--surface);stroke:var(--accent)" stroke-width="1.6"/><text class="dg-name" x="333" y="130" text-anchor="middle" >Model</text><text class="dg-sub" x="333" y="150" text-anchor="middle" >trained on 7,332 surveys</text><text class="dg-sub" x="333" y="166" text-anchor="middle" >at 1,162 other sites</text><text class="dg-sub" x="333" y="184" text-anchor="middle" >(never sees the year)</text><line x1="428" y1="150" x2="468" y2="150" style="stroke:var(--muted)" stroke-width="1.4" marker-end="url(#mf-arrow-ink)"/><text class="dg-name" x="560" y="72" text-anchor="middle" >Expected range for a survey</text><rect x="480" y="90" width="160" height="22" rx="4" style="fill:var(--grey)" opacity=".25"/><line x1="560" x2="560" y1="86" y2="116" style="stroke:var(--muted)" stroke-dasharray="3 3"/><text class="dg-sub" x="560" y="128" text-anchor="middle" >expected</text><circle cx="500" cy="101" r="6" style="fill:var(--accent)"/><text class="dg-sub" x="500" y="145" text-anchor="middle" >found</text><line x1="500" y1="133" x2="500" y2="108" style="stroke:var(--accent)" stroke-width=".8"/><text class="dg-sub" x="560" y="166" text-anchor="middle" >gap = found − expected</text><line x1="480" x2="715" y1="225.2" y2="225.2" style="stroke:var(--grey)"/><text class="dg-sub" x="715" y="221.2" text-anchor="end" >as expected</text><polyline points="480,231.7 538.8,234.1 597.5,241.5 656.2,232.5 715,265" fill="none" style="stroke:var(--accent)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" /><circle cx="480" cy="231.7" r="3.5" style="fill:var(--accent)"/><text class="dg-sub" x="480" y="296" text-anchor="middle" >2005–09</text><circle cx="538.8" cy="234.1" r="3.5" style="fill:var(--accent)"/><text class="dg-sub" x="538.8" y="296" text-anchor="middle" >2010–14</text><circle cx="597.5" cy="241.5" r="3.5" style="fill:var(--accent)"/><text class="dg-sub" x="597.5" y="296" text-anchor="middle" >2015–19</text><circle cx="656.2" cy="232.5" r="3.5" style="fill:var(--accent)"/><text class="dg-sub" x="656.2" y="296" text-anchor="middle" >2020–24</text><circle cx="715" cy="265" r="3.5" style="fill:var(--accent)"/><text class="dg-sub" x="715" y="296" text-anchor="middle" >2025–26</text><text class="dg-name" x="470" y="196" text-anchor="start" >Site 1&#x27;s median gap, by five-year period</text><text class="dg-sub" x="0" y="296" text-anchor="start" >Held-out accuracy: R² 0.39, against 0.02 for season and form alone</text></svg><figcaption>How the model is used. The line is Site 1&#39;s median gap in each five-year period.</figcaption></figure>
+        <figure class="diagram"><svg class="dg" viewBox="0 0 760 300" role="img" aria-label="How the expected-score model works"><defs><radialGradient id="mf-water" cx="35%" cy="30%" r="80%"><stop offset="0" style="stop-color:color-mix(in srgb, var(--dg-water) 62%, white)"/><stop offset=".55" style="stop-color:var(--dg-water)"/><stop offset="1" style="stop-color:color-mix(in srgb, var(--dg-water) 70%, black)"/></radialGradient><radialGradient id="mf-water-deep" cx="35%" cy="30%" r="80%"><stop offset="0" style="stop-color:color-mix(in srgb, var(--dg-water-deep) 62%, white)"/><stop offset=".55" style="stop-color:var(--dg-water-deep)"/><stop offset="1" style="stop-color:color-mix(in srgb, var(--dg-water-deep) 70%, black)"/></radialGradient><radialGradient id="mf-stone" cx="35%" cy="30%" r="80%"><stop offset="0" style="stop-color:color-mix(in srgb, var(--dg-stone) 62%, white)"/><stop offset=".55" style="stop-color:var(--dg-stone)"/><stop offset="1" style="stop-color:color-mix(in srgb, var(--dg-stone) 70%, black)"/></radialGradient><radialGradient id="mf-stone-dark" cx="35%" cy="30%" r="80%"><stop offset="0" style="stop-color:color-mix(in srgb, var(--dg-stone-dark) 62%, white)"/><stop offset=".55" style="stop-color:var(--dg-stone-dark)"/><stop offset="1" style="stop-color:color-mix(in srgb, var(--dg-stone-dark) 70%, black)"/></radialGradient><radialGradient id="mf-sand" cx="35%" cy="30%" r="80%"><stop offset="0" style="stop-color:color-mix(in srgb, var(--dg-sand) 62%, white)"/><stop offset=".55" style="stop-color:var(--dg-sand)"/><stop offset="1" style="stop-color:color-mix(in srgb, var(--dg-sand) 70%, black)"/></radialGradient><radialGradient id="mf-soil" cx="35%" cy="30%" r="80%"><stop offset="0" style="stop-color:color-mix(in srgb, var(--dg-soil) 62%, white)"/><stop offset=".55" style="stop-color:var(--dg-soil)"/><stop offset="1" style="stop-color:color-mix(in srgb, var(--dg-soil) 70%, black)"/></radialGradient><radialGradient id="mf-leaf" cx="35%" cy="30%" r="80%"><stop offset="0" style="stop-color:color-mix(in srgb, var(--dg-leaf) 62%, white)"/><stop offset=".55" style="stop-color:var(--dg-leaf)"/><stop offset="1" style="stop-color:color-mix(in srgb, var(--dg-leaf) 70%, black)"/></radialGradient><radialGradient id="mf-leaf-dark" cx="35%" cy="30%" r="80%"><stop offset="0" style="stop-color:color-mix(in srgb, var(--dg-leaf-dark) 62%, white)"/><stop offset=".55" style="stop-color:var(--dg-leaf-dark)"/><stop offset="1" style="stop-color:color-mix(in srgb, var(--dg-leaf-dark) 70%, black)"/></radialGradient><radialGradient id="mf-bark" cx="35%" cy="30%" r="80%"><stop offset="0" style="stop-color:color-mix(in srgb, var(--dg-bark) 62%, white)"/><stop offset=".55" style="stop-color:var(--dg-bark)"/><stop offset="1" style="stop-color:color-mix(in srgb, var(--dg-bark) 70%, black)"/></radialGradient><radialGradient id="mf-grass" cx="35%" cy="30%" r="80%"><stop offset="0" style="stop-color:color-mix(in srgb, var(--dg-grass) 62%, white)"/><stop offset=".55" style="stop-color:var(--dg-grass)"/><stop offset="1" style="stop-color:color-mix(in srgb, var(--dg-grass) 70%, black)"/></radialGradient><radialGradient id="mf-roof" cx="35%" cy="30%" r="80%"><stop offset="0" style="stop-color:color-mix(in srgb, var(--dg-roof) 62%, white)"/><stop offset=".55" style="stop-color:var(--dg-roof)"/><stop offset="1" style="stop-color:color-mix(in srgb, var(--dg-roof) 70%, black)"/></radialGradient><radialGradient id="mf-wall" cx="35%" cy="30%" r="80%"><stop offset="0" style="stop-color:color-mix(in srgb, var(--dg-wall) 62%, white)"/><stop offset=".55" style="stop-color:var(--dg-wall)"/><stop offset="1" style="stop-color:color-mix(in srgb, var(--dg-wall) 70%, black)"/></radialGradient><radialGradient id="mf-road" cx="35%" cy="30%" r="80%"><stop offset="0" style="stop-color:color-mix(in srgb, var(--dg-road) 62%, white)"/><stop offset=".55" style="stop-color:var(--dg-road)"/><stop offset="1" style="stop-color:color-mix(in srgb, var(--dg-road) 70%, black)"/></radialGradient><radialGradient id="mf-snow" cx="35%" cy="30%" r="80%"><stop offset="0" style="stop-color:color-mix(in srgb, var(--dg-snow) 62%, white)"/><stop offset=".55" style="stop-color:var(--dg-snow)"/><stop offset="1" style="stop-color:color-mix(in srgb, var(--dg-snow) 70%, black)"/></radialGradient><radialGradient id="mf-salt" cx="35%" cy="30%" r="80%"><stop offset="0" style="stop-color:color-mix(in srgb, var(--dg-salt) 62%, white)"/><stop offset=".55" style="stop-color:var(--dg-salt)"/><stop offset="1" style="stop-color:color-mix(in srgb, var(--dg-salt) 70%, black)"/></radialGradient><radialGradient id="mf-olive" cx="35%" cy="30%" r="80%"><stop offset="0" style="stop-color:color-mix(in srgb, var(--dg-olive) 62%, white)"/><stop offset=".55" style="stop-color:var(--dg-olive)"/><stop offset="1" style="stop-color:color-mix(in srgb, var(--dg-olive) 70%, black)"/></radialGradient><radialGradient id="mf-amber" cx="35%" cy="30%" r="80%"><stop offset="0" style="stop-color:color-mix(in srgb, var(--dg-amber) 62%, white)"/><stop offset=".55" style="stop-color:var(--dg-amber)"/><stop offset="1" style="stop-color:color-mix(in srgb, var(--dg-amber) 70%, black)"/></radialGradient><radialGradient id="mf-brown" cx="35%" cy="30%" r="80%"><stop offset="0" style="stop-color:color-mix(in srgb, var(--dg-brown) 62%, white)"/><stop offset=".55" style="stop-color:var(--dg-brown)"/><stop offset="1" style="stop-color:color-mix(in srgb, var(--dg-brown) 70%, black)"/></radialGradient><radialGradient id="mf-dark" cx="35%" cy="30%" r="80%"><stop offset="0" style="stop-color:color-mix(in srgb, var(--dg-dark) 62%, white)"/><stop offset=".55" style="stop-color:var(--dg-dark)"/><stop offset="1" style="stop-color:color-mix(in srgb, var(--dg-dark) 70%, black)"/></radialGradient><radialGradient id="mf-copper" cx="35%" cy="30%" r="80%"><stop offset="0" style="stop-color:color-mix(in srgb, var(--dg-copper) 62%, white)"/><stop offset=".55" style="stop-color:var(--dg-copper)"/><stop offset="1" style="stop-color:color-mix(in srgb, var(--dg-copper) 70%, black)"/></radialGradient><radialGradient id="mf-green" cx="35%" cy="30%" r="80%"><stop offset="0" style="stop-color:color-mix(in srgb, var(--dg-green) 62%, white)"/><stop offset=".55" style="stop-color:var(--dg-green)"/><stop offset="1" style="stop-color:color-mix(in srgb, var(--dg-green) 70%, black)"/></radialGradient><radialGradient id="mf-tan" cx="35%" cy="30%" r="80%"><stop offset="0" style="stop-color:color-mix(in srgb, var(--dg-tan) 62%, white)"/><stop offset=".55" style="stop-color:var(--dg-tan)"/><stop offset="1" style="stop-color:color-mix(in srgb, var(--dg-tan) 70%, black)"/></radialGradient><radialGradient id="mf-rust" cx="35%" cy="30%" r="80%"><stop offset="0" style="stop-color:color-mix(in srgb, var(--dg-rust) 62%, white)"/><stop offset=".55" style="stop-color:var(--dg-rust)"/><stop offset="1" style="stop-color:color-mix(in srgb, var(--dg-rust) 70%, black)"/></radialGradient><radialGradient id="mf-pink" cx="35%" cy="30%" r="80%"><stop offset="0" style="stop-color:color-mix(in srgb, var(--dg-pink) 62%, white)"/><stop offset=".55" style="stop-color:var(--dg-pink)"/><stop offset="1" style="stop-color:color-mix(in srgb, var(--dg-pink) 70%, black)"/></radialGradient><radialGradient id="mf-blood" cx="35%" cy="30%" r="80%"><stop offset="0" style="stop-color:color-mix(in srgb, var(--dg-blood) 62%, white)"/><stop offset=".55" style="stop-color:var(--dg-blood)"/><stop offset="1" style="stop-color:color-mix(in srgb, var(--dg-blood) 70%, black)"/></radialGradient><radialGradient id="mf-grey" cx="35%" cy="30%" r="80%"><stop offset="0" style="stop-color:color-mix(in srgb, var(--dg-grey) 62%, white)"/><stop offset=".55" style="stop-color:var(--dg-grey)"/><stop offset="1" style="stop-color:color-mix(in srgb, var(--dg-grey) 70%, black)"/></radialGradient><radialGradient id="mf-beige" cx="35%" cy="30%" r="80%"><stop offset="0" style="stop-color:color-mix(in srgb, var(--dg-beige) 62%, white)"/><stop offset=".55" style="stop-color:var(--dg-beige)"/><stop offset="1" style="stop-color:color-mix(in srgb, var(--dg-beige) 70%, black)"/></radialGradient><radialGradient id="mf-accent" cx="35%" cy="30%" r="80%"><stop offset="0" style="stop-color:color-mix(in srgb, var(--dg-accent) 62%, white)"/><stop offset=".55" style="stop-color:var(--dg-accent)"/><stop offset="1" style="stop-color:color-mix(in srgb, var(--dg-accent) 70%, black)"/></radialGradient><linearGradient id="mf-wcol" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--dg-water)"/><stop offset="1" style="stop-color:var(--dg-water-deep)"/></linearGradient><linearGradient id="mf-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--dg-sky)"/><stop offset="1" style="stop-color:var(--surface)"/></linearGradient><marker id="mf-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--dg-flow)"/></marker><marker id="mf-arrow-ink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--muted)"/></marker></defs><text class="dg-big" x="0" y="18" text-anchor="start" >How each survey is judged against what its setting predicts</text><rect x="0" y="44" width="190" height="26" rx="13" style="fill:var(--bg);stroke:var(--rule)"/><text class="dg-sub" x="12" y="61" text-anchor="start" >Season</text><path d="M190 57 C215 57 215 150 236 150" fill="none" style="stroke:var(--rule)" stroke-width="1.2"/><rect x="0" y="78" width="190" height="26" rx="13" style="fill:var(--bg);stroke:var(--rule)"/><text class="dg-sub" x="12" y="95" text-anchor="start" >Survey form</text><path d="M190 91 C215 91 215 150 236 150" fill="none" style="stroke:var(--rule)" stroke-width="1.2"/><rect x="0" y="112" width="190" height="26" rx="13" style="fill:var(--bg);stroke:var(--rule)"/><text class="dg-sub" x="12" y="129" text-anchor="start" >Watershed land cover</text><path d="M190 125 C215 125 215 150 236 150" fill="none" style="stroke:var(--rule)" stroke-width="1.2"/><rect x="0" y="146" width="190" height="26" rx="13" style="fill:var(--bg);stroke:var(--rule)"/><text class="dg-sub" x="12" y="163" text-anchor="start" >Soil, elevation, climate</text><path d="M190 159 C215 159 215 150 236 150" fill="none" style="stroke:var(--rule)" stroke-width="1.2"/><rect x="0" y="180" width="190" height="26" rx="13" style="fill:var(--bg);stroke:var(--rule)"/><text class="dg-sub" x="12" y="197" text-anchor="start" >Recent rain and heat</text><path d="M190 193 C215 193 215 150 236 150" fill="none" style="stroke:var(--rule)" stroke-width="1.2"/><rect x="0" y="214" width="190" height="26" rx="13" style="fill:var(--bg);stroke:var(--rule)"/><text class="dg-sub" x="12" y="231" text-anchor="start" >Water temperature and flow</text><path d="M190 227 C215 227 215 150 236 150" fill="none" style="stroke:var(--rule)" stroke-width="1.2"/><rect x="0" y="248" width="190" height="26" rx="13" style="fill:var(--bg);stroke:var(--rule)"/><text class="dg-sub" x="12" y="265" text-anchor="start" >Team size</text><path d="M190 261 C215 261 215 150 236 150" fill="none" style="stroke:var(--rule)" stroke-width="1.2"/><rect x="238" y="104" width="190" height="92" rx="10" style="fill:var(--surface);stroke:var(--accent)" stroke-width="1.6"/><text class="dg-name" x="333" y="130" text-anchor="middle" >Model</text><text class="dg-sub" x="333" y="150" text-anchor="middle" >trained on 7,332 surveys</text><text class="dg-sub" x="333" y="166" text-anchor="middle" >at 1,162 other sites</text><text class="dg-sub" x="333" y="184" text-anchor="middle" >(never sees the year)</text><line x1="428" y1="150" x2="468" y2="150" style="stroke:var(--muted)" stroke-width="1.4" marker-end="url(#mf-arrow-ink)"/><text class="dg-name" x="560" y="72" text-anchor="middle" >Expected range for a survey</text><rect x="480" y="90" width="160" height="22" rx="4" style="fill:var(--grey)" opacity=".25"/><line x1="560" x2="560" y1="86" y2="116" style="stroke:var(--muted)" stroke-dasharray="3 3"/><text class="dg-sub" x="560" y="128" text-anchor="middle" >expected</text><circle cx="500" cy="101" r="6" style="fill:var(--accent)"/><text class="dg-sub" x="500" y="145" text-anchor="middle" >found</text><line x1="500" y1="133" x2="500" y2="108" style="stroke:var(--accent)" stroke-width=".8"/><text class="dg-sub" x="560" y="166" text-anchor="middle" >gap = found − expected</text><line x1="480" x2="715" y1="225.2" y2="225.2" style="stroke:var(--grey)"/><text class="dg-sub" x="715" y="221.2" text-anchor="end" >as expected</text><polyline points="480,231.7 538.8,234.1 597.5,241.5 656.2,232.5 715,265" fill="none" style="stroke:var(--accent)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" /><circle cx="480" cy="231.7" r="3.5" style="fill:var(--accent)"/><text class="dg-sub" x="480" y="296" text-anchor="middle" >2005–09</text><circle cx="538.8" cy="234.1" r="3.5" style="fill:var(--accent)"/><text class="dg-sub" x="538.8" y="296" text-anchor="middle" >2010–14</text><circle cx="597.5" cy="241.5" r="3.5" style="fill:var(--accent)"/><text class="dg-sub" x="597.5" y="296" text-anchor="middle" >2015–19</text><circle cx="656.2" cy="232.5" r="3.5" style="fill:var(--accent)"/><text class="dg-sub" x="656.2" y="296" text-anchor="middle" >2020–24</text><circle cx="715" cy="265" r="3.5" style="fill:var(--accent)"/><text class="dg-sub" x="715" y="296" text-anchor="middle" >2025–26</text><text class="dg-name" x="470" y="196" text-anchor="start" >Site 1&#x27;s median gap, by five-year period</text><text class="dg-sub" x="0" y="296" text-anchor="start" >Held-out accuracy: R² 0.39, against 0.02 for season and form alone</text></svg><figcaption>How the model is used. The line is Site 1&#39;s median gap in each five-year period.</figcaption></figure>
 <p>For every usable biological survey, the model predicts what it should find given its season, survey form, watershed (paved and urban share, forest, farmland, soils, elevation, climate), rain and air temperature in the week before, water temperature, flow and team. It never sees the year, so change over time stays in the gap between observed and expected.</p><p>Every expected value comes from a version of the model that never saw any survey from that site (five folds grouped by site), which is how a site is judged by what the rest of the country predicts for it.</p>    <div class="tbl"><table>
       <thead><tr><th class="">Predicts</th><th class="n">Surveys</th><th class="n">Sites</th><th class="n">Held-out R²</th><th class="n">Season and form only</th><th class="n">Typical error</th></tr></thead>
       <tbody><tr><td class="">Share of groups found that are pollution-sensitive</td><td class="n">7,332</td><td class="n">1,162</td><td class="n">0.39</td><td class="n">0.02</td><td class="n">8 pts</td></tr><tr><td class="">Score percentile within its survey form</td><td class="n">7,294</td><td class="n">1,147</td><td class="n">0.38</td><td class="n">0.00</td><td class="n">18 percentile pts</td></tr></tbody>
@@ -121,38 +140,52 @@
 <p>Rainfall in the week before each survey is included. Volunteer data is noisy, so an R² near 0.4 at unseen sites is useful: enough to set an expected range for each survey and to tell a change in the stream from a change in the season or team.</p>    <div class="related"><h3>Related</h3><ul>
 <li><a href="chapter--expected.html">Compared with what its setting predicts</a> <span class="meta">— what the model says about the chapter&#39;s sites</span></li><li><a href="national--paving.html">Paved watersheds lose sensitive animals</a> <span class="meta">— the land-cover pattern it relies on</span></li>    </ul></div>
 
-  <details class="method"><summary>How this was worked out</summary><p>scikit-learn HistGradientBoostingRegressor (500 iterations, learning rate 0.04, 15 leaves, at least 40 surveys per leaf); importance by scrambling each input group on held-out folds.</p></details>
-  <nav class="pager" aria-label="More in National picture">
-<a href="national--paving.html"><span class="meta">Previous</span>Paved watersheds lose sensitive animals</a><a class="nx" href="national--monitoring-growth.html"><span class="meta">Next</span>Volunteer monitoring took off after 2017</a>  </nav>
-</article>
-    <footer class="foot">
-      <p class="meta">Data: <a href="https://www.cleanwaterhub.org/site/467">Clean Water Hub</a> (Izaak Walton League), snapshot 2026-10-27; USGS NLDI; EPA StreamCat; Open-Meteo. No personal details are shown.</p>
-      <p class="meta">Code and methods: <a href="https://github.com/shankardba/iwla-river">github.com/shankardba/iwla-river</a> · Machine-readable index: <a href="findings.json">findings.json</a></p>
-    </footer>
-  </main>
+    <details class="method"><summary>How this was worked out</summary><p>scikit-learn HistGradientBoostingRegressor (500 iterations, learning rate 0.04, 15 leaves, at least 40 surveys per leaf); importance by scrambling each input group on held-out folds.</p></details>
+    <nav class="pager" aria-label="More in National picture">
+<a href="national--paving.html"><span class="meta">← Previous</span>Paved watersheds lose sensitive animals</a><a class="nx" href="national--monitoring-growth.html"><span class="meta">Next →</span>Volunteer monitoring took off after 2017</a>    </nav>
+  </article>
 </div>
+
+<footer class="foot">
+  <div class="foot-in">
+    <p class="meta">Data: <a href="https://www.cleanwaterhub.org/">Clean Water Hub</a> (Izaak Walton League), snapshot 2026-10-27; USGS Watershed Boundary Dataset and NLDI; EPA StreamCat; Open-Meteo; US Census Bureau boundaries. No personal details are shown.</p>
+    <p class="meta"><a href="https://github.com/shankardba/iwla-river">Code and methods</a> · <a href="data--downloads.html">Downloads</a> · <a href="about.html">About</a></p>
+  </div>
+</footer>
 <script type="application/json" id="chart-specs">[{"type": "hbars", "title": "Watershed land cover carries most of the prediction", "rows": [{"label": "Watershed land cover", "value": 0.41641985914866614, "valueLabel": "0.42", "color": "accent", "opacity": 1}, {"label": "Watershed setting (soil, elevation, climate)", "value": 0.13416512486883336, "valueLabel": "0.13", "color": "grey", "opacity": 0.6}, {"label": "Location", "value": 0.011218861535375945, "valueLabel": "0.01", "color": "grey", "opacity": 0.6}, {"label": "Team", "value": 0.006948334235204934, "valueLabel": "0.01", "color": "grey", "opacity": 0.6}, {"label": "Season", "value": 0.006759557861459031, "valueLabel": "0.01", "color": "grey", "opacity": 0.6}, {"label": "Survey form", "value": 0.005553738949800024, "valueLabel": "0.01", "color": "grey", "opacity": 0.6}, {"label": "Recent rain and heat", "value": 0.0033047647485256126, "valueLabel": "0.00", "color": "grey", "opacity": 0.6}, {"label": "Water temperature and flow", "value": -0.002133480083530337, "valueLabel": "-0.00", "color": "grey", "opacity": 0.6}]}]</script>
 <script src="assets/charts.js?v=4f2d43b7"></script>
-<script src="assets/explorer.js?v=6eaed82f"></script>
+<script src="assets/explorer.js?v=51248372"></script>
 <script>
-  // Findings panel: closed by default; the viewer's choice is remembered on wide screens.
+  // Menus: click to open, Escape or an outside click closes; one open at a time. Phones: a full-screen sheet.
   (function () {
-    var root = document.documentElement, btn = document.getElementById("nav-btn"),
-        scrim = document.getElementById("scrim"), narrow = window.matchMedia("(max-width: 960px)");
-    function set(open, remember) {
-      root.classList.toggle("nav-open", open);
-      btn.setAttribute("aria-expanded", String(open));
-      scrim.hidden = !(open && narrow.matches);
-      if (remember && !narrow.matches) { try { localStorage.setItem("iwla-nav", open ? "1" : "0"); } catch (e) {} }
+    var btns = document.querySelectorAll(".has-menu > button");
+    function closeAll(except) {
+      btns.forEach(function (b) { if (b !== except) { b.setAttribute("aria-expanded", "false"); document.getElementById(b.getAttribute("aria-controls")).hidden = true; } });
     }
-    var saved = null;
-    try { saved = localStorage.getItem("iwla-nav"); } catch (e) {}
-    set(saved === "1" && !narrow.matches, false);
-    btn.addEventListener("click", function () { set(!root.classList.contains("nav-open"), true); });
-    document.getElementById("side-close").addEventListener("click", function () { set(false, true); btn.focus(); });
-    scrim.addEventListener("click", function () { set(false, false); });
-    document.addEventListener("keydown", function (e) { if (e.key === "Escape" && root.classList.contains("nav-open")) { set(false, true); btn.focus(); } });
-    narrow.addEventListener("change", function () { set(false, false); });
+    btns.forEach(function (b) {
+      var m = document.getElementById(b.getAttribute("aria-controls"));
+      b.addEventListener("click", function (e) {
+        e.stopPropagation();
+        var open = b.getAttribute("aria-expanded") === "true";
+        closeAll(b); b.setAttribute("aria-expanded", String(!open)); m.hidden = open;
+        if (!open && e.detail === 0) { var first = m.querySelector("a"); if (first) first.focus(); }
+      });
+    });
+    document.addEventListener("click", function (e) { if (!e.target.closest(".has-menu")) closeAll(); });
+    var sheet = document.getElementById("sheet"), mb = document.getElementById("menu-btn");
+    function setSheet(open) {
+      sheet.hidden = !open; mb.setAttribute("aria-expanded", String(open));
+      document.documentElement.classList.toggle("sheet-open", open);
+      if (open) sheet.querySelector("a").focus(); else mb.focus();
+    }
+    document.addEventListener("keydown", function (e) {
+      if (e.key !== "Escape") return;
+      var openBtn = document.querySelector('.has-menu > button[aria-expanded="true"]');
+      closeAll(); if (openBtn) openBtn.focus();
+      if (!sheet.hidden) setSheet(false);
+    });
+    mb.addEventListener("click", function () { setSheet(true); });
+    document.getElementById("sheet-close").addEventListener("click", function () { setSheet(false); });
   })();
 </script>
 </body>

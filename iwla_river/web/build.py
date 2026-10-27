@@ -78,7 +78,13 @@ def write_watershed_data(db: DB, out: Path) -> None:
     us = db.rows("""SELECT count(DISTINCT site_id) AS sites FROM site_huc""")[0]
     bio = db.one("SELECT sum(bio_surveys) FROM watershed_metrics WHERE digits = 2")
     so = db.rows("SELECT avg(observed) AS so, avg(expected) AS se, avg(resid) AS g FROM expected WHERE target = 'sensitive_share'")[0]
-    top[""] = pack({"code": "", "name": "United States", "sites": us["sites"], "bio_surveys": bio, **{k: so[k] for k in ("so", "se", "g")}}) | \
+    nat = db.rows("""SELECT (SELECT avg(ws_impervious_pct) FROM site_context) AS imperv, (SELECT avg(ws_forest_pct) FROM site_context) AS forest,
+                            (SELECT median(value) FROM chemistry WHERE parameter = 'chloride') AS cl_median,
+                            (SELECT count(*) FROM chemistry WHERE parameter = 'chloride') AS cl_n,
+                            (SELECT median(value) FROM chemistry WHERE parameter IN ('nitrate', 'nitrate_n')) AS no3_median,
+                            (SELECT count(*) FROM chemistry WHERE parameter IN ('nitrate', 'nitrate_n')) AS no3_n,
+                            (SELECT avg(observed) FROM expected WHERE target = 'score_pct') AS score_pct""")[0]
+    top[""] = pack({"code": "", "name": "United States", "sites": us["sites"], "bio_surveys": bio, **nat}) | \
         {"so": round(so["so"], 3), "se": round(so["se"], 3), "g": round(so["g"], 3)}
     (out / "data" / "huc4").mkdir(parents=True, exist_ok=True)
     # Heat cells of a quarter degree (about 25 km) by sample type: aggregated, so no single site is located by them.
@@ -116,8 +122,37 @@ def write_watershed_data(db: DB, out: Path) -> None:
                                                    s["salt"], s["no3"], s["chem"]])
     for p in (out / "data" / "huc4").glob("*.json"):
         p.unlink()
+    # Survey history of each biological site: [date, form, score, sensitive share found, expected], for the site panel.
+    hist = db.rows("""
+        SELECT h.huc12, f.site_id, f.survey_date::DATE AS d, f.protocol AS form, f.score, f.sensitive_share AS ss, e.expected AS ex
+        FROM features f JOIN site_huc h USING (site_id)
+        LEFT JOIN expected e ON e.survey_uid = f.survey_uid AND e.target = 'sensitive_share'
+        ORDER BY f.site_id, d""") if db.has("expected") else []
+    series = {}
+    short = {"sos_bio": "SOS", "va_rocky": "VA", "va_muddy": "VA muddy"}
+    for r in hist:
+        rd = lambda v, k=3: None if v is None or v != v else round(v, k)
+        series.setdefault(r["huc12"][:4], {}).setdefault(str(r["site_id"]), []).append(
+            [r["d"], short.get(r["form"], r["form"]), rd(r["score"], 1), rd(r["ss"]), rd(r["ex"])])
     for h in set(small) | set(by4):
-        (out / "data" / "huc4" / f"{h}.json").write_text(json.dumps({"w": small.get(h, {}), "sites": by4.get(h, [])}, separators=(",", ":")))
+        (out / "data" / "huc4" / f"{h}.json").write_text(json.dumps(
+            {"w": small.get(h, {}), "sites": by4.get(h, []), "series": series.get(h, {})}, separators=(",", ":")))
+
+    # Search index: every named watershed, and biological sites under their public names.
+    search = {"w": [[r["code"], r["name"]] for r in rows if r["name"]],
+              "s": [[s["site_id"], s["name"], s["huc12"]] for s in sites if s["bio"] > 0 and s["name"] != "Biological monitoring site"]}
+    (out / "data" / "search.json").write_text(json.dumps(search, separators=(",", ":")))
+
+    # Download: metrics for every watershed (aggregates only).
+    import csv
+    cols = ["code", "digits", "name", "parent", "sites", "bio_sites", "bio_surveys", "chem_readings", "first_year", "last_year",
+            "sens_obs", "sens_exp", "gap", "gap_p", "gap_slope", "gap_verdict", "score_pct", "imperv", "forest",
+            "cl_median", "cl_p90", "cl_n", "no3_median", "no3_n"]
+    with open(out / "data" / "watershed_metrics.csv", "w", newline="") as f:
+        wr = csv.writer(f)
+        wr.writerow(cols)
+        for r in sorted(rows, key=lambda r: (r["digits"], r["code"])):
+            wr.writerow(["" if r.get(c) is None or r.get(c) != r.get(c) else (round(r[c], 4) if isinstance(r[c], float) else r[c]) for c in cols])
 
 
 def build(db_path=C.DB_PATH, out: Path = OUT, body_out: Path = BODY_OUT) -> Path:
@@ -162,9 +197,12 @@ def build(db_path=C.DB_PATH, out: Path = OUT, body_out: Path = BODY_OUT) -> Path
 
     from .diagrams import plates
     from .findings.watersheds import chapter_huc, complete
-    pages = {"index.html": render("home.html", "index.html", hero_svg=plates.riffle("home"),
+    pages = {"index.html": render("home.html", "index.html",
                                   explorer_chapter=(chapter_huc(db) or "") if complete(db) else None,
                                   key=[i for s in sections for i in s["findings"] if i["key"]])}
+    key = [i for s in sections for i in s["findings"] if i["key"]]
+    pages["findings.html"] = render("findings.html", "findings.html", key=key)
+    pages["about.html"] = render("about.html", "about.html", hero_svg=plates.riffle("about"))
     for s in sections:
         pages[s["url"]] = render("section.html", s["url"], section=s)
         for n, i in enumerate(s["findings"]):
@@ -184,8 +222,13 @@ def build(db_path=C.DB_PATH, out: Path = OUT, body_out: Path = BODY_OUT) -> Path
     # Body-only home page: the same page minus <!doctype>, <html>, <head> and <body> wrappers.
     body_out.mkdir(parents=True, exist_ok=True)
     home = pages["index.html"]
-    head_start, body_start = home.index("<head>") + 6, home.index("<body>") + 6
-    body = home[head_start:home.index("</head>")] + home[body_start:home.index("</body>")]
+    head_start = home.index("<head>") + 6
+    body_tag = home.index("<body")
+    body_start = home.index(">", body_tag) + 1
+    cls = home[body_tag:body_start]
+    # Keep the body's class on a wrapper so app-only styles still apply.
+    klass = cls.split('class="')[1].split('"')[0] if 'class="' in cls else ""
+    body = (home[head_start:home.index("</head>")] + f'<div class="{klass}">' + home[body_start:home.index("</body>")] + "</div>")
     (body_out / "index.html").write_text(body)
     print({"pages": len(pages), "findings": len(index), "out": str(out)})
     return out

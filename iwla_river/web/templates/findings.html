@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% import "_blocks.html" as ui with context %}
+{% block title %}Findings · Great Seneca Creek Record{% endblock %}
+{% block description %}Every result from the Save Our Streams data, from Great Seneca Creek to the national picture.{% endblock %}
+{% block main %}
+<header class="hero">
+  <div class="eyebrow">Findings</div>
+  <h1>What the data shows</h1>
+  <p class="lede">{{ meta.chapter_surveys }} stream surveys at the chapter's two sites, read against {{ meta.usable | fmt }} volunteer samples nationwide. Each result has its own page with the evidence behind it.</p>
+</header>
+
+<section class="block">
+  <h2>Start here</h2>
+  <div class="cards">{% for f in key %}{{ ui.card(f, show_section=True) }}{% endfor %}</div>
+</section>
+
+{% for s in sections %}
+<section class="block">
+  <div class="block-head"><h2><a href="{{ s.url }}">{{ s.title }}</a></h2><span class="meta">{{ s.findings | length }} finding{{ "s" if s.findings | length != 1 }}</span></div>
+  <p class="sec-intro">{{ s.intro }}</p>
+  <div class="rows">
+    {% for f in s.findings %}
+    <a class="row" href="{{ f.url }}">
+      <span class="dot {{ f.page.status }}"></span>
+      <span class="row-main"><b>{{ f.title }}</b><span>{{ f.page.headline }}</span></span>
+      {{ ui.status(f.page.status) }}
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endfor %}
+{% endblock %}

@@ -26,123 +26,156 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="assets/site.css?v=80f28218">
+<link rel="stylesheet" href="assets/site.css?v=709852cb">
 </head>
-<body>
+<body class="">
 <header class="topbar">
   <div class="topbar-in">
-    <button class="nav-btn" id="nav-btn" type="button" aria-controls="side" aria-expanded="false">
-      <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-      <span>Findings</span>
+    <a class="brand" href="index.html" aria-label="Great Seneca Creek Record, home">
+      <img src="assets/icon.svg?v=1" alt="" width="26" height="26">
+      <span class="brand-name">Great Seneca Creek Record</span>
+    </a>
+    <nav class="mainnav" aria-label="Main">
+      <ul>
+        <li><a class="nav-link" href="index.html" >Explore</a></li>
+        <li class="has-menu">
+          <button class="nav-link" type="button" aria-expanded="false" aria-controls="menu-findings"
+data-current>Findings<svg viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></button>
+          <div class="menu mega" id="menu-findings" hidden>
+            <a class="menu-all" href="findings.html">All findings <span class="meta">every result on one page</span></a>
+            <div class="mega-cols">
+              <div class="mega-col">
+                <a class="mega-head" href="chapter.html">Great Seneca Creek</a>
+                <ul><li><a href="chapter--expected.html" ><span class="dot watch"></span>Compared with what its setting predicts</a></li><li><a href="chapter--score-trend.html" ><span class="dot steady"></span>The score has held steady</a></li><li><a href="chapter--species-mix.html" ><span class="dot watch"></span>The mix of animals is shifting</a></li><li><a href="chapter--trend-tests.html" ><span class="dot concern"></span>Trend tests</a></li><li><a href="chapter--score-parts.html" ><span class="dot info"></span>What moves the score</a></li><li><a href="chapter--season.html" ><span class="dot info"></span>Season matters</a></li><li><a href="chapter--survey-forms.html" ><span class="dot info"></span>The chapter changed survey forms in 2024</a></li></ul>
+              </div>
+              <div class="mega-col">
+                <a class="mega-head" href="watersheds.html">Watersheds</a>
+                <ul><li><a href="watersheds--great-seneca.html" ><span class="dot info"></span>Great Seneca Creek within its watersheds</a></li></ul>
+              </div>
+              <div class="mega-col">
+                <a class="mega-head" href="chemistry.html">Water chemistry</a>
+                <ul><li><a href="chemistry--road-salt.html" ><span class="dot watch"></span>Road salt reaches the creek every winter</a></li><li><a href="chemistry--nitrate.html" ><span class="dot good"></span>Nitrate stays low</a></li></ul>
+              </div>
+              <div class="mega-col">
+                <a class="mega-head" href="region.html">Neighbouring streams</a>
+                <ul><li><a href="region--local-map.html" ><span class="dot info"></span>Map of sites around the creek</a></li><li><a href="region--neighbour-trends.html" ><span class="dot good"></span>Streams across the Potomac are mostly improving</a></li><li><a href="region--nearby-sites.html" ><span class="dot info"></span>Sites nearby</a></li></ul>
+              </div>
+              <div class="mega-col">
+                <a class="mega-head" href="national.html">National picture</a>
+                <ul><li><a href="national--map.html" ><span class="dot info"></span>Where volunteers monitor</a></li><li><a href="national--paving.html" ><span class="dot info"></span>Paved watersheds lose sensitive animals</a></li><li><a href="national--model.html" ><span class="dot info"></span>How the expected-score model works</a></li><li><a href="national--monitoring-growth.html" aria-current="page"><span class="dot info"></span>Volunteer monitoring took off after 2017</a></li></ul>
+              </div>
+            </div>
+          </div>
+        </li>
+        <li><a class="nav-link" href="chapter.html" >Great Seneca Creek</a></li>
+        <li class="has-menu">
+          <button class="nav-link" type="button" aria-expanded="false" aria-controls="menu-data" >Data<svg viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></button>
+          <div class="menu" id="menu-data" hidden>
+            <ul><li><a href="data--data-quality.html" ><b>How clean the data is</b><span class="meta">83,297 of 88,511 records (94%) are usable after removing undated,...</span></a></li><li><a href="data--temperature-units.html" ><b>Water temperature switches units</b><span class="meta">The Hub stores no temperature unit; chapter readings switch from °C...</span></a></li><li><a href="data--methods.html" ><b>Sources and methods</b><span class="meta">Built from a Clean Water Hub snapshot of 2026-10-27, with public...</span></a></li><li><a href="data--downloads.html" ><b>Downloads</b><span class="meta">Watershed-level figures and every finding, free to download.</span></a></li></ul>
+          </div>
+        </li>
+        <li><a class="nav-link" href="about.html" >About</a></li>
+      </ul>
+    </nav>
+    <button class="menu-btn" id="menu-btn" type="button" aria-expanded="false" aria-controls="sheet" aria-label="Open the menu">
+      <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
     </button>
-    <div class="brand-wrap">
-      <a class="brand" href="index.html">Great Seneca Creek Record</a>
-      <span class="brand-sub">IWLA Rockville Chapter · Save Our Streams</span>
-    </div>
   </div>
 </header>
-<div class="layout">
-  <nav class="side" id="side" aria-label="All findings">
-    <div class="side-head"><span>All findings</span><button class="side-close" id="side-close" type="button" aria-label="Close the findings panel">×</button></div>
-      <ul class="tree">
-        <li><a href="index.html" >Overview</a></li>
-        <li class="tree-sec">
-          <a href="chapter.html" >Great Seneca Creek</a>
-          <ul>
-            <li><a href="chapter--expected.html" ><span class="dot watch"></span>Compared with what its setting predicts</a></li>
-            <li><a href="chapter--score-trend.html" ><span class="dot steady"></span>The score has held steady</a></li>
-            <li><a href="chapter--species-mix.html" ><span class="dot watch"></span>The mix of animals is shifting</a></li>
-            <li><a href="chapter--trend-tests.html" ><span class="dot concern"></span>Trend tests</a></li>
-            <li><a href="chapter--score-parts.html" ><span class="dot info"></span>What moves the score</a></li>
-            <li><a href="chapter--season.html" ><span class="dot info"></span>Season matters</a></li>
-            <li><a href="chapter--survey-forms.html" ><span class="dot info"></span>The chapter changed survey forms in 2024</a></li>
-          </ul>
-        </li>
-        <li class="tree-sec">
-          <a href="watersheds.html" >Watersheds</a>
-          <ul>
-            <li><a href="watersheds--explorer.html" ><span class="dot info"></span>Watershed explorer</a></li>
-            <li><a href="watersheds--great-seneca.html" ><span class="dot info"></span>Great Seneca Creek within its watersheds</a></li>
-          </ul>
-        </li>
-        <li class="tree-sec">
-          <a href="chemistry.html" >Water chemistry</a>
-          <ul>
-            <li><a href="chemistry--road-salt.html" ><span class="dot watch"></span>Road salt reaches the creek every winter</a></li>
-            <li><a href="chemistry--nitrate.html" ><span class="dot good"></span>Nitrate stays low</a></li>
-          </ul>
-        </li>
-        <li class="tree-sec">
-          <a href="region.html" >Neighbouring streams</a>
-          <ul>
-            <li><a href="region--local-map.html" ><span class="dot info"></span>Map of sites around the creek</a></li>
-            <li><a href="region--neighbour-trends.html" ><span class="dot good"></span>Streams across the Potomac are mostly improving</a></li>
-            <li><a href="region--nearby-sites.html" ><span class="dot info"></span>Sites nearby</a></li>
-          </ul>
-        </li>
-        <li class="tree-sec">
-          <a href="national.html" >National picture</a>
-          <ul>
-            <li><a href="national--map.html" ><span class="dot info"></span>Where volunteers monitor</a></li>
-            <li><a href="national--paving.html" ><span class="dot info"></span>Paved watersheds lose sensitive animals</a></li>
-            <li><a href="national--model.html" ><span class="dot info"></span>How the expected-score model works</a></li>
-            <li><a href="national--monitoring-growth.html" aria-current="page"><span class="dot info"></span>Volunteer monitoring took off after 2017</a></li>
-          </ul>
-        </li>
-        <li class="tree-sec">
-          <a href="data.html" >Data and methods</a>
-          <ul>
-            <li><a href="data--data-quality.html" ><span class="dot info"></span>How clean the data is</a></li>
-            <li><a href="data--temperature-units.html" ><span class="dot info"></span>Water temperature switches units</a></li>
-            <li><a href="data--methods.html" ><span class="dot info"></span>Sources and methods</a></li>
-          </ul>
-        </li>
-      </ul>
+
+<div class="sheet" id="sheet" hidden>
+  <div class="sheet-head"><span class="brand-name">Menu</span><button class="sheet-close" id="sheet-close" type="button" aria-label="Close the menu">×</button></div>
+  <nav aria-label="Main (phone)">
+    <a class="sheet-top" href="index.html">Explore the map</a>
+    <a class="sheet-top" href="findings.html">All findings</a>
+    <details >
+      <summary>Great Seneca Creek</summary>
+      <ul><li><a href="chapter.html">Section overview</a></li><li><a href="chapter--expected.html"><span class="dot watch"></span>Compared with what its setting predicts</a></li><li><a href="chapter--score-trend.html"><span class="dot steady"></span>The score has held steady</a></li><li><a href="chapter--species-mix.html"><span class="dot watch"></span>The mix of animals is shifting</a></li><li><a href="chapter--trend-tests.html"><span class="dot concern"></span>Trend tests</a></li><li><a href="chapter--score-parts.html"><span class="dot info"></span>What moves the score</a></li><li><a href="chapter--season.html"><span class="dot info"></span>Season matters</a></li><li><a href="chapter--survey-forms.html"><span class="dot info"></span>The chapter changed survey forms in 2024</a></li></ul>
+    </details>
+    <details >
+      <summary>Watersheds</summary>
+      <ul><li><a href="watersheds.html">Section overview</a></li><li><a href="watersheds--great-seneca.html"><span class="dot info"></span>Great Seneca Creek within its watersheds</a></li></ul>
+    </details>
+    <details >
+      <summary>Water chemistry</summary>
+      <ul><li><a href="chemistry.html">Section overview</a></li><li><a href="chemistry--road-salt.html"><span class="dot watch"></span>Road salt reaches the creek every winter</a></li><li><a href="chemistry--nitrate.html"><span class="dot good"></span>Nitrate stays low</a></li></ul>
+    </details>
+    <details >
+      <summary>Neighbouring streams</summary>
+      <ul><li><a href="region.html">Section overview</a></li><li><a href="region--local-map.html"><span class="dot info"></span>Map of sites around the creek</a></li><li><a href="region--neighbour-trends.html"><span class="dot good"></span>Streams across the Potomac are mostly improving</a></li><li><a href="region--nearby-sites.html"><span class="dot info"></span>Sites nearby</a></li></ul>
+    </details>
+    <details open>
+      <summary>National picture</summary>
+      <ul><li><a href="national.html">Section overview</a></li><li><a href="national--map.html"><span class="dot info"></span>Where volunteers monitor</a></li><li><a href="national--paving.html"><span class="dot info"></span>Paved watersheds lose sensitive animals</a></li><li><a href="national--model.html"><span class="dot info"></span>How the expected-score model works</a></li><li><a href="national--monitoring-growth.html"><span class="dot info"></span>Volunteer monitoring took off after 2017</a></li></ul>
+    </details>
+    <details >
+      <summary>Data and methods</summary>
+      <ul><li><a href="data.html">Section overview</a></li><li><a href="data--data-quality.html"><span class="dot info"></span>How clean the data is</a></li><li><a href="data--temperature-units.html"><span class="dot info"></span>Water temperature switches units</a></li><li><a href="data--methods.html"><span class="dot info"></span>Sources and methods</a></li><li><a href="data--downloads.html"><span class="dot info"></span>Downloads</a></li></ul>
+    </details>
+    <a class="sheet-top" href="about.html">About</a>
   </nav>
-  <div class="scrim" id="scrim" hidden></div>
-  <main class="main">
-<nav class="crumbs" aria-label="Breadcrumb"><a href="index.html">Overview</a> <span>›</span> <a href="national.html">National picture</a> <span>›</span> Volunteer monitoring took off after 2017</nav>
-<article class="finding">
-  <header class="hero">
-    <div class="eyebrow">National picture</div>
-    <h1>Volunteer monitoring took off after 2017</h1>
-    <p class="lede"><span class="pill neutral">Context</span> The Hub holds 83,297 usable surveys; 7,414 are biological, enough to train a national model.</p>
-  </header>
-  
-      
+</div>
+
+<div class="page with-side">
+  <nav class="local" aria-label="In National picture">
+    <a class="local-head" href="national.html">National picture</a>
+    <ul><li><a href="national--map.html" ><span class="dot info"></span>Where volunteers monitor</a></li><li><a href="national--paving.html" ><span class="dot info"></span>Paved watersheds lose sensitive animals</a></li><li><a href="national--model.html" ><span class="dot info"></span>How the expected-score model works</a></li><li><a href="national--monitoring-growth.html" aria-current="page"><span class="dot info"></span>Volunteer monitoring took off after 2017</a></li></ul>
+  </nav>
+  <article class="finding">
+    <nav class="crumbs" aria-label="Breadcrumb"><a href="findings.html">Findings</a><span>›</span><a href="national.html">National picture</a></nav>
+    <header class="hero">
+      <h1>Volunteer monitoring took off after 2017</h1>
+      <p class="lede"><span class="pill neutral">Context</span> The Hub holds 83,297 usable surveys; 7,414 are biological, enough to train a national model.</p>
+    </header>
+    
+        
     <figure><div class="chart" data-chart="0"></div><figcaption>Usable surveys per year, all Hub sites, by survey form (2000 on).</figcaption></figure>
 <p>Salt Watch and Nitrate Watch kits, mailed free to volunteers, account for most of the growth since 2019. The biological surveys, which take training and a net, grow more slowly but carry the ecology.</p>
-  <nav class="pager" aria-label="More in National picture">
-<a href="national--model.html"><span class="meta">Previous</span>How the expected-score model works</a>  </nav>
-</article>
-    <footer class="foot">
-      <p class="meta">Data: <a href="https://www.cleanwaterhub.org/site/467">Clean Water Hub</a> (Izaak Walton League), snapshot 2026-10-27; USGS NLDI; EPA StreamCat; Open-Meteo. No personal details are shown.</p>
-      <p class="meta">Code and methods: <a href="https://github.com/shankardba/iwla-river">github.com/shankardba/iwla-river</a> · Machine-readable index: <a href="findings.json">findings.json</a></p>
-    </footer>
-  </main>
+    <nav class="pager" aria-label="More in National picture">
+<a href="national--model.html"><span class="meta">← Previous</span>How the expected-score model works</a>    </nav>
+  </article>
 </div>
+
+<footer class="foot">
+  <div class="foot-in">
+    <p class="meta">Data: <a href="https://www.cleanwaterhub.org/">Clean Water Hub</a> (Izaak Walton League), snapshot 2026-10-27; USGS Watershed Boundary Dataset and NLDI; EPA StreamCat; Open-Meteo; US Census Bureau boundaries. No personal details are shown.</p>
+    <p class="meta"><a href="https://github.com/shankardba/iwla-river">Code and methods</a> · <a href="data--downloads.html">Downloads</a> · <a href="about.html">About</a></p>
+  </div>
+</footer>
 <script type="application/json" id="chart-specs">[{"type": "stack", "title": "Volunteer monitoring took off after 2017, peaking at 16,972 surveys in 2025", "legend": [{"name": "SOS Biological", "color": "c1", "shape": "square"}, {"name": "VA SOS rocky bottom", "color": "c2", "shape": "square"}, {"name": "VA SOS muddy bottom", "color": "c3", "shape": "square"}, {"name": "SOS Chemical", "color": "c4", "shape": "square"}, {"name": "Salt Watch", "color": "accent", "shape": "square"}, {"name": "Nitrate Watch", "color": "grey", "shape": "square"}], "y": {"max": 18000, "ticks": [0, 2000, 4000, 6000, 8000, 10000, 12000, 14000, 16000, 18000], "fmt": "comma"}, "height": 330, "bars": [{"label": "2000", "segs": [{"v": 1, "color": "c1", "tip": "2000, SOS Biological: 1"}, {"v": 0, "color": "c2", "tip": "2000, VA SOS rocky bottom: 0"}, {"v": 0, "color": "c3", "tip": "2000, VA SOS muddy bottom: 0"}, {"v": 15, "color": "c4", "tip": "2000, SOS Chemical: 15"}, {"v": 0, "color": "accent", "tip": "2000, Salt Watch: 0"}, {"v": 0, "color": "grey", "tip": "2000, Nitrate Watch: 0"}]}, {"label": "", "segs": [{"v": 1, "color": "c1", "tip": "2001, SOS Biological: 1"}, {"v": 0, "color": "c2", "tip": "2001, VA SOS rocky bottom: 0"}, {"v": 0, "color": "c3", "tip": "2001, VA SOS muddy bottom: 0"}, {"v": 11, "color": "c4", "tip": "2001, SOS Chemical: 11"}, {"v": 0, "color": "accent", "tip": "2001, Salt Watch: 0"}, {"v": 0, "color": "grey", "tip": "2001, Nitrate Watch: 0"}]}, {"label": "", "segs": [{"v": 5, "color": "c1", "tip": "2002, SOS Biological: 5"}, {"v": 4, "color": "c2", "tip": "2002, VA SOS rocky bottom: 4"}, {"v": 0, "color": "c3", "tip": "2002, VA SOS muddy bottom: 0"}, {"v": 103, "color": "c4", "tip": "2002, SOS Chemical: 103"}, {"v": 0, "color": "accent", "tip": "2002, Salt Watch: 0"}, {"v": 0, "color": "grey", "tip": "2002, Nitrate Watch: 0"}]}, {"label": "", "segs": [{"v": 5, "color": "c1", "tip": "2003, SOS Biological: 5"}, {"v": 1, "color": "c2", "tip": "2003, VA SOS rocky bottom: 1"}, {"v": 0, "color": "c3", "tip": "2003, VA SOS muddy bottom: 0"}, {"v": 178, "color": "c4", "tip": "2003, SOS Chemical: 178"}, {"v": 0, "color": "accent", "tip": "2003, Salt Watch: 0"}, {"v": 0, "color": "grey", "tip": "2003, Nitrate Watch: 0"}]}, {"label": "", "segs": [{"v": 3, "color": "c1", "tip": "2004, SOS Biological: 3"}, {"v": 2, "color": "c2", "tip": "2004, VA SOS rocky bottom: 2"}, {"v": 0, "color": "c3", "tip": "2004, VA SOS muddy bottom: 0"}, {"v": 218, "color": "c4", "tip": "2004, SOS Chemical: 218"}, {"v": 0, "color": "accent", "tip": "2004, Salt Watch: 0"}, {"v": 0, "color": "grey", "tip": "2004, Nitrate Watch: 0"}]}, {"label": "2005", "segs": [{"v": 8, "color": "c1", "tip": "2005, SOS Biological: 8"}, {"v": 4, "color": "c2", "tip": "2005, VA SOS rocky bottom: 4"}, {"v": 0, "color": "c3", "tip": "2005, VA SOS muddy bottom: 0"}, {"v": 229, "color": "c4", "tip": "2005, SOS Chemical: 229"}, {"v": 1, "color": "accent", "tip": "2005, Salt Watch: 1"}, {"v": 0, "color": "grey", "tip": "2005, Nitrate Watch: 0"}]}, {"label": "", "segs": [{"v": 6, "color": "c1", "tip": "2006, SOS Biological: 6"}, {"v": 424, "color": "c2", "tip": "2006, VA SOS rocky bottom: 424"}, {"v": 0, "color": "c3", "tip": "2006, VA SOS muddy bottom: 0"}, {"v": 224, "color": "c4", "tip": "2006, SOS Chemical: 224"}, {"v": 0, "color": "accent", "tip": "2006, Salt Watch: 0"}, {"v": 0, "color": "grey", "tip": "2006, Nitrate Watch: 0"}]}, {"label": "", "segs": [{"v": 18, "color": "c1", "tip": "2007, SOS Biological: 18"}, {"v": 376, "color": "c2", "tip": "2007, VA SOS rocky bottom: 376"}, {"v": 0, "color": "c3", "tip": "2007, VA SOS muddy bottom: 0"}, {"v": 266, "color": "c4", "tip": "2007, SOS Chemical: 266"}, {"v": 1, "color": "accent", "tip": "2007, Salt Watch: 1"}, {"v": 0, "color": "grey", "tip": "2007, Nitrate Watch: 0"}]}, {"label": "", "segs": [{"v": 15, "color": "c1", "tip": "2008, SOS Biological: 15"}, {"v": 460, "color": "c2", "tip": "2008, VA SOS rocky bottom: 460"}, {"v": 0, "color": "c3", "tip": "2008, VA SOS muddy bottom: 0"}, {"v": 399, "color": "c4", "tip": "2008, SOS Chemical: 399"}, {"v": 1, "color": "accent", "tip": "2008, Salt Watch: 1"}, {"v": 0, "color": "grey", "tip": "2008, Nitrate Watch: 0"}]}, {"label": "", "segs": [{"v": 11, "color": "c1", "tip": "2009, SOS Biological: 11"}, {"v": 265, "color": "c2", "tip": "2009, VA SOS rocky bottom: 265"}, {"v": 0, "color": "c3", "tip": "2009, VA SOS muddy bottom: 0"}, {"v": 133, "color": "c4", "tip": "2009, SOS Chemical: 133"}, {"v": 0, "color": "accent", "tip": "2009, Salt Watch: 0"}, {"v": 0, "color": "grey", "tip": "2009, Nitrate Watch: 0"}]}, {"label": "2010", "segs": [{"v": 16, "color": "c1", "tip": "2010, SOS Biological: 16"}, {"v": 288, "color": "c2", "tip": "2010, VA SOS rocky bottom: 288"}, {"v": 0, "color": "c3", "tip": "2010, VA SOS muddy bottom: 0"}, {"v": 201, "color": "c4", "tip": "2010, SOS Chemical: 201"}, {"v": 0, "color": "accent", "tip": "2010, Salt Watch: 0"}, {"v": 0, "color": "grey", "tip": "2010, Nitrate Watch: 0"}]}, {"label": "", "segs": [{"v": 11, "color": "c1", "tip": "2011, SOS Biological: 11"}, {"v": 264, "color": "c2", "tip": "2011, VA SOS rocky bottom: 264"}, {"v": 0, "color": "c3", "tip": "2011, VA SOS muddy bottom: 0"}, {"v": 230, "color": "c4", "tip": "2011, SOS Chemical: 230"}, {"v": 0, "color": "accent", "tip": "2011, Salt Watch: 0"}, {"v": 0, "color": "grey", "tip": "2011, Nitrate Watch: 0"}]}, {"label": "", "segs": [{"v": 8, "color": "c1", "tip": "2012, SOS Biological: 8"}, {"v": 179, "color": "c2", "tip": "2012, VA SOS rocky bottom: 179"}, {"v": 0, "color": "c3", "tip": "2012, VA SOS muddy bottom: 0"}, {"v": 199, "color": "c4", "tip": "2012, SOS Chemical: 199"}, {"v": 0, "color": "accent", "tip": "2012, Salt Watch: 0"}, {"v": 1, "color": "grey", "tip": "2012, Nitrate Watch: 1"}]}, {"label": "", "segs": [{"v": 5, "color": "c1", "tip": "2013, SOS Biological: 5"}, {"v": 265, "color": "c2", "tip": "2013, VA SOS rocky bottom: 265"}, {"v": 0, "color": "c3", "tip": "2013, VA SOS muddy bottom: 0"}, {"v": 177, "color": "c4", "tip": "2013, SOS Chemical: 177"}, {"v": 0, "color": "accent", "tip": "2013, Salt Watch: 0"}, {"v": 0, "color": "grey", "tip": "2013, Nitrate Watch: 0"}]}, {"label": "", "segs": [{"v": 4, "color": "c1", "tip": "2014, SOS Biological: 4"}, {"v": 300, "color": "c2", "tip": "2014, VA SOS rocky bottom: 300"}, {"v": 3, "color": "c3", "tip": "2014, VA SOS muddy bottom: 3"}, {"v": 165, "color": "c4", "tip": "2014, SOS Chemical: 165"}, {"v": 0, "color": "accent", "tip": "2014, Salt Watch: 0"}, {"v": 1, "color": "grey", "tip": "2014, Nitrate Watch: 1"}]}, {"label": "2015", "segs": [{"v": 5, "color": "c1", "tip": "2015, SOS Biological: 5"}, {"v": 274, "color": "c2", "tip": "2015, VA SOS rocky bottom: 274"}, {"v": 3, "color": "c3", "tip": "2015, VA SOS muddy bottom: 3"}, {"v": 121, "color": "c4", "tip": "2015, SOS Chemical: 121"}, {"v": 1, "color": "accent", "tip": "2015, Salt Watch: 1"}, {"v": 0, "color": "grey", "tip": "2015, Nitrate Watch: 0"}]}, {"label": "", "segs": [{"v": 4, "color": "c1", "tip": "2016, SOS Biological: 4"}, {"v": 298, "color": "c2", "tip": "2016, VA SOS rocky bottom: 298"}, {"v": 1, "color": "c3", "tip": "2016, VA SOS muddy bottom: 1"}, {"v": 119, "color": "c4", "tip": "2016, SOS Chemical: 119"}, {"v": 1, "color": "accent", "tip": "2016, Salt Watch: 1"}, {"v": 7, "color": "grey", "tip": "2016, Nitrate Watch: 7"}]}, {"label": "", "segs": [{"v": 27, "color": "c1", "tip": "2017, SOS Biological: 27"}, {"v": 333, "color": "c2", "tip": "2017, VA SOS rocky bottom: 333"}, {"v": 4, "color": "c3", "tip": "2017, VA SOS muddy bottom: 4"}, {"v": 305, "color": "c4", "tip": "2017, SOS Chemical: 305"}, {"v": 0, "color": "accent", "tip": "2017, Salt Watch: 0"}, {"v": 18, "color": "grey", "tip": "2017, Nitrate Watch: 18"}]}, {"label": "", "segs": [{"v": 47, "color": "c1", "tip": "2018, SOS Biological: 47"}, {"v": 276, "color": "c2", "tip": "2018, VA SOS rocky bottom: 276"}, {"v": 9, "color": "c3", "tip": "2018, VA SOS muddy bottom: 9"}, {"v": 479, "color": "c4", "tip": "2018, SOS Chemical: 479"}, {"v": 55, "color": "accent", "tip": "2018, Salt Watch: 55"}, {"v": 19, "color": "grey", "tip": "2018, Nitrate Watch: 19"}]}, {"label": "", "segs": [{"v": 92, "color": "c1", "tip": "2019, SOS Biological: 92"}, {"v": 318, "color": "c2", "tip": "2019, VA SOS rocky bottom: 318"}, {"v": 6, "color": "c3", "tip": "2019, VA SOS muddy bottom: 6"}, {"v": 865, "color": "c4", "tip": "2019, SOS Chemical: 865"}, {"v": 414, "color": "accent", "tip": "2019, Salt Watch: 414"}, {"v": 27, "color": "grey", "tip": "2019, Nitrate Watch: 27"}]}, {"label": "2020", "segs": [{"v": 48, "color": "c1", "tip": "2020, SOS Biological: 48"}, {"v": 141, "color": "c2", "tip": "2020, VA SOS rocky bottom: 141"}, {"v": 0, "color": "c3", "tip": "2020, VA SOS muddy bottom: 0"}, {"v": 1275, "color": "c4", "tip": "2020, SOS Chemical: 1,275"}, {"v": 1136, "color": "accent", "tip": "2020, Salt Watch: 1,136"}, {"v": 6, "color": "grey", "tip": "2020, Nitrate Watch: 6"}]}, {"label": "", "segs": [{"v": 109, "color": "c1", "tip": "2021, SOS Biological: 109"}, {"v": 283, "color": "c2", "tip": "2021, VA SOS rocky bottom: 283"}, {"v": 18, "color": "c3", "tip": "2021, VA SOS muddy bottom: 18"}, {"v": 2055, "color": "c4", "tip": "2021, SOS Chemical: 2,055"}, {"v": 2388, "color": "accent", "tip": "2021, Salt Watch: 2,388"}, {"v": 19, "color": "grey", "tip": "2021, Nitrate Watch: 19"}]}, {"label": "", "segs": [{"v": 100, "color": "c1", "tip": "2022, SOS Biological: 100"}, {"v": 349, "color": "c2", "tip": "2022, VA SOS rocky bottom: 349"}, {"v": 13, "color": "c3", "tip": "2022, VA SOS muddy bottom: 13"}, {"v": 2756, "color": "c4", "tip": "2022, SOS Chemical: 2,756"}, {"v": 4326, "color": "accent", "tip": "2022, Salt Watch: 4,326"}, {"v": 38, "color": "grey", "tip": "2022, Nitrate Watch: 38"}]}, {"label": "", "segs": [{"v": 58, "color": "c1", "tip": "2023, SOS Biological: 58"}, {"v": 421, "color": "c2", "tip": "2023, VA SOS rocky bottom: 421"}, {"v": 16, "color": "c3", "tip": "2023, VA SOS muddy bottom: 16"}, {"v": 4500, "color": "c4", "tip": "2023, SOS Chemical: 4,500"}, {"v": 4091, "color": "accent", "tip": "2023, Salt Watch: 4,091"}, {"v": 1439, "color": "grey", "tip": "2023, Nitrate Watch: 1,439"}]}, {"label": "", "segs": [{"v": 48, "color": "c1", "tip": "2024, SOS Biological: 48"}, {"v": 394, "color": "c2", "tip": "2024, VA SOS rocky bottom: 394"}, {"v": 14, "color": "c3", "tip": "2024, VA SOS muddy bottom: 14"}, {"v": 4722, "color": "c4", "tip": "2024, SOS Chemical: 4,722"}, {"v": 6564, "color": "accent", "tip": "2024, Salt Watch: 6,564"}, {"v": 2565, "color": "grey", "tip": "2024, Nitrate Watch: 2,565"}]}, {"label": "2025", "segs": [{"v": 64, "color": "c1", "tip": "2025, SOS Biological: 64"}, {"v": 337, "color": "c2", "tip": "2025, VA SOS rocky bottom: 337"}, {"v": 20, "color": "c3", "tip": "2025, VA SOS muddy bottom: 20"}, {"v": 3203, "color": "c4", "tip": "2025, SOS Chemical: 3,203"}, {"v": 8783, "color": "accent", "tip": "2025, Salt Watch: 8,783"}, {"v": 4565, "color": "grey", "tip": "2025, Nitrate Watch: 4,565"}]}, {"label": "", "segs": [{"v": 49, "color": "c1", "tip": "2026, SOS Biological: 49"}, {"v": 260, "color": "c2", "tip": "2026, VA SOS rocky bottom: 260"}, {"v": 11, "color": "c3", "tip": "2026, VA SOS muddy bottom: 11"}, {"v": 1556, "color": "c4", "tip": "2026, SOS Chemical: 1,556"}, {"v": 7527, "color": "accent", "tip": "2026, Salt Watch: 7,527"}, {"v": 7175, "color": "grey", "tip": "2026, Nitrate Watch: 7,175"}]}]}]</script>
 <script src="assets/charts.js?v=4f2d43b7"></script>
-<script src="assets/explorer.js?v=6eaed82f"></script>
+<script src="assets/explorer.js?v=51248372"></script>
 <script>
-  // Findings panel: closed by default; the viewer's choice is remembered on wide screens.
+  // Menus: click to open, Escape or an outside click closes; one open at a time. Phones: a full-screen sheet.
   (function () {
-    var root = document.documentElement, btn = document.getElementById("nav-btn"),
-        scrim = document.getElementById("scrim"), narrow = window.matchMedia("(max-width: 960px)");
-    function set(open, remember) {
-      root.classList.toggle("nav-open", open);
-      btn.setAttribute("aria-expanded", String(open));
-      scrim.hidden = !(open && narrow.matches);
-      if (remember && !narrow.matches) { try { localStorage.setItem("iwla-nav", open ? "1" : "0"); } catch (e) {} }
+    var btns = document.querySelectorAll(".has-menu > button");
+    function closeAll(except) {
+      btns.forEach(function (b) { if (b !== except) { b.setAttribute("aria-expanded", "false"); document.getElementById(b.getAttribute("aria-controls")).hidden = true; } });
     }
-    var saved = null;
-    try { saved = localStorage.getItem("iwla-nav"); } catch (e) {}
-    set(saved === "1" && !narrow.matches, false);
-    btn.addEventListener("click", function () { set(!root.classList.contains("nav-open"), true); });
-    document.getElementById("side-close").addEventListener("click", function () { set(false, true); btn.focus(); });
-    scrim.addEventListener("click", function () { set(false, false); });
-    document.addEventListener("keydown", function (e) { if (e.key === "Escape" && root.classList.contains("nav-open")) { set(false, true); btn.focus(); } });
-    narrow.addEventListener("change", function () { set(false, false); });
+    btns.forEach(function (b) {
+      var m = document.getElementById(b.getAttribute("aria-controls"));
+      b.addEventListener("click", function (e) {
+        e.stopPropagation();
+        var open = b.getAttribute("aria-expanded") === "true";
+        closeAll(b); b.setAttribute("aria-expanded", String(!open)); m.hidden = open;
+        if (!open && e.detail === 0) { var first = m.querySelector("a"); if (first) first.focus(); }
+      });
+    });
+    document.addEventListener("click", function (e) { if (!e.target.closest(".has-menu")) closeAll(); });
+    var sheet = document.getElementById("sheet"), mb = document.getElementById("menu-btn");
+    function setSheet(open) {
+      sheet.hidden = !open; mb.setAttribute("aria-expanded", String(open));
+      document.documentElement.classList.toggle("sheet-open", open);
+      if (open) sheet.querySelector("a").focus(); else mb.focus();
+    }
+    document.addEventListener("keydown", function (e) {
+      if (e.key !== "Escape") return;
+      var openBtn = document.querySelector('.has-menu > button[aria-expanded="true"]');
+      closeAll(); if (openBtn) openBtn.focus();
+      if (!sheet.hidden) setSheet(false);
+    });
+    mb.addEventListener("click", function () { setSheet(true); });
+    document.getElementById("sheet-close").addEventListener("click", function () { setSheet(false); });
   })();
 </script>
 </body>

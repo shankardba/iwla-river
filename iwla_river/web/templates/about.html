@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}About · Great Seneca Creek Record{% endblock %}
+{% block description %}What this is, how Save Our Streams volunteers sample, where the data comes from and how to use the explorer.{% endblock %}
+{% block main %}
+<header class="hero">
+  <div class="eyebrow">About</div>
+  <h1>About this record</h1>
+  <p class="lede">An independent analysis of the Izaak Walton League's Save Our Streams data, built to follow how a stream's ecology changes over time. It starts with the Rockville Chapter's sites on Great Seneca Creek in Germantown, Maryland, and reads them against every volunteer sample in the country.</p>
+</header>
+
+<section class="block">
+  <h2>How volunteers sample</h2>
+  <p>Save Our Streams volunteers work in riffles, the fast, shallow, stony stretches of a stream. They stir the stones upstream of a net, then sort and count the animals that wash in. Insects such as mayflies and stoneflies only live in clean water, so the mix of animals found says how healthy the stream is. Other volunteers test water for chloride from road salt and for nitrate with test-strip kits.</p>
+  {% if hero_svg %}<figure class="diagram">{{ hero_svg | safe }}<figcaption>Illustration. Animals in the lens are drawn far larger than true.</figcaption></figure>{% endif %}
+</section>
+
+<section class="block">
+  <h2>How to use it</h2>
+  <ol class="next">
+    <li><a href="index.html">Explore</a> opens on a map of where samples are taken. Filter by sample type, colour the watershed rings by the measure you care about, and click a ring to zoom from a region down to a small subwatershed. Press <kbd>/</kbd> to search.</li>
+    <li>At the smallest watersheds, click a biological site to see its own history: every survey, what it found, and what was expected for its season and setting.</li>
+    <li><a href="findings.html">Findings</a> collects the results, each with the evidence and method behind it. <a href="chapter.html">Great Seneca Creek</a> has the chapter's own story.</li>
+  </ol>
+</section>
+
+<section class="block">
+  <h2>Sources and care</h2>
+  <p>Survey data comes from the Izaak Walton League's <a href="https://www.cleanwaterhub.org/">Clean Water Hub</a> (snapshot {{ meta.snapshot }}). Watersheds are USGS hydrologic units; watershed land cover is from EPA StreamCat; rainfall from the Open-Meteo archive; state outlines from the US Census Bureau. See <a href="data--methods.html">Sources and methods</a>.</p>
+  <p>Personal details are never shown. Many salt and nitrate kits test home taps, so those sites carry no names and their locations are rounded to about 1 km. Volunteer data is valuable and noisy: every result here says how strong its evidence is.</p>
+</section>
+{% endblock %}

@@ -3,12 +3,18 @@
 {% block title %}{{ section.title }} · Great Seneca Creek Record{% endblock %}
 {% block description %}{{ section.intro }}{% endblock %}
 {% block main %}
-<nav class="crumbs" aria-label="Breadcrumb"><a href="index.html">Overview</a> <span>›</span> {{ section.title }}</nav>
-<section class="hero">
+<nav class="crumbs" aria-label="Breadcrumb"><a href="findings.html">Findings</a><span>›</span>{{ section.title }}</nav>
+<header class="hero">
   <h1>{{ section.title }}</h1>
   <p class="lede">{{ section.intro }}</p>
-</section>
-<div class="cards list">
-  {% for f in section.findings %}{{ ui.card(f) }}{% endfor %}
+</header>
+<div class="rows">
+  {% for f in section.findings %}
+  <a class="row" href="{{ f.url }}">
+    <span class="dot {{ f.page.status }}"></span>
+    <span class="row-main"><b>{{ f.title }}</b><span>{{ f.page.headline }}</span></span>
+    {{ ui.status(f.page.status) }}
+  </a>
+  {% endfor %}
 </div>
 {% endblock %}
