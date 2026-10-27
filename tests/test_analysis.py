@@ -39,3 +39,20 @@ def test_jaccard_and_shannon():
     assert A.jaccard({"a", "b"}, {"b", "c"}) == 1 / 3
     assert abs(A.shannon([10, 10]) - np.log(2)) < 1e-12
     assert np.isnan(A.shannon([0, None]))
+
+
+def test_point_in_polygon_with_a_hole():
+    from iwla_river.enrich import _inside
+    outer = [[0, 0], [10, 0], [10, 10], [0, 10]]
+    hole = [[4, 4], [6, 4], [6, 6], [4, 6]]
+    assert _inside(2, 2, [outer, hole])
+    assert not _inside(5, 5, [outer, hole])      # inside the hole
+    assert not _inside(12, 5, [outer, hole])
+
+
+def test_watersheds_skip_without_codes(tmp_path):
+    import duckdb
+    from iwla_river import watersheds
+    db = tmp_path / "x.duckdb"
+    duckdb.connect(str(db)).close()
+    assert watersheds.run(db) == 0

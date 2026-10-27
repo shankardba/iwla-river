@@ -190,6 +190,11 @@
   function map(spec) {
     const hd = header(spec), T = hd.top, H = T + spec.height + 24;
     let s = hd.s + `<g transform="translate(0 ${T})">`;
+    if (spec.clip) s += `<clipPath id="mapclip-${spec.height}"><rect width="${W}" height="${spec.height}"/></clipPath>`;
+    s += `<g${spec.clip ? ` clip-path="url(#mapclip-${spec.height})"` : ""}>`;
+    (spec.paths || []).forEach(p => s += `<path d="${p.d}" fill="none" class="${p.k === "border" ? "map-border" : "map-state"}"/>`);
+    s += `</g>`;
+    (spec.words || []).forEach(t => s += `<text class="map-word" x="${t.x}" y="${t.y}" text-anchor="middle">${esc(t.text)}</text>`);
     (spec.rings || []).forEach(r => s += `<circle cx="${r.cx}" cy="${r.cy}" r="${r.r}" fill="none" class="grid" stroke-dasharray="3 4"/><text class="t-note" x="${r.cx + r.r * 0.71 + 4}" y="${r.cy - r.r * 0.71 - 4}">${esc(r.label)}</text>`);
     spec.points.forEach(p => {
       if (!p.href && p.ll) p.href = `https://www.google.com/maps/search/?api=1&query=${p.ll[0]},${p.ll[1]}`;

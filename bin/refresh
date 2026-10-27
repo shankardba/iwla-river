@@ -7,5 +7,6 @@ cd "$(dirname "$0")/.."
 .venv/bin/python -m iwla_river.analysis
 .venv/bin/python -m iwla_river.enrich
 .venv/bin/python -m iwla_river.model
+.venv/bin/python -m iwla_river.watersheds
 .venv/bin/python -m iwla_river.report
 .venv/bin/python -m iwla_river.site

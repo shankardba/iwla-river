@@ -130,6 +130,9 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 figure { margin: 0; background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding: 16px; display: flex; flex-direction: column; gap: 8px; }
 .chart svg { width: 100%; height: auto; display: block; }
 .chart a circle { cursor: pointer; }
+.map-border { stroke: var(--muted); stroke-width: 1.1; stroke-linejoin: round; }
+.map-state { stroke: var(--rule); stroke-width: .8; stroke-linejoin: round; }
+.map-word { font: 600 11px var(--display); letter-spacing: .18em; fill: var(--muted); opacity: .7; }
 .chart a:hover circle { stroke: var(--ink); stroke-width: 1.5; fill-opacity: 1; }
 .chart a text { fill: var(--accent); text-decoration: underline; }
 figcaption { font: 12px/1.5 var(--mono); color: var(--muted); }
@@ -182,3 +185,21 @@ ol.next { margin: 0; padding-left: 22px; display: flex; flex-direction: column; 
   figure.diagram { overflow-x: auto; }
   figure.diagram svg.dg { min-width: 640px; }
 }
+
+/* watershed explorer */
+.explorer { display: flex; flex-direction: column; gap: 14px; }
+.ex-crumbs { font: 13px/1.6 var(--display); color: var(--muted); }
+.ex-crumbs a { color: var(--accent); }
+.ex-crumbs .sep { margin: 0 3px; }
+.ex-title .meta { font-size: 13px; margin-left: 6px; }
+.ex-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.ex-actions button, .ex-actions .btn { font: 600 13px/1 var(--display); padding: 8px 12px; border-radius: 6px; cursor: pointer;
+  border: 1px solid var(--rule); background: var(--surface); color: var(--ink); text-decoration: none; }
+.ex-actions button:hover, .ex-actions .btn:hover { border-color: var(--accent); color: var(--accent); }
+.ex-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font: 12px/1.4 var(--display); color: var(--muted); }
+.ex-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; vertical-align: -1px; }
+.ex-kids th.sortable { cursor: pointer; user-select: none; }
+.ex-kids th.sortable:hover { color: var(--accent); }
+.ex-kids tr.go:hover td { background: color-mix(in srgb, var(--accent) 6%, transparent); }
+.ex-map svg a circle { cursor: pointer; }
+.ex-map svg a:hover circle { stroke: var(--ink); stroke-width: 1.5; fill-opacity: .9; }

@@ -50,6 +50,60 @@ def run_findings(db: DB) -> list[dict]:
     return out
 
 
+def write_watershed_data(db: DB, out: Path) -> None:
+    """data/watersheds.json for regions to subbasins; data/huc4/<code>.json for smaller units and sites."""
+    from .findings.watersheds import complete
+    if not complete(db):
+        if (out / "data").exists():
+            shutil.rmtree(out / "data")
+        return
+    keys = {"code": "c", "name": "n", "parent": "p", "sites": "s", "bio_surveys": "bv", "first_year": "fy", "last_year": "ly",
+            "lat": "la", "lon": "lo", "imperv": "im", "forest": "fo", "sens_obs": "so", "sens_exp": "se", "gap": "g",
+            "gap_p": "gp", "gap_verdict": "gv", "score_pct": "sp", "cl_median": "cm", "cl_n": "cn", "no3_median": "nm", "no3_n": "nn"}
+    rnd = {"la": 4, "lo": 4, "im": 1, "fo": 1, "so": 3, "se": 3, "g": 3, "gp": 4, "sp": 1, "cm": 1, "nm": 2}
+
+    def pack(r):
+        o = {}
+        for k, short in keys.items():
+            v = r.get(k)
+            if v is None or v != v or v == "":
+                continue
+            if isinstance(v, float):
+                v = round(v, rnd.get(short, 0)) if short in rnd else int(round(v))
+            o[short] = v
+        return o
+
+    rows = db.rows("SELECT * FROM watershed_metrics")
+    top = {r["code"]: pack(r) for r in rows if r["digits"] <= 8}
+    us = db.rows("""SELECT count(DISTINCT site_id) AS sites FROM site_huc""")[0]
+    bio = db.one("SELECT sum(bio_surveys) FROM watershed_metrics WHERE digits = 2")
+    so = db.rows("SELECT avg(observed) AS so, avg(expected) AS se, avg(resid) AS g FROM expected WHERE target = 'sensitive_share'")[0]
+    top[""] = pack({"code": "", "name": "United States", "sites": us["sites"], "bio_surveys": bio, **{k: so[k] for k in ("so", "se", "g")}}) | \
+        {"so": round(so["so"], 3), "se": round(so["se"], 3), "g": round(so["g"], 3)}
+    (out / "data" / "huc4").mkdir(parents=True, exist_ok=True)
+    (out / "data" / "watersheds.json").write_text(json.dumps({"w": top}, separators=(",", ":")))
+    geo = HERE / "geo" / "lower48.json"
+    if geo.exists():
+        shutil.copy(geo, out / "data" / "lower48.json")
+    sites = db.rows("""
+        SELECT h.huc12, u.site_id, round(any_value(u.lat), 5) AS lat, round(any_value(u.lon), 5) AS lon,
+               count(*) FILTER (WHERE u.protocol IN ('sos_bio', 'va_rocky', 'va_muddy')) AS bio,
+               count(*) FILTER (WHERE u.protocol NOT IN ('sos_bio', 'va_rocky', 'va_muddy')) AS other,
+               left(coalesce(any_value(u.site_name), ''), 40) AS name
+        FROM usable_surveys u JOIN site_huc h USING (site_id) GROUP BY h.huc12, u.site_id""")
+    small = {}
+    for r in rows:
+        if r["digits"] >= 10:
+            small.setdefault(r["code"][:4], {})[r["code"]] = pack(r)
+    by4 = {}
+    for s in sites:
+        by4.setdefault(s["huc12"][:4], []).append([s["site_id"], s["lat"], s["lon"], s["huc12"], s["bio"], s["other"], s["name"]])
+    for p in (out / "data" / "huc4").glob("*.json"):
+        p.unlink()
+    for h in set(small) | set(by4):
+        (out / "data" / "huc4" / f"{h}.json").write_text(json.dumps({"w": small.get(h, {}), "sites": by4.get(h, [])}, separators=(",", ":")))
+
+
 def build(db_path=C.DB_PATH, out: Path = OUT, body_out: Path = BODY_OUT) -> Path:
     load_findings()
     db = DB(db_path)
@@ -99,6 +153,8 @@ def build(db_path=C.DB_PATH, out: Path = OUT, body_out: Path = BODY_OUT) -> Path
             pages[i["url"]] = render("finding.html", i["url"], section=s, item=i, prev=prev, next=nxt)
     for name, html in pages.items():
         (out / name).write_text(html)
+
+    write_watershed_data(db, out)
 
     index = [{"section": i["section"], "id": i["id"], "title": i["title"], "url": i["url"], "key": i["key"],
               "headline": i["page"].headline, "status": i["page"].status,

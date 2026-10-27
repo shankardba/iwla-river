@@ -15,6 +15,7 @@ from __future__ import annotations
 import argparse
 import datetime as dt
 import json
+import math
 import threading
 import time
 from concurrent.futures import ThreadPoolExecutor
@@ -153,46 +154,83 @@ def stage_rain(rows, workers: int = 4) -> None:
     _save("rain.json", cache)
 
 
-def stage_huc(points, workers: int = 4) -> None:
-    """USGS Watershed Boundary Dataset: the 12-digit hydrologic unit (HUC12) each site sits in."""
+def _inside(x, y, rings) -> bool:
+    """Even-odd ray test against all rings of an ESRI polygon (holes handled by the parity)."""
+    hit = False
+    for ring in rings:
+        for (x1, y1), (x2, y2) in zip(ring, ring[1:] + ring[:1]):
+            if (y1 > y) != (y2 > y) and x < x1 + (y - y1) * (x2 - x1) / ((y2 - y1) or 1e-12):
+                hit = not hit
+    return hit
+
+
+def stage_huc(points, workers: int = 3) -> None:
+    """USGS Watershed Boundary Dataset: the 12-digit hydrologic unit (HUC12) each site sits in.
+
+    One request per 1-degree square that holds sites fetches every HUC12 boundary there (simplified);
+    each site is then placed by a point-in-polygon test. Sites left over get a single-point lookup.
+    """
     cache = _load("huc.json")
     todo = [(sid, la, lo) for sid, la, lo in points if str(sid) not in cache]
-    print(f"huc: {len(todo)} sites to look up ({len(cache)} cached)", flush=True)
-    lock = threading.Lock()
-    next_slot = [time.monotonic()]
+    cells = {}
+    for sid, la, lo in todo:
+        cells.setdefault((math.floor(la), math.floor(lo)), []).append((sid, la, lo))
+    print(f"huc: {len(todo)} sites in {len(cells)} one-degree squares ({len(cache)} cached)", flush=True)
 
-    def wait_turn():
-        with lock:
-            now = time.monotonic()
-            slot = max(now, next_slot[0])
-            next_slot[0] = slot + 0.12  # at most about 8 requests a second
-        time.sleep(max(0.0, slot - now))
-
-    def fetch(item):
-        sid, la, lo = item
-        params = {"geometry": f"{lo},{la}", "geometryType": "esriGeometryPoint", "inSR": 4326,
-                  "spatialRel": "esriSpatialRelIntersects", "outFields": "huc12", "returnGeometry": "false", "f": "json"}
-        for attempt in range(4):
-            wait_turn()
+    def get(url, params, tries=5):
+        for attempt in range(tries):
             try:
-                r = requests.get(f"{WBD}/6/query", params=params, timeout=60, headers=UA)
-                feats = r.json().get("features", []) if r.ok else None
+                r = requests.get(url, params=params, timeout=120, headers=UA)
+                if r.ok:
+                    return r.json()
             except (requests.RequestException, ValueError):
-                feats = None
-            if feats is not None:
-                return sid, feats[0]["attributes"]["huc12"] if feats else ""
-            time.sleep(5 * (attempt + 1))
-        return sid, None
+                pass
+            time.sleep(4 * (attempt + 1))
+        return None
 
-    done = 0
+    def fetch_cell(item):
+        (la, lo), pts_ = item
+        data = get(f"{WBD}/6/query", {"geometry": f"{lo},{la},{lo + 1},{la + 1}", "geometryType": "esriGeometryEnvelope",
+                                      "inSR": 4326, "outSR": 4326, "spatialRel": "esriSpatialRelIntersects",
+                                      "outFields": "huc12", "returnGeometry": "true", "maxAllowableOffset": 0.0008, "f": "json"})
+        found = {}
+        if data is None:
+            return found, pts_
+        polys = []
+        for f in data.get("features", []):
+            rings = f.get("geometry", {}).get("rings") or []
+            xs = [p[0] for r in rings for p in r]
+            ys = [p[1] for r in rings for p in r]
+            if xs:
+                polys.append((f["attributes"]["huc12"], min(xs), max(xs), min(ys), max(ys), rings))
+        left = []
+        for sid, y, x in pts_:
+            code = next((c for c, x0, x1, y0, y1, rings in polys if x0 <= x <= x1 and y0 <= y <= y1 and _inside(x, y, rings)), None)
+            if code:
+                found[str(sid)] = code
+            else:
+                left.append((sid, y, x))
+        return found, left
+
+    leftovers, done = [], 0
     with ThreadPoolExecutor(max_workers=workers) as pool:
-        for sid, huc in pool.map(fetch, todo):
-            if huc is not None:
-                cache[str(sid)] = huc
+        for found, left in pool.map(fetch_cell, sorted(cells.items())):
+            cache.update(found)
+            leftovers += left
             done += 1
-            if done % 500 == 0:
+            if done % 25 == 0:
                 _save("huc.json", cache)
-                print(f"  huc {done}/{len(todo)} at {dt.datetime.now():%H:%M}", flush=True)
+                print(f"  huc squares {done}/{len(cells)}, {len(cache)} sites placed at {dt.datetime.now():%H:%M}", flush=True)
+    _save("huc.json", cache)
+    print(f"huc: {len(leftovers)} sites need a single-point lookup", flush=True)
+    for i, (sid, la, lo) in enumerate(leftovers, 1):
+        data = get(f"{WBD}/6/query", {"geometry": f"{lo},{la}", "geometryType": "esriGeometryPoint", "inSR": 4326,
+                                      "spatialRel": "esriSpatialRelIntersects", "outFields": "huc12", "returnGeometry": "false", "f": "json"}, 3)
+        if data is not None:
+            feats = data.get("features", [])
+            cache[str(sid)] = feats[0]["attributes"]["huc12"] if feats else ""
+        if i % 100 == 0:
+            _save("huc.json", cache)
     _save("huc.json", cache)
 
     # Names for every level of each unit found.

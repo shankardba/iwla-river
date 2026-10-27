@@ -5,11 +5,35 @@ No basemap is loaded: dots are placed by their own coordinates, which keeps the 
 
 from __future__ import annotations
 
+import json
 import math
+from pathlib import Path
 
 from ... import config as C
 from ..db import fmt, pfmt, year
 from ..registry import Page, chart, finding, gmaps, links, text
+
+GEO = Path(__file__).resolve().parent.parent / "geo" / "lower48.json"
+
+
+def outline_paths(P) -> list:
+    """State lines and the national outline, projected with P and thinned to about one pixel."""
+    if not GEO.exists():
+        return []
+    geo = json.loads(GEO.read_text())
+    out = []
+    for kind in ("inner", "border"):
+        for arc in geo[kind]:
+            pts, last = [], None
+            for lo, la in arc:
+                x, y = P(*albers(la, lo))
+                if last is None or abs(x - last[0]) + abs(y - last[1]) >= 0.9:
+                    pts.append((x, y))
+                    last = (x, y)
+            if len(pts) >= 2:
+                out.append({"k": kind, "d": "M" + "L".join(f"{x:.1f} {y:.1f}" for x, y in pts)})
+    return out
+
 
 KIND = {"sos_bio": "bio", "va_rocky": "bio", "va_muddy": "bio", "sos_chem": "chem", "salt": "chem", "nitrate": "chem"}
 
@@ -41,7 +65,10 @@ def national_map(db):
     if len(cells) < 2:
         return None
     proj = {k: albers(*k) for k in cells}
-    xs, ys = [p[0] for p in proj.values()], [p[1] for p in proj.values()]
+    # Fit the frame to the lower-48 outline (or the dots, if the outline file is missing).
+    frame = [albers(la, lo) for kind in ("border",) for arc in (json.loads(GEO.read_text())[kind] if GEO.exists() else [])
+             for lo, la in arc] or list(proj.values())
+    xs, ys = [p[0] for p in frame], [p[1] for p in frame]
     W, pad = 760, 10
     sc = (W - 2 * pad) / (max(xs) - min(xs))
     H = (max(ys) - min(ys)) * sc + 2 * pad
@@ -64,9 +91,9 @@ def national_map(db):
     spec = {"type": "map", "title": f"{fmt(n_sites)} monitored sites in the lower 48 states",
             "legend": [{"name": "Has biological surveys", "color": "c4"}, {"name": "Salt, nitrate or chemistry only", "color": "c1"},
                        {"name": "Great Seneca Creek", "color": "bad"}],
-            "height": round(H), "points": pts, "opacity": 0.6,
+            "height": round(H), "points": pts, "opacity": 0.6, "paths": outline_paths(P),
             "labels": [{"x": cx, "y": cy, "tx": cx - 50, "ty": cy + 70, "text": "Great Seneca Creek", "anchor": "end"}],
-            "note": "Dot size: surveys in each quarter-degree cell. Alaska and Hawaii not shown. Click a dot to open it in Google Maps."}
+            "note": "Dot size: surveys in each quarter-degree cell. Alaska and Hawaii not shown. Outlines: US Census Bureau. Click a dot to open it in Google Maps."}
     return Page(
         headline=f"{fmt(n_sites)} sites across the lower 48 states have usable surveys; most are in {', '.join(s['state'] for s in states[:3])}.",
         status="info",
@@ -96,6 +123,15 @@ def local_map(db):
     P = lambda la, lo: (round(W / 2 + (lo - lon0) * math.cos(math.radians(lat0)) * 111.32 * sc, 1),
                         round(H / 2 - (la - lat0) * 110.57 * sc, 1))
     color = {"improving": "good", "declining": "bad"}
+    paths = []
+    if GEO.exists():
+        geo = json.loads(GEO.read_text())
+        for kind in ("inner", "border"):
+            for arc in geo[kind]:
+                xy = [P(la, lo) for lo, la in arc]
+                inside = [(x, y) for x, y in xy if -40 <= x <= W + 40 and -40 <= y <= H + 40]
+                if len(inside) >= 2:
+                    paths.append({"k": kind, "d": "M" + "L".join(f"{x:.1f} {y:.1f}" for x, y in inside)})
     pts = []
     for r in sorted(rows, key=lambda r: r["site_id"] in trends):
         x, y = P(r["lat"], r["lon"])
@@ -117,9 +153,10 @@ def local_map(db):
     spec = {"type": "map", "title": f"{len(rows)} sites with surveys within {R} km; {n_trend} have a score-trend test",
             "legend": [{"name": "Improving", "color": "good"}, {"name": "No clear trend", "color": "grey"}, {"name": "Declining", "color": "bad"},
                        {"name": "Other biological", "color": "c4"}, {"name": "Salt, nitrate, chemistry", "color": "c1"}],
-            "height": round(H), "points": pts, "opacity": 0.55,
+            "height": round(H), "points": pts, "opacity": 0.55, "paths": paths, "clip": True,
             "rings": [{"cx": cx, "cy": cy, "r": round(k * sc, 1), "label": f"{k} km"} for k in (10, 20, 30)],
             "labels": [{"x": cx, "y": cy, "tx": cx + 70, "ty": cy - 60, "text": "Great Seneca Creek", "sub": "chapter sites"}],
+            "words": [{"x": cx + 110, "y": cy + 60, "text": "MARYLAND"}, {"x": cx - 170, "y": cy + 175, "text": "VIRGINIA"}],
             "note": "North is up. Big dots: sites with a score-trend test. Click any dot to open it in Google Maps."}
     return Page(
         headline=f"{len(rows)} Clean Water Hub sites with surveys lie within {R} km of the chapter; the long-record ones cluster to the southwest, across the Potomac.",

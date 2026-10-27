@@ -73,6 +73,10 @@ python -m iwla_river.model      # train, validate by site, observed minus expect
 
 Targets: share of animal groups found that are pollution-sensitive (comparable across forms) and the score as a percentile within its form. Model: gradient-boosted trees (scikit-learn `HistGradientBoostingRegressor`), five folds grouped by site. The year is never an input, so change over time stays in the gap.
 
+## Watersheds
+
+`python -m iwla_river.enrich --stage huc` places every site in its USGS 12-digit hydrologic unit (Watershed Boundary Dataset): one request per one-degree square fetches the simplified boundaries there, and each site is placed by a point-in-polygon test (cached in `data/cache/huc.json`, names in `huc_names.json`). `python -m iwla_river.watersheds` then computes, for every unit at every level (2, 4, 6, 8, 10 and 12 digits): sites and surveys, sensitive share found against expected, the gap and its seasonal Kendall trend, score percentile, paved and forest share, chloride and nitrate. The site's Watershed explorer page zooms through those levels; `docs/data/watersheds.json` holds regions to subbasins and `docs/data/huc4/<code>.json` the smaller units and sites, fetched as you zoom.
+
 ## The findings site
 
 `python -m iwla_river.site` builds a multi-page site into `docs/`, served by GitHub Pages at https://shankardba.github.io/iwla-river/.
