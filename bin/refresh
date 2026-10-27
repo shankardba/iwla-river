@@ -1,0 +1,7 @@
+#!/bin/sh
+# Pull a fresh snapshot, rebuild the database and write the data-quality report.
+set -e
+cd "$(dirname "$0")/.."
+.venv/bin/python -m iwla_river.pull "$@"
+.venv/bin/python -m iwla_river.clean
+.venv/bin/python -m iwla_river.report

@@ -1,0 +1,39 @@
+source_field,taxon,taxon_group,tolerance
+caddisflies,caddisflies (most),Trichoptera,sensitive
+most_caddisflies,caddisflies (most),Trichoptera,sensitive
+mayflies,mayflies,Ephemeroptera,sensitive
+stoneflies,stoneflies,Plecoptera,sensitive
+riffle_beetles,riffle beetles,Coleoptera,sensitive
+beetles,beetles,Coleoptera,sensitive
+water_pennies,water pennies,Coleoptera,sensitive
+gilled_snails,gilled snails,Gastropoda,sensitive
+water_snipe_flies,water snipe flies,Diptera,sensitive
+alderflies,alderflies,Megaloptera,less_sensitive
+dobsonflies,dobsonflies,Megaloptera,less_sensitive
+fishflies,fishflies,Megaloptera,less_sensitive
+hellgrammites_fishflies_alderflies,hellgrammites/fishflies/alderflies,Megaloptera,less_sensitive
+aquatic_sowbugs,sowbugs,Crustacea,less_sensitive
+sowbugs,sowbugs,Crustacea,less_sensitive
+scuds,scuds,Crustacea,less_sensitive
+freshwater_shrimp,freshwater shrimp,Crustacea,less_sensitive
+crayfish,crayfish,Crustacea,less_sensitive
+clams,clams,Bivalvia,less_sensitive
+mussels,mussels,Bivalvia,less_sensitive
+common_net_spinning_caddisflies,common net-spinning caddisflies,Trichoptera,less_sensitive
+common_netspinners,common net-spinning caddisflies,Trichoptera,less_sensitive
+crane_flies,crane flies,Diptera,less_sensitive
+damselflies,damselflies,Odonata,less_sensitive
+dragonflies,dragonflies,Odonata,less_sensitive
+dragonflies_and_damselflies,dragonflies and damselflies,Odonata,less_sensitive
+gomphidae_dragonflies,gomphid dragonflies,Odonata,less_sensitive
+aquatic_worms,aquatic worms,Annelida,tolerant
+worms,aquatic worms,Annelida,tolerant
+leeches,leeches,Annelida,tolerant
+black_flies,black flies,Diptera,tolerant
+blackflies,black flies,Diptera,tolerant
+midge_flies,midges,Diptera,tolerant
+midges,midges,Diptera,tolerant
+lunged_snails,lunged snails,Gastropoda,tolerant
+flatworms,flatworms,Platyhelminthes,tolerant
+most_true_flies,other true flies,Diptera,unassigned
+true_bugs,true bugs,Hemiptera,unassigned
