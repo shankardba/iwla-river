@@ -1,0 +1,296 @@
+{
+ "snapshot": "2026-10-27",
+ "findings": [
+  {
+   "section": "chapter",
+   "id": "expected",
+   "title": "Compared with what its setting predicts",
+   "url": "chapter--expected.html",
+   "key": true,
+   "headline": "Site 1 finds fewer pollution-sensitive animals than its setting predicts, and the gap appears to be widening (p = 0.055, about 11 percentage points a decade).",
+   "status": "watch",
+   "numbers": [
+    {
+     "value": "11 pts",
+     "label": "per decade, widening gap at Site 1"
+    },
+    {
+     "value": "2 of 3",
+     "label": "latest Site 1 surveys below the expected range"
+    }
+   ]
+  },
+  {
+   "section": "chapter",
+   "id": "score-trend",
+   "title": "The score has held steady",
+   "url": "chapter--score-trend.html",
+   "key": true,
+   "headline": "Scores held near 16.5 before 2013 and 16.6 since; the overall score shows no trend.",
+   "status": "steady",
+   "numbers": [
+    {
+     "value": "16.5 \u2192 16.6",
+     "label": "mean SOS score, before and since 2013"
+    },
+    {
+     "value": "3.4",
+     "label": "points between the two sites on the same day"
+    }
+   ]
+  },
+  {
+   "section": "chapter",
+   "id": "species-mix",
+   "title": "The mix of animals is shifting",
+   "url": "chapter--species-mix.html",
+   "key": true,
+   "headline": "Between 2005\u20132009 and 2020\u20132024, damselflies and common net-spinning caddisflies became rarer while dobsonflies and aquatic worms became regulars.",
+   "status": "watch",
+   "numbers": [
+    {
+     "value": "65% \u2192 15%",
+     "label": "damselflies, share of surveys"
+    },
+    {
+     "value": "47% \u2192 92%",
+     "label": "aquatic worms, share of surveys"
+    }
+   ]
+  },
+  {
+   "section": "chapter",
+   "id": "trend-tests",
+   "title": "Trend tests",
+   "url": "chapter--trend-tests.html",
+   "key": false,
+   "headline": "At Site 1 the share of pollution-sensitive groups is declining (p = 0.042) while the total score shows no clear trend.",
+   "status": "concern",
+   "numbers": []
+  },
+  {
+   "section": "chapter",
+   "id": "score-parts",
+   "title": "What moves the score",
+   "url": "chapter--score-parts.html",
+   "key": false,
+   "headline": "Pollution-sensitive animals drive the swings: they add 2 to 18 points per survey.",
+   "status": "info",
+   "numbers": []
+  },
+  {
+   "section": "chapter",
+   "id": "season",
+   "title": "Season matters",
+   "url": "chapter--season.html",
+   "key": false,
+   "headline": "Spring surveys average 2.6 points more than summer ones, so trends must compare like seasons.",
+   "status": "info",
+   "numbers": []
+  },
+  {
+   "section": "chapter",
+   "id": "survey-forms",
+   "title": "The chapter changed survey forms in 2024",
+   "url": "chapter--survey-forms.html",
+   "key": false,
+   "headline": "Since 2024 the chapter has also used the Virginia form, which the Hub's own site page does not chart.",
+   "status": "info",
+   "numbers": []
+  },
+  {
+   "section": "watersheds",
+   "id": "explorer",
+   "title": "Watershed explorer",
+   "url": "watersheds--explorer.html",
+   "key": true,
+   "headline": "Explore 3,433 subwatersheds with surveys, from US regions down to the chapter's own Great Seneca Creek.",
+   "status": "info",
+   "numbers": []
+  },
+  {
+   "section": "watersheds",
+   "id": "great-seneca",
+   "title": "Great Seneca Creek within its watersheds",
+   "url": "watersheds--great-seneca.html",
+   "key": false,
+   "headline": "Great Seneca Creek's subwatershed finds 39% sensitive groups against 39% expected; its wider watershed, Seneca Creek, finds 39%.",
+   "status": "info",
+   "numbers": []
+  },
+  {
+   "section": "chemistry",
+   "id": "road-salt",
+   "title": "Road salt reaches the creek every winter",
+   "url": "chemistry--road-salt.html",
+   "key": true,
+   "headline": "Chloride in the creek climbs from about 85 mg/L in summer to winter peaks of 159, still below the EPA's 230.",
+   "status": "watch",
+   "numbers": [
+    {
+     "value": "159 mg/L",
+     "label": "highest winter chloride in the creek"
+    },
+    {
+     "value": "132 mg/L",
+     "label": "Maryland Salt Watch median"
+    }
+   ]
+  },
+  {
+   "section": "chemistry",
+   "id": "nitrate",
+   "title": "Nitrate stays low",
+   "url": "chemistry--nitrate.html",
+   "key": false,
+   "headline": "Nitrate strips have read 2 mg/L at the creek on every visit.",
+   "status": "good",
+   "numbers": []
+  },
+  {
+   "section": "region",
+   "id": "local-map",
+   "title": "Map of sites around the creek",
+   "url": "region--local-map.html",
+   "key": false,
+   "headline": "1652 Clean Water Hub sites with surveys lie within 30 km of the chapter; the long-record ones cluster to the southwest, across the Potomac.",
+   "status": "info",
+   "numbers": []
+  },
+  {
+   "section": "region",
+   "id": "neighbour-trends",
+   "title": "Streams across the Potomac are mostly improving",
+   "url": "region--neighbour-trends.html",
+   "key": true,
+   "headline": "11 of 31 long-record sites within 30 km show improving scores, the opposite of Site 1's direction.",
+   "status": "good",
+   "numbers": [
+    {
+     "value": "11 of 31",
+     "label": "neighbour sites improving"
+    },
+    {
+     "value": "about 3",
+     "label": "expected by chance alone"
+    }
+   ]
+  },
+  {
+   "section": "region",
+   "id": "nearby-sites",
+   "title": "Sites nearby",
+   "url": "region--nearby-sites.html",
+   "key": false,
+   "headline": "25 other Hub sites within 10 km have usable surveys, mostly salt and nitrate readings.",
+   "status": "info",
+   "numbers": []
+  },
+  {
+   "section": "national",
+   "id": "map",
+   "title": "Where volunteers monitor",
+   "url": "national--map.html",
+   "key": true,
+   "headline": "19,960 sites across the lower 48 states have usable surveys; most are in IA, NJ, VA.",
+   "status": "info",
+   "numbers": [
+    {
+     "value": "19,960",
+     "label": "sites with usable surveys"
+    },
+    {
+     "value": "IA, NJ, VA, MD, MN",
+     "label": "states with the most sites"
+    }
+   ]
+  },
+  {
+   "section": "national",
+   "id": "paving",
+   "title": "Paved watersheds lose sensitive animals",
+   "url": "national--paving.html",
+   "key": true,
+   "headline": "Nationally, sensitive animals fall from 40% of groups found in near-natural watersheds to 22% where a quarter or more is paved.",
+   "status": "info",
+   "numbers": [
+    {
+     "value": "12.8%",
+     "label": "of the chapter's watershed paved or roofed (2019)"
+    },
+    {
+     "value": "28%",
+     "label": "of it forest"
+    }
+   ]
+  },
+  {
+   "section": "national",
+   "id": "model",
+   "title": "How the expected-score model works",
+   "url": "national--model.html",
+   "key": false,
+   "headline": "Trained on 7,332 surveys at 1,162 sites, it explains 39% of the variation at sites it never saw.",
+   "status": "info",
+   "numbers": [
+    {
+     "value": "0.39",
+     "label": "held-out R\u00b2, sensitive share"
+    },
+    {
+     "value": "0.02",
+     "label": "season and form alone"
+    }
+   ]
+  },
+  {
+   "section": "national",
+   "id": "monitoring-growth",
+   "title": "Volunteer monitoring took off after 2017",
+   "url": "national--monitoring-growth.html",
+   "key": false,
+   "headline": "The Hub holds 83,297 usable surveys; 7,414 are biological, enough to train a national model.",
+   "status": "info",
+   "numbers": []
+  },
+  {
+   "section": "data",
+   "id": "data-quality",
+   "title": "How clean the data is",
+   "url": "data--data-quality.html",
+   "key": false,
+   "headline": "83,297 of 88,511 records (94%) are usable after removing undated, deleted and duplicate surveys.",
+   "status": "info",
+   "numbers": [
+    {
+     "value": "88,511",
+     "label": "records downloaded"
+    },
+    {
+     "value": "83,297",
+     "label": "usable"
+    }
+   ]
+  },
+  {
+   "section": "data",
+   "id": "temperature-units",
+   "title": "Water temperature switches units",
+   "url": "data--temperature-units.html",
+   "key": false,
+   "headline": "The Hub stores no temperature unit; chapter readings switch from \u00b0C to \u00b0F in 2012, and 83 readings nationwide needed converting.",
+   "status": "info",
+   "numbers": []
+  },
+  {
+   "section": "data",
+   "id": "methods",
+   "title": "Sources and methods",
+   "url": "data--methods.html",
+   "key": false,
+   "headline": "Built from a Clean Water Hub snapshot of 2026-10-27, with public land-cover and weather data.",
+   "status": "info",
+   "numbers": []
+  }
+ ]
+}

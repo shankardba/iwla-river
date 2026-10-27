@@ -114,15 +114,23 @@ def build_report(db_path=C.DB_PATH) -> str:
             (SELECT max(year(survey_date)) + 1 FROM usable_surveys WHERE is_chapter_site)) t(y)
         WHERE y NOT IN (SELECT year(survey_date) FROM usable_surveys WHERE is_chapter_site)""").fetchall()[0][0] or "none"), ""]
 
-    out += ["## Sites nearest the chapter sites (within 25 km)", "",
-            "Candidates for upstream and downstream comparison in phase 2.", "", md_table(q("""
-        WITH c AS (SELECT lat, lon FROM sites WHERE site_id = 467), d AS (
-        SELECT s.site_id, s.site_name, s.stream, s.state,
+    # Only biological sites are comparison candidates; kit sites are often homes and are never named here.
+    from .web.db import public_site
+    near = q("""
+        WITH c AS (SELECT lat, lon FROM sites WHERE site_id = 467)
+        SELECT s.site_id, s.site_name, s.stream, s.state, s.water_source,
                round(6371 * 2 * asin(sqrt(pow(sin(radians(s.lat - c.lat) / 2), 2) +
                      cos(radians(c.lat)) * cos(radians(s.lat)) * pow(sin(radians(s.lon - c.lon) / 2), 2))), 1) AS km,
-               (SELECT count(*) FROM usable_surveys u WHERE u.site_id = s.site_id) AS usable_surveys
-        FROM sites s, c WHERE s.lat IS NOT NULL AND s.site_id NOT IN (467, 468))
-        SELECT * FROM d WHERE km <= 25 ORDER BY km LIMIT 15""")), ""]
+               count(u.survey_uid) AS bio_surveys
+        FROM sites s CROSS JOIN c JOIN usable_surveys u USING (site_id)
+        WHERE s.lat IS NOT NULL AND s.site_id NOT IN (467, 468) AND u.protocol IN ('sos_bio', 'va_rocky', 'va_muddy')
+        GROUP BY ALL HAVING km <= 25 ORDER BY km LIMIT 15""").fetchall()
+    lines = ["| site_id | site | stream | state | km | biological surveys |", "| --- | --- | --- | --- | --- | --- |"]
+    for sid, name, stream, state, ws, km, n in near:
+        label = public_site(name, 0.0, 0.0, True, ws)[0]
+        lines.append(f"| {sid} | {label} | {stream if label == name else ''} | {state or ''} | {km} | {n} |")
+    out += ["## Biological sites nearest the chapter sites (within 25 km)", "",
+            "Candidates for upstream and downstream comparison.", "", "\n".join(lines), ""]
     con.close()
     return "\n".join(out)
 
