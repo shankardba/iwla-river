@@ -1,0 +1,26 @@
+/* Terrain on the Explore map (terrain.js). Uses site.css tokens. */
+:root { --peak: #6b4f36; --peak-halo: rgba(255, 255, 255, .85); --terrain-op: .62; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --peak: #e7d3b8; --peak-halo: rgba(15, 23, 25, .85); --terrain-op: .5; } }
+:root[data-theme="dark"] { --peak: #e7d3b8; --peak-halo: rgba(15, 23, 25, .85); --terrain-op: .5; }
+
+.ex-terrain { opacity: var(--terrain-op); pointer-events: none; image-rendering: auto; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .ex-terrain { filter: brightness(.8) saturate(.8); } }
+:root[data-theme="dark"] .ex-terrain { filter: brightness(.8) saturate(.8); }
+
+.ex-peak { fill: var(--peak); stroke: var(--peak-halo); stroke-width: 1; stroke-linejoin: round; }
+.ex-peak-g.small .ex-peak { opacity: .75; }
+.ex-peak-label { font: 600 10.5px var(--display); fill: var(--ink); paint-order: stroke; stroke: var(--peak-halo); stroke-width: 3px; stroke-linejoin: round; pointer-events: none; }
+.ex-peak-m { font: 500 10px var(--mono); fill: var(--muted); }
+.ex-peaks { pointer-events: visiblePainted; }
+
+.ex-terrain-legend { display: inline-grid; grid-template-columns: auto 120px auto; grid-template-rows: auto auto; column-gap: 8px; align-items: center; font: 12px/1.3 var(--display); color: var(--muted); }
+.ex-terrain-legend .lbl { grid-row: 1; }
+.ex-terrain-legend .bar { grid-row: 1; height: 8px; border-radius: 4px; border: 1px solid var(--rule); opacity: .9; }
+.ex-terrain-legend .ticks { grid-row: 2; grid-column: 2; display: flex; justify-content: space-between; font: 10.5px var(--mono); }
+.ex-terrain-legend .peak-key { grid-row: 1; display: inline-flex; align-items: center; gap: 4px; }
+
+.ex-profile .flow { stroke-dasharray: 10 14; animation: dg-flow 1.6s linear infinite; }
+@media (prefers-reduced-motion: reduce) { .ex-profile .flow { animation: none; } .ex-profile .ripple { display: none; } }
+
+/* let the relief show through the coloured watershed areas */
+.ex-map svg:has(.ex-terrain) .ex-area path { fill-opacity: .28; }

@@ -223,6 +223,13 @@ def write_watershed_data(db: DB, out: Path) -> None:
             wr.writerow(["" if r.get(c) is None or r.get(c) != r.get(c) else (round(r[c], 4) if isinstance(r[c], float) else r[c]) for c in cols])
 
 
+def tidal(rows):
+    """A river whose mouth is at sea level reaches tidal water, whatever line it touches there."""
+    for r in rows:
+        if r.get("me") is not None and r["me"] <= 2:
+            r["t"], r["f"] = True, None
+
+
 def write_rivers(out: Path) -> list:
     """Pack data/cache/rivers_osm/<huc8>.json into data/rivers/<huc4>.json; returns search rows [name, huc8, index]."""
     src = C.DATA / "cache" / "rivers_osm"
@@ -244,6 +251,11 @@ def write_rivers(out: Path) -> list:
                          "si": r["source_in_unit"], "m": r["mouth"], "me": r["mouth_elev_m"], "f": r["flows_into"], "t": r.get("tidal", False),
                          "fb": r["formed_by"], "u": r["u"], "p": r["paths"]})
         pack.setdefault(d["huc8"][:4], {})[d["huc8"]] = rows
+    from .. import terrain   # heights at both ends and along each river, from terrain tiles
+    for v in pack.values():
+        for rows in v.values():
+            terrain.fill_rivers(rows)
+            tidal(rows)
     for h, v in pack.items():
         (rdir / f"{h}.json").write_text(json.dumps(v, separators=(",", ":")))
     nat = C.DATA / "cache" / "rivers_national.json"
@@ -251,6 +263,8 @@ def write_rivers(out: Path) -> list:
         rows = [{"n": r["name"], "k": "river", "L": r["len_km"], "Li": r["len_km"], "s": r["source"], "se": r["source_elev_m"], "si": True,
                  "m": r["mouth"], "me": r["mouth_elev_m"], "f": r["flows_into"], "t": r["tidal"], "fb": r["formed_by"], "u": r["u"], "p": r["paths"]}
                 for r in json.loads(nat.read_text())["rivers"]]
+        terrain.fill_rivers(rows)
+        tidal(rows)
         # Country view: the longest rivers, coarsely; each region: its own major rivers.
         def coarse(r, nd, step):
             pts = [[[round(x, nd), round(y, nd)] for x, y in path[::step] + [path[-1]]] for path in r["p"]]

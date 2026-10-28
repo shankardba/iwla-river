@@ -179,6 +179,8 @@
       }
       if (d.includes("L")) s += `<path d="${d}" fill="none" class="${part === "border" ? "map-border" : "map-state"}"/>`;
     }
+    // shaded relief under everything (data/terrain, from AWS Terrain Tiles)
+    if (window.EXTERRAIN) s += EXTERRAIN.layer(code, X, Y, W, H, sc);
     // watershed areas
     const labels = [];
     withShape.forEach(x => {
@@ -235,6 +237,7 @@
         labels.push({ x: m[0], y: m[1] - 6, area: 1e9 + r.here, n: r.n, rn: 1 });
       });
     }
+    if (window.EXTERRAIN) s += EXTERRAIN.peaks(code, X, Y, albers, W, H);
     s += "</g>";
     sites.forEach(it => {
       const q = albers(it.la, it.lo), x = X(q).toFixed(1), y = Y(q).toFixed(1), sel = site && String(it.id) === String(site);
@@ -403,6 +406,7 @@
     }
 
     if (code.length === 8) {
+      const rp = rv.find(q => q.pf); if (rp && window.EXTERRAIN) return EXTERRAIN.profileFigure(rp);
       // From source to mouth: the main river's fall, with real end elevations.
       const r = rv.find(q => num(q.se) && num(q.me) && q.se > q.me) || null;
       if (!r) return "";
@@ -602,7 +606,7 @@
     $(".ex-colorby").disabled = cur.length === 12 || !showRings;
     $(".ex-rings").checked = showRings;
     $(".ex-map").innerHTML = mapSvg(cur);
-    $(".ex-legend").innerHTML = legend(cur);
+    $(".ex-legend").innerHTML = legend(cur) + (window.EXTERRAIN ? EXTERRAIN.legend(cur) : "");
     $(".ex-crumbs").innerHTML = crumbs(cur);
     if (site) {
       const t = (SITES[huc4(cur)] || []).find(r => String(r[0]) === String(site)) || [];
@@ -704,6 +708,7 @@
   window.addEventListener("hashchange", () => { fromHash(); render(false); });
 
   fetch("data/lower48.json").then(r => r.json()).then(g => { GEO = g; if (Object.keys(W8).length) render(false); }).catch(() => {});
+  if (window.EXTERRAIN) EXTERRAIN.load("us", "").then(() => { if (Object.keys(W8).length) render(false); }).catch(() => {});
   fetch("data/watersheds.json").then(r => r.json()).then(d => {
     W8 = d.w; HEAT = d.heat || []; ST = d.st || {};
     fromHash(); render(false);
