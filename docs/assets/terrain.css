@@ -24,3 +24,11 @@
 
 /* let the relief show through the coloured watershed areas */
 .ex-map svg:has(.ex-terrain) .ex-area path { fill-opacity: .28; }
+
+/* water bodies and rivers beyond the selected unit */
+:root { --water-fill: #b9d8ec; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --water-fill: #1d3a52; } }
+:root[data-theme="dark"] { --water-fill: #1d3a52; }
+.ex-water path { fill: var(--water-fill); stroke: none; pointer-events: none; }
+.ex-rivers-out path { fill: none; stroke: var(--river); stroke-linecap: round; stroke-linejoin: round; opacity: .42; }
+.ex-label.wn { fill: var(--river); font-style: italic; font-weight: 500; letter-spacing: .04em; }

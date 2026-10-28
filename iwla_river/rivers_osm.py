@@ -199,7 +199,7 @@ class Grid:
 
 
 # ---------- rivers ----------
-def components(pieces):
+def components(pieces, gap=None):
     """Group same-name pieces into separate rivers (two creeks can share a name)."""
     by_name = defaultdict(list)
     for i, (kind, name, pts) in enumerate(pieces):
@@ -222,11 +222,12 @@ def components(pieces):
             g.add(pts[0], i)
             g.add(pts[-1], i)
         # Bridge small gaps in the map: a piece that ends near where another starts is the same river.
-        heads = Grid(0.005)
+        gap = gap or GAP_M
+        heads = Grid(max(0.005, gap / 100_000))
         for i in idx:
             heads.add(pieces[i][2][0], i)
         for i in idx:
-            for j in heads.near(pieces[i][2][-1], GAP_M):
+            for j in heads.near(pieces[i][2][-1], gap):
                 parent[find(i)] = find(j)
         groups = defaultdict(list)
         for i in idx:
@@ -262,7 +263,13 @@ USE_OPEN_METEO = True
 def elevations(points):
     """Elevation in metres from Open-Meteo (Copernicus 90 m DEM), 100 points a call. With --no-elev, None (filled later from terrain tiles)."""
     if not USE_OPEN_METEO:
-        return [None] * len(points)
+        # Offline: heights from the terrain tiles cached in NOMAD's library (iwla_river.terrain).
+        try:
+            from . import terrain
+            return [None if h is None or h != h else round(float(h)) for h in terrain.heights(list(points), 10)]
+        except Exception as e:
+            print("terrain heights unavailable:", e, flush=True)
+            return [None] * len(points)
     out = []
     for i in range(0, len(points), 100):
         chunk = points[i:i + 100]
@@ -437,7 +444,7 @@ def national(z=9, min_km=40):
             ys = [q[1] for r in rr for q in r]
             units.append((code, rr, (min(xs), min(ys), max(xs), max(ys))))
     rivers = []
-    for name, ids in components(pieces):
+    for name, ids in components(pieces, gap=150_000):
         total = sum(length_km(pieces[i][2]) for i in ids)
         if total < min_km:
             continue

@@ -93,10 +93,17 @@
   // se source elevation m, si source inside the subbasin, m mouth, me mouth elevation, f flows into, t reaches tidal water,
   // fb the two rivers that meet to form it, u {huc10/huc12: km}, p paths in the direction of flow}. From OpenStreetMap.
   const RIV = {}; let hiRiver = null;
+  const WATER = {};   // ocean, bays and lakes per view: "us" or a subregion (data/water/<key>.json)
+  const waterKey = code => code.length >= 4 && WATER[code.slice(0, 4)] !== null ? code.slice(0, 4) : "us";
+  async function ensureWater(code) {
+    const get = k => fetch(`data/water/${k}.json`).then(r => r.ok ? r.json() : null).catch(() => null);
+    if (!("us" in WATER)) WATER.us = await get("us");
+    if (code.length >= 4 && !(code.slice(0, 4) in WATER)) WATER[code.slice(0, 4)] = await get(code.slice(0, 4));
+  }
   const NAT = {};   // major rivers: "" = the longest in the lower 48; "<region>" = a region's major rivers (for regions down to basins)
   async function ensureRivers(code) {
     const nk = code.slice(0, 2);
-    if (code.length <= 6 && !NAT[nk]) NAT[nk] = await fetch(nk ? `data/rivers/n${nk}.json` : "data/rivers/national.json").then(r => r.ok ? r.json() : []).catch(() => []);
+    if (!NAT[nk]) NAT[nk] = await fetch(nk ? `data/rivers/n${nk}.json` : "data/rivers/national.json").then(r => r.ok ? r.json() : []).catch(() => []);
     if (code.length < 4 || RIV[huc4(code)]) return;
     RIV[huc4(code)] = await fetch(`data/rivers/${huc4(code)}.json`).then(r => r.ok ? r.json() : {}).catch(() => ({}));
   }
@@ -168,6 +175,7 @@
       });
       return { p: best, area: bestA / 2 };
     };
+    const waterNames = [];
     let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Map of ${esc(label(code))}"><clipPath id="exclip"><rect width="${W}" height="${H}"/></clipPath><g clip-path="url(#exclip)">`;
     if (GEO) for (const part of ["inner", "border"]) for (const arc of GEO[part]) {
       let d = "", last = null, on = false;
@@ -181,6 +189,13 @@
     }
     // shaded relief under everything (data/terrain, from AWS Terrain Tiles)
     if (window.EXTERRAIN) s += EXTERRAIN.layer(code, X, Y, W, H, sc);
+    // ocean, bays and lakes, so rivers can be followed out to where they end
+    const wat = WATER[waterKey(code)];
+    if (wat) {
+      const ring = rr => { let d = "", last = null; rr.forEach(([lo, la]) => { const q = albers(la, lo), x = X(q), y = Y(q); if (last && Math.abs(x - last[0]) + Math.abs(y - last[1]) < 0.8) return; d += `${d ? "L" : "M"}${x.toFixed(1)} ${y.toFixed(1)}`; last = [x, y]; }); return d + "Z"; };
+      s += `<g class="ex-water">` + wat.poly.map(p => `<path d="${p.map(ring).join("")}" fill-rule="evenodd"/>`).join("") + `</g>`;
+      wat.names.forEach(([n, lo, la, k]) => { const q = albers(la, lo), x = X(q), y = Y(q); if (x > 30 && x < W - 30 && y > 16 && y < H - 10) waterNames.push({ x, y, n, k }); });
+    }
     // watershed areas
     const labels = [];
     withShape.forEach(x => {
@@ -214,13 +229,19 @@
       const line = pts => { let d = "", last = null; pts.forEach(([lo, la]) => { const q = albers(la, lo), x = X(q), y = Y(q); if (last && Math.abs(x - last[0]) + Math.abs(y - last[1]) < 1) return; d += `${d ? "L" : "M"}${x.toFixed(1)} ${y.toFixed(1)}`; last = [x, y]; }); return d; };
       const top = Math.max(...rv.map(r => r.L));
       const clip = shape(code) ? `<clipPath id="exriv"><path d="${pathOf(shape(code))}"/></clipPath>` : "";
-      s += `${clip}<g class="ex-rivers"${clip ? ' clip-path="url(#exriv)"' : ""}>`;
-      rv.forEach(r => {
+      const wOf = r => ((code.length <= 2 ? 0.5 : 0.9) + (code.length <= 2 ? 2 : 2.6) * Math.sqrt(Math.min(r.L, top) / top)).toFixed(1);
+      // context: the region's major rivers (where these rivers go, and what they join), drawn faint outside the unit
+      const names = new Set(rv.map(r => r.n));
+      const ctx = code.length >= 4 ? (NAT[code.slice(0, 2)] || []).filter(r => !names.has(r.n) && Object.keys(r.u).some(k => k.startsWith(code.slice(0, 4)))) : [];
+      let lines = "", faint = "";
+      rv.concat(ctx).forEach(r => {
         const d = r.p.map(line).filter(x => x.includes("L")).join("");
         if (!d) return;
-        const wdt = ((code.length <= 2 ? 0.5 : 0.9) + (code.length <= 2 ? 2 : 2.6) * Math.sqrt(r.L / top)).toFixed(1), hi = r.n === hiRiver;
-        s += `<g class="ex-river${hi ? " hi" : ""}" data-river="${esc(r.n)}"><path d="${d}" stroke-width="${wdt}"/><path class="flow" d="${d}" stroke-width="${(wdt * 0.55).toFixed(1)}"/><path class="hit" d="${d}"><title>${esc(r.n)}: ${r.L.toFixed(0)} km long${num(r.se) ? `, rises at ${Math.round(r.se)} m` : ""}${r.t ? ", reaches tidal water" : r.f ? `, flows into ${esc(r.f)}` : ""}</title></path></g>`;
+        const wdt = wOf(r), hi = r.n === hiRiver, own = names.has(r.n);
+        if (clip || !own) faint += `<path d="${d}" stroke-width="${wdt}"><title>${esc(r.n)}</title></path>`;
+        if (own) lines += `<g class="ex-river${hi ? " hi" : ""}" data-river="${esc(r.n)}"><path d="${d}" stroke-width="${wdt}"/><path class="flow" d="${d}" stroke-width="${(wdt * 0.55).toFixed(1)}"/><path class="hit" d="${d}"><title>${esc(r.n)}: ${r.L.toFixed(0)} km long${num(r.se) ? `, rises at ${Math.round(r.se)} m` : ""}${r.t ? ", reaches tidal water" : r.f ? `, flows into ${esc(r.f)}` : ""}</title></path></g>`;
       });
+      s += `<g class="ex-rivers-out">${faint}</g>${clip}<g class="ex-rivers"${clip ? ' clip-path="url(#exriv)"' : ""}>` + lines;
       rv.filter(r => r.s && (code.length >= 8 || r.L >= 30)).forEach(r => {
         const q = albers(r.s[1], r.s[0]), x = X(q), y = Y(q);
         if (x < 4 || x > W - 4 || y < 4 || y > H - 4) return;
@@ -228,6 +249,7 @@
         if (r.n === hiRiver) labels.push({ x, y: y - 9, area: 2e9, n: `Source of ${r.n}`, src: 1 });
       });
       s += `</g>`;
+      waterNames.forEach(w => labels.push({ x: w.x, y: w.y, area: 1.5e9, n: w.n, wn: 1 }));
       // names of the main rivers, along their longest stretch in view
       rv.slice(0, code.length <= 6 ? 4 : 6).forEach(r => {
         const pts = r.p.reduce((a, b) => b.length > a.length ? b : a, []).map(([lo, la]) => { const q = albers(la, lo); return [X(q), Y(q)]; })
@@ -253,7 +275,7 @@
       const x = Math.min(W - tw / 2 - 2, Math.max(tw / 2 + 2, l.x)), y = Math.min(H - 6, Math.max(14, l.y + 4));
       if (!free(x - tw / 2, y - 11, tw, 14)) return;
       boxes.push([x - tw / 2, y - 11, tw, 14]);
-      s += `<text class="ex-label${l.ch ? " ch" : ""}${l.src ? " src" : ""}${l.rn ? " rn" : ""}" x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="middle">${esc(nm)}</text>`;
+      s += `<text class="ex-label${l.ch ? " ch" : ""}${l.src ? " src" : ""}${l.rn ? " rn" : ""}${l.wn ? " wn" : ""}" x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="middle">${esc(nm)}</text>`;
     });
     return s + "</svg>";
   }
@@ -598,7 +620,7 @@
       $(".ex-colorby").value = colorBy; $(".ex-colorby").disabled = !showRings; $(".ex-rings").checked = showRings;
       return renderStates(push);
     }
-    await Promise.all([ensure(cur), ensureGeo(cur), ensureRivers(cur)]);
+    await Promise.all([ensure(cur), ensureGeo(cur), ensureRivers(cur), ensureWater(cur)]);
     if (push) { const h = site ? `#s${site}@${cur}` : `#w${cur || "US"}`; try { history.replaceState(null, "", h); } catch (e) { /* keep the old address */ } }
     const x = w(cur) || {}, parent = cur ? w(cur.slice(0, -2)) : null;
     $(".ex-tools-kind").innerHTML = KINDS.map(([k, t]) => `<button type="button" data-kind="${k}" aria-pressed="${k === kind}">${t}</button>`).join("");
