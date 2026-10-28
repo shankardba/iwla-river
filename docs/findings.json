@@ -109,6 +109,29 @@
    "numbers": []
   },
   {
+   "section": "watersheds",
+   "id": "watershed-findings",
+   "title": "How the findings for each watershed are worked out",
+   "url": "watersheds--watershed-findings.html",
+   "key": false,
+   "headline": "Pick any watershed on the Explore map to see what the data show there: 28,015 units have findings of their own, each a plain sentence with its numbers and numbered sources.",
+   "status": "info",
+   "numbers": [
+    {
+     "value": "28,015",
+     "label": "watersheds with findings"
+    },
+    {
+     "value": "271",
+     "label": "trend tests"
+    },
+    {
+     "value": "13",
+     "label": "driver models"
+    }
+   ]
+  },
+  {
    "section": "chemistry",
    "id": "road-salt",
    "title": "Road salt reaches the creek every winter",

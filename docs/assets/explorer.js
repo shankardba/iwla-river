@@ -34,6 +34,27 @@
   const huc4 = code => code.slice(0, 4);
   const label = code => !code ? "United States" : ((w(code) || {}).n || `Unit ${code}`);
 
+  // Findings for each watershed (data/wsf/<region>.json, from iwla_river/watershed_findings.py) and short source labels.
+  const WSF = {}; let REFS_S = null;
+  const wsfFile = code => code.length < 2 ? null : code.length < 4 ? code.slice(0, 2) : code.slice(0, 4);   // one file per subregion
+  let refsP = null; const wsfP = {};
+  async function ensureWsf(code) {
+    refsP = refsP || fetch("data/refs.json").then(r => r.ok ? r.json() : {}).catch(() => ({})).then(d => { REFS_S = d; });
+    const f = wsfFile(code);
+    if (f) wsfP[f] = wsfP[f] || fetch(`data/wsf/${f}.json`).then(r => r.ok ? r.json() : {}).catch(() => ({})).then(d => { WSF[f] = d; });
+    await Promise.all([refsP, f ? wsfP[f] : null]);
+  }
+  function findingsIn(code) {
+    const head = `<h3 class="ex-h">What the data show here <span class="meta"><a href="watersheds--watershed-findings.html">how these are worked out</a></span></h3>`;
+    if (!code) return `<h3 class="ex-h">What the data show</h3><p class="meta">Pick a region for findings about that watershed. National results are in <a href="findings.html">Findings</a> and <a href="context.html">In context</a>.</p>`;
+    const u = (WSF[wsfFile(code)] || {})[code];
+    if (!u || !u.items.length) return head + '<p class="meta">Not enough data in this unit for findings of its own; see the larger unit above it.</p>';
+    const keys = [];
+    const ref = k => { let i = keys.indexOf(k); if (i < 0) { keys.push(k); i = keys.length - 1; } return `<a class="ref" href="data--references.html#ref-${esc(k)}" title="${esc((REFS_S[k] || {}).s || k)}">${i + 1}</a>`; };
+    const items = u.items.map(it => `<li><span class="dot ${esc(it.s)}"></span><span>${esc(it.t)}<sup>${it.r.map(ref).join(",")}</sup></span></li>`).join("");
+    return head + `<ul class="wsf">${items}</ul><details class="wsf-src"><summary>Sources (${keys.length})</summary><ol>` +
+      keys.map(k => `<li><a href="data--references.html#ref-${esc(k)}">${esc((REFS_S[k] || {}).s || k)}</a></li>`).join("") + `</ol></details>`;
+  }
   async function ensure(code) {
     if (code.length < 4) return;
     const h = huc4(code);
@@ -518,7 +539,7 @@
       $(".ex-colorby").value = colorBy; $(".ex-colorby").disabled = !showRings; $(".ex-rings").checked = showRings;
       return renderStates(push);
     }
-    await Promise.all([ensure(cur), ensureGeo(cur), ensureRivers(cur), ensureWater(cur)]);
+    await Promise.all([ensure(cur), ensureGeo(cur), ensureRivers(cur), ensureWater(cur), ensureWsf(cur)]);
     if (push) { const h = site ? `#s${site}@${cur}` : `#w${cur || "US"}`; try { history.replaceState(null, "", h); } catch (e) { /* keep the old address */ } }
     const x = w(cur) || {}, parent = cur ? w(cur.slice(0, -2)) : null;
     $(".ex-tools-kind").innerHTML = KINDS.map(([k, t]) => `<button type="button" data-kind="${k}" aria-pressed="${k === kind}">${KCOL[k] ? `<i class="dot" style="background:${KCOL[k]}"></i>` : ""}${t}</button>`).join("");
@@ -541,7 +562,7 @@
         `${CHAPTER && cur !== CHAPTER ? `<button type="button" class="primary" data-go="${CHAPTER}">Go to Great Seneca Creek</button>` : ""}` +
         `${num(x.la) && cur ? `<a class="btn" href="${gmaps(x.la, x.lo)}" target="_blank" rel="noopener">Google Maps ↗</a>` : ""}</div>`;
       $(".ex-body").innerHTML = (cur === "" ? `<p class="ex-intro">Shaded areas are the water-resource regions of the lower 48, coloured by the measure you pick; orange dots show where volunteers take samples. Click a region to zoom in, or search for a watershed or stream<span class="kbd-hint"> (press <kbd>/</kbd>)</span>.</p>` : "") +
-        cards(x, parent) + `<h3 class="ex-h">${cur.length === 12 ? "Sites" : `${CHILD[cur.length][0].toUpperCase()}${CHILD[cur.length].slice(1)} inside`} <span class="meta">${cur.length === 12 ? "biological sites open their history" : "click a row to zoom in"}</span></h3>` +
+        cards(x, parent) + findingsIn(cur) + `<h3 class="ex-h">${cur.length === 12 ? "Sites" : `${CHILD[cur.length][0].toUpperCase()}${CHILD[cur.length].slice(1)} inside`} <span class="meta">${cur.length === 12 ? "biological sites open their history" : "click a row to zoom in"}</span></h3>` +
         kidTable(cur) + (cur.length >= 0 ? `<h3 class="ex-h">${cur ? "Rivers" : "Major rivers"} <span class="meta">from source to where each one ends; click to trace it</span></h3>` + riverRows(cur) : "") +
         (cur ? measures(x, parent) : "");
     }

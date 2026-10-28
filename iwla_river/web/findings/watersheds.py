@@ -76,3 +76,47 @@ def great_seneca(db):
                         num(r["cl_median"], lambda v: f"{v:.0f} mg/L")] for r in rows]),
                 text("Open Explore to zoom from any of these units to its neighbours."),
                 links([("expected", "the chapter's own sites against expectations")])])
+
+
+@finding("watersheds", "watershed-findings", "How the findings for each watershed are worked out", order=40)
+def watershed_findings(db):
+    import json
+    from pathlib import Path
+    m = Path(__file__).parent.parent / "wsf" / "meta.json"
+    if not m.exists():
+        return None
+    meta = json.loads(m.read_text())
+    return Page(refs=["cwh", "sos", "wbd", "mann", "hirsch1982", "sen1968", "bh1995", "annual-nlcd", "attains", "echo", "usmin",
+                      "streamcat", "nlcd2019", "lightgbm", "treeshap", "kaushal2018", "walsh2005"],
+        headline=f"Pick any watershed on the Explore map to see what the data show there: {fmt(meta['units'])} units have "
+                 f"findings of their own, each a plain sentence with its numbers and numbered sources.",
+        status="info",
+        numbers=[(fmt(meta["units"]), "watersheds with findings"), (fmt(meta["trend_units"]), "trend tests"),
+                 (fmt(meta["driver_units"]), "driver models")],
+        blocks=[table([("Finding",), ("How",), ("Shown when",)], [
+                    ["Trend in pollution-sensitive animals and in the survey score",
+                     "Each survey relative to its own site's usual level; seasonal Kendall test on season-year means, Sen slope; "
+                     "false discovery rate held at 5% across all units of the same size (Benjamini–Hochberg)",
+                     "8+ years, 3+ sites, 30+ surveys"],
+                    ["Chloride rising or falling",
+                     f"Seasonal Kendall test on log chloride at each site; Benjamini–Hochberg across all {fmt(meta['chloride_sites_tested'])} sites tested",
+                     "a site with 8+ readings over 4+ years"],
+                    ["Paved and roofed area, 1985 to 2025", "Annual NLCD fractional impervious cover averaged over each small watershed "
+                     "(HUC12), then area-weighted over the unit", "always, within IWLA's river basins"],
+                    ["Impairment listings and dischargers", "EPA ATTAINS (January 2025 snapshot): waters impaired for aquatic life or "
+                     "for salt; EPA ECHO: permit holders in significant noncompliance", "always, within IWLA's river basins"],
+                    ["Volunteer coverage", "Small watersheds with a bug site surveyed since 2021; high need = 5+ pressure flags "
+                     "(see In context: monitoring gaps)", "always, within IWLA's river basins"],
+                    ["What predicts the sensitive share", "Gradient-boosted trees (LightGBM) on watershed traits from EPA StreamCat "
+                     "plus time of year and survey form; five repeats of five folds grouped by site, so no site is in both "
+                     "training and test; TreeSHAP on the held-out surveys; direction from the rank correlation of each trait "
+                     "with its contribution", "regions down to subbasins with 40+ biological sites"]]),
+                text("A finding for a large unit can hide opposite changes in its parts, and a trend in a small unit rests on few "
+                     "sites, so read each with its counts. Units with too little data show none. Sites are compared with "
+                     "themselves, so a unit gaining or losing sites does not create a trend by itself.",
+                     f"Run on the M4 mini by iwla_river/watershed_findings.py from the Clean Water Hub snapshot of "
+                     f"{meta['clean_water_hub_snapshot']} and the joined public data of {meta['streams_dataset']}; "
+                     f"{fmt(meta['significant']['share_c'])} sensitive-share trends and {fmt(meta['significant']['z_c'])} "
+                     f"score trends pass the 5% false discovery rate.")],
+        method="Code: iwla_river/watershed_findings.py. Results: iwla_river/web/wsf/<region>.json, one sentence per finding with "
+               "the keys of its sources.")

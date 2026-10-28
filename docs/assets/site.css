@@ -380,3 +380,12 @@ ol.next { margin: 0; padding-left: 22px; display: flex; flex-direction: column; 
 .sources li, .reflist li { margin: 4px 0; overflow-wrap: anywhere; }
 .reflist li .meta { display: block; }
 .reflist li:target { background: color-mix(in srgb, var(--heat) 12%, transparent); border-radius: 4px; }
+/* findings for the picked watershed */
+.wsf { list-style: none; padding: 0; margin: 6px 0 4px; display: grid; gap: 8px; font-size: 14px; line-height: 1.45; }
+.wsf li { display: flex; gap: 8px; align-items: baseline; }
+.wsf li .dot { flex: none; transform: translateY(-1px); }
+.wsf sup { font-size: 10.5px; margin-left: 2px; }
+.wsf a.ref { text-decoration: none; padding: 0 1px; }
+.wsf-src { font-size: 13px; margin-bottom: 10px; }
+.wsf-src summary { cursor: pointer; color: var(--muted, inherit); }
+.wsf-src ol { padding-left: 20px; margin: 4px 0; }

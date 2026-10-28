@@ -119,6 +119,13 @@ def write_watershed_data(db: DB, out: Path) -> None:
         for r in db.rows("SELECT * FROM state_metrics"):
             st[r["code"]] = pack(r) | {"hb": subs.get(r["code"], [])}
     (out / "data" / "watersheds.json").write_text(json.dumps({"w": top, "heat": heat, "st": st}, separators=(",", ":")))
+    # Findings per watershed (iwla_river/watershed_findings.py) and short source labels for the Explore panel.
+    wsf = out / "data" / "wsf"
+    if wsf.exists():
+        shutil.rmtree(wsf)
+    if (HERE / "wsf").exists():
+        shutil.copytree(HERE / "wsf", wsf)
+    (out / "data" / "refs.json").write_text(json.dumps({k: {"s": r["short"]} for k, r in refs.REFS.items()}, separators=(",", ":")))
     # Finer heat inside each state (cells of 0.05 degree, about 5 km), fetched when a state is opened.
     if db.has("site_state"):
         hd = out / "data" / "states"

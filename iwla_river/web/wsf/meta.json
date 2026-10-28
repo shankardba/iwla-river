@@ -1,0 +1,13 @@
+{
+ "generated": "2026-10-28",
+ "clean_water_hub_snapshot": "2026-10-27",
+ "streams_dataset": "2026-10-28",
+ "units": 28015,
+ "trend_units": 271,
+ "driver_units": 13,
+ "chloride_sites_tested": 396,
+ "significant": {
+  "share_c": 2,
+  "z_c": 10
+ }
+}
