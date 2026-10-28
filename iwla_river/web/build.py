@@ -230,6 +230,34 @@ def tidal(rows):
             r["t"], r["f"] = True, None
 
 
+def link_mouths(rows):
+    """Name what each river flows into when the extractor could not: the nearest other line at its mouth (within ~200 m)."""
+    import math
+    cell = 0.003
+    grid = {}
+    for j, r in enumerate(rows):
+        for path in r["p"]:
+            for x, y in path:
+                grid.setdefault((int(x // cell), int(y // cell)), set()).add(j)
+    for i, r in enumerate(rows):
+        if r.get("f") or r.get("t") or not r.get("m"):
+            continue
+        mx, my = r["m"]
+        best, bd = None, 0.002
+        for dx in (-1, 0, 1):
+            for dy in (-1, 0, 1):
+                for j in grid.get((int(mx // cell) + dx, int(my // cell) + dy), ()):
+                    if j == i or rows[j]["n"] == r["n"]:
+                        continue
+                    for path in rows[j]["p"]:
+                        for x, y in path:
+                            d = math.hypot((x - mx) * math.cos(math.radians(my)), y - my)
+                            if d < bd:
+                                best, bd = rows[j]["n"], d
+        if best:
+            r["f"] = best
+
+
 def write_rivers(out: Path) -> list:
     """Pack data/cache/rivers_osm/<huc8>.json into data/rivers/<huc4>.json; returns search rows [name, huc8, index]."""
     src = C.DATA / "cache" / "rivers_osm"
@@ -256,6 +284,7 @@ def write_rivers(out: Path) -> list:
         for rows in v.values():
             terrain.fill_rivers(rows)
             tidal(rows)
+            link_mouths(rows)
     for h, v in pack.items():
         (rdir / f"{h}.json").write_text(json.dumps(v, separators=(",", ":")))
     nat = C.DATA / "cache" / "rivers_national.json"
