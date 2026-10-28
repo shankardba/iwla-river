@@ -202,9 +202,13 @@ def write_watershed_data(db: DB, out: Path) -> None:
         for h, d in sub.items():
             (gdir / f"s{h}.json").write_text(json.dumps(d, separators=(",", ":")))
 
+    # Rivers: every named river in each subbasin with biological surveys, packaged per subregion (data/rivers/<huc4>.json).
+    rivers = write_rivers(out)
+
     # Search index: every named watershed, and biological sites under their public names.
     search = {"w": [[r["code"], r["name"]] for r in rows if r["name"]],
-              "s": [[s["site_id"], s["name"], s["huc12"]] for s in sites if s["bio"] > 0 and s["name"] != "Biological monitoring site"]}
+              "s": [[s["site_id"], s["name"], s["huc12"]] for s in sites if s["bio"] > 0 and s["name"] != "Biological monitoring site"],
+              "r": rivers}
     (out / "data" / "search.json").write_text(json.dumps(search, separators=(",", ":")))
 
     # Download: metrics for every watershed (aggregates only).
@@ -217,6 +221,32 @@ def write_watershed_data(db: DB, out: Path) -> None:
         wr.writerow(cols)
         for r in sorted(rows, key=lambda r: (r["digits"], r["code"])):
             wr.writerow(["" if r.get(c) is None or r.get(c) != r.get(c) else (round(r[c], 4) if isinstance(r[c], float) else r[c]) for c in cols])
+
+
+def write_rivers(out: Path) -> list:
+    """Pack data/cache/rivers_osm/<huc8>.json into data/rivers/<huc4>.json; returns search rows [name, huc8, index]."""
+    src = C.DATA / "cache" / "rivers_osm"
+    rdir = out / "data" / "rivers"
+    for f in rdir.glob("*.json") if rdir.exists() else []:
+        f.unlink()
+    if not src.exists():
+        return []
+    rdir.mkdir(parents=True, exist_ok=True)
+    pack, search = {}, []
+    for f in sorted(src.glob("*.json")):
+        d = json.loads(f.read_text())
+        rows = []
+        for r in d["rivers"]:
+            if r["len_in_km"] < 1:
+                continue
+            search.append([r["name"], d["huc8"], len(rows)])
+            rows.append({"n": r["name"], "k": r["kind"], "L": r["len_km"], "Li": r["len_in_km"], "s": r["source"], "se": r["source_elev_m"],
+                         "si": r["source_in_unit"], "m": r["mouth"], "me": r["mouth_elev_m"], "f": r["flows_into"], "t": r.get("tidal", False),
+                         "fb": r["formed_by"], "u": r["u"], "p": r["paths"]})
+        pack.setdefault(d["huc8"][:4], {})[d["huc8"]] = rows
+    for h, v in pack.items():
+        (rdir / f"{h}.json").write_text(json.dumps(v, separators=(",", ":")))
+    return search
 
 
 def build(db_path=C.DB_PATH, out: Path = OUT, body_out: Path = BODY_OUT) -> Path:

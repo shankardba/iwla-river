@@ -351,3 +351,37 @@ ol.next { margin: 0; padding-left: 22px; display: flex; flex-direction: column; 
 .ex-area.dim path { fill: transparent; stroke: var(--rule); }
 .ex-area.dim:hover path { stroke: var(--muted); fill: color-mix(in srgb, var(--muted) 10%, transparent); fill-opacity: 1; }
 .ex-view button[aria-pressed="true"] { background: color-mix(in srgb, var(--accent) 16%, transparent); }
+
+/* rivers on the Explore map: water moves downstream along each line; a spring marks each source */
+:root { --river: #2f7fc1; --river-flow: #bfe3ff; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --river: #5aa9e6; --river-flow: #e3f3ff; } }
+:root[data-theme="dark"] { --river: #5aa9e6; --river-flow: #e3f3ff; }
+.ex-river path { fill: none; stroke: var(--river); stroke-linecap: round; stroke-linejoin: round; }
+.ex-river path.flow { stroke: var(--river-flow); stroke-dasharray: 2 14; opacity: .85; animation: ex-flow 1.6s linear infinite; }
+.ex-river path.hit { stroke: transparent; stroke-width: 10; cursor: pointer; }
+.ex-river.hi path:first-child, .ex-river.hl path:first-child { stroke-width: 4.5; }
+.ex-rivers .ex-river.hi ~ .ex-river:not(.hi) path:first-child { opacity: .55; }
+.ex-source circle { fill: var(--surface); stroke: var(--river); stroke-width: 2; cursor: pointer; }
+.ex-source .ripple { fill: none; stroke: var(--river); stroke-width: 1.4; animation: ex-ripple 2.4s ease-out infinite; transform-box: fill-box; transform-origin: center; }
+.ex-source.hi circle:not(.ripple), .ex-source.hl circle:not(.ripple) { fill: var(--river); }
+.ex-label.rn { fill: var(--river); font-style: italic; font-weight: 600; }
+.ex-label.src { fill: var(--river); font-size: 11px; }
+@keyframes ex-flow { to { stroke-dashoffset: -16; } }
+@keyframes ex-ripple { from { transform: scale(1); opacity: .9; } to { transform: scale(3.2); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .ex-river path.flow, .ex-source .ripple { animation: none; } .ex-source .ripple { display: none; } }
+.ex-rivlist tr.hi td, .ex-rivlist tr.hl td { background: color-mix(in srgb, var(--river) 12%, transparent); }
+.linklike { background: none; border: 0; padding: 0; font: inherit; font-weight: 600; color: var(--accent); cursor: pointer; text-align: left; }
+.linklike:hover { text-decoration: underline; }
+
+/* concept animations in the Explore panel, one per zoom level */
+.ex-concept { margin: 14px 0 6px; border: 1px solid var(--rule); border-radius: 10px; background: var(--surface); }
+.ex-concept summary { cursor: pointer; padding: 8px 12px; font: 600 13px var(--display); color: var(--ink); }
+.ex-concept figure { margin: 0; padding: 0 12px 12px; }
+.ex-concept figcaption { font: 13.5px/1.45 var(--body); color: var(--ink); margin-top: 8px; }
+.ex-concept .rise { animation: dg-flow 2.4s linear infinite reverse; }
+.ex-concept .soak { animation: dg-flow 1.8s linear infinite; }
+.ex-concept .runoff { animation: dg-flow .7s linear infinite; }
+.ex-concept .ripple { animation: ex-ripple 2.4s ease-out infinite; transform-box: fill-box; transform-origin: center; }
+.ex-concept .bob { animation: ex-bob 3s ease-in-out infinite alternate; }
+@keyframes ex-bob { from { translate: 0 0; } to { translate: 3px -2px; } }
+@media (prefers-reduced-motion: reduce) { .ex-concept .rise, .ex-concept .soak, .ex-concept .runoff, .ex-concept .ripple, .ex-concept .bob { animation: none; } }

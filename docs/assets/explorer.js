@@ -88,6 +88,33 @@
     if (code.length >= 2 && !GREG[code.slice(0, 2)]) GREG[code.slice(0, 2)] = await get(`data/geo/r${code.slice(0, 2)}.json`);
     if (code.length >= 4 && !GSUB[code.slice(0, 4)]) GSUB[code.slice(0, 4)] = await get(`data/geo/s${code.slice(0, 4)}.json`);
   }
+  // ---------- rivers ----------
+  // data/rivers/<huc4>.json: { huc8: [river] }, each river {n name, k kind, L km in all, Li km in the subbasin, s source [lon,lat],
+  // se source elevation m, si source inside the subbasin, m mouth, me mouth elevation, f flows into, t reaches tidal water,
+  // fb the two rivers that meet to form it, u {huc10/huc12: km}, p paths in the direction of flow}. From OpenStreetMap.
+  const RIV = {}; let hiRiver = null;
+  async function ensureRivers(code) {
+    if (code.length < 4 || RIV[huc4(code)]) return;
+    RIV[huc4(code)] = await fetch(`data/rivers/${huc4(code)}.json`).then(r => r.ok ? r.json() : {}).catch(() => ({}));
+  }
+  function riversIn(code) {
+    if (code.length < 4) return [];
+    const pack = RIV[huc4(code)] || {}, out = [], seen = new Set();
+    Object.entries(pack).forEach(([h8, list]) => {
+      if (!h8.startsWith(code) && !(code.length > 8 && code.startsWith(h8))) return;
+      list.forEach((r, i) => {
+        let here = r.Li;
+        if (code.length > 8) here = Object.entries(r.u).filter(([k]) => k.length === code.length && k.startsWith(code)).reduce((a, [, v]) => a + v, 0);
+        if (here < (code.length > 8 ? 0.3 : 1)) return;
+        const key = r.n + "|" + (r.s || []).join(",");
+        if (seen.has(key)) { const o = out.find(x => x.key === key); if (o) o.here += here; return; }
+        seen.add(key); out.push({ ...r, key, here, h8, i });
+      });
+    });
+    const min = code.length <= 6 ? 15 : 0;   // bigger units: only the larger rivers
+    return out.filter(r => r.L >= min || r.n === hiRiver).sort((a, b) => b.here - a.here);
+  }
+
   const shape = c => !c ? null : c.length === 2 ? (GTOP || {})[c] : c.length === 4 ? (GREG[c.slice(0, 2)] || {})[c] : (GSUB[c.slice(0, 4)] || {})[c];
 
   function mapSvg(code) {
@@ -172,6 +199,34 @@
       });
       s += `</g>`;
     }
+    // rivers, drawn in the direction they flow, with water moving along them; a spring marks each source in view
+    const rv = riversIn(code).slice(0, code.length <= 6 ? 14 : 40);
+    if (rv.length) {
+      const line = pts => { let d = "", last = null; pts.forEach(([lo, la]) => { const q = albers(la, lo), x = X(q), y = Y(q); if (last && Math.abs(x - last[0]) + Math.abs(y - last[1]) < 1) return; d += `${d ? "L" : "M"}${x.toFixed(1)} ${y.toFixed(1)}`; last = [x, y]; }); return d; };
+      const top = Math.max(...rv.map(r => r.L));
+      s += `<g class="ex-rivers">`;
+      rv.forEach(r => {
+        const d = r.p.map(line).filter(x => x.includes("L")).join("");
+        if (!d) return;
+        const wdt = (0.9 + 2.6 * Math.sqrt(r.L / top)).toFixed(1), hi = r.n === hiRiver;
+        s += `<g class="ex-river${hi ? " hi" : ""}" data-river="${esc(r.n)}"><path d="${d}" stroke-width="${wdt}"/><path class="flow" d="${d}" stroke-width="${(wdt * 0.55).toFixed(1)}"/><path class="hit" d="${d}"><title>${esc(r.n)}: ${r.L.toFixed(0)} km long${num(r.se) ? `, rises at ${Math.round(r.se)} m` : ""}${r.t ? ", reaches tidal water" : r.f ? `, flows into ${esc(r.f)}` : ""}</title></path></g>`;
+      });
+      rv.filter(r => r.s && (code.length >= 8 || r.L >= 30)).forEach(r => {
+        const q = albers(r.s[1], r.s[0]), x = X(q), y = Y(q);
+        if (x < 4 || x > W - 4 || y < 4 || y > H - 4) return;
+        s += `<g class="ex-source${r.n === hiRiver ? " hi" : ""}" data-river="${esc(r.n)}" transform="translate(${x.toFixed(1)} ${y.toFixed(1)})"><circle class="ripple" r="4"/><circle r="3.4"/><title>Source of ${esc(r.n)}${num(r.se) ? `, ${Math.round(r.se)} m above sea level` : ""}${r.fb && r.fb.length === 2 ? ` (where ${esc(r.fb[0])} and ${esc(r.fb[1])} meet)` : ""}</title></g>`;
+        if (r.n === hiRiver) labels.push({ x, y: y - 9, area: 2e9, n: `Source of ${r.n}`, src: 1 });
+      });
+      s += `</g>`;
+      // names of the main rivers, along their longest stretch in view
+      rv.slice(0, code.length <= 6 ? 4 : 6).forEach(r => {
+        const pts = r.p.reduce((a, b) => b.length > a.length ? b : a, []).map(([lo, la]) => { const q = albers(la, lo); return [X(q), Y(q)]; })
+          .filter(([x, y]) => x > 20 && x < W - 20 && y > 20 && y < H - 20);
+        if (pts.length < 2) return;
+        const m = pts[Math.floor(pts.length / 2)];
+        labels.push({ x: m[0], y: m[1] - 6, area: 1e9 + r.here, n: r.n, rn: 1 });
+      });
+    }
     s += "</g>";
     sites.forEach(it => {
       const q = albers(it.la, it.lo), x = X(q).toFixed(1), y = Y(q).toFixed(1), sel = site && String(it.id) === String(site);
@@ -187,7 +242,7 @@
       const x = Math.min(W - tw / 2 - 2, Math.max(tw / 2 + 2, l.x)), y = Math.min(H - 6, Math.max(14, l.y + 4));
       if (!free(x - tw / 2, y - 11, tw, 14)) return;
       boxes.push([x - tw / 2, y - 11, tw, 14]);
-      s += `<text class="ex-label${l.ch ? " ch" : ""}" x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="middle">${esc(nm)}</text>`;
+      s += `<text class="ex-label${l.ch ? " ch" : ""}${l.src ? " src" : ""}${l.rn ? " rn" : ""}" x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="middle">${esc(nm)}</text>`;
     });
     return s + "</svg>";
   }
@@ -279,6 +334,123 @@
       `<tr class="go" data-go="${x.c}" data-code="${x.c}"><td><span class="sw" style="border-color:${colorOf(x)}"></span><a href="#w${x.c}" data-go="${x.c}">${esc(x.n || x.c)}</a>${CHAPTER && CHAPTER.startsWith(x.c) ? ' <span class="pill accent">chapter</span>' : ""}</td>` +
       `<td class="n">${fmt(x.bv)}</td><td class="n">${pct(x.so)}</td><td class="n">${pts(x.g)}</td>${extra ? `<td class="n">${extra[3](x[extra[0]])}</td>` : ""}</tr>`).join("") +
       "</tbody></table></div>";
+  }
+
+  function riverRows(code) {
+    const rv = riversIn(code);
+    if (!rv.length) return code.length >= 4 ? '<p class="meta">No river lines for this area yet (its state map is still downloading).</p>' : "";
+    const gm = p => p ? `<a class="maplink" href="${gmaps(p[1], p[0])}" target="_blank" rel="noopener">map ↗</a>` : "";
+    const rises = r => r.fb && r.fb.length === 2 && !r.fb.some(n => /canal/i.test(n)) ? `where ${esc(r.fb[0])} and ${esc(r.fb[1])} meet` :
+      num(r.se) ? `at ${Math.round(r.se)} m` : "";
+    const ends = r => r.t ? "tidal water" : r.f ? esc(r.f) : "—";
+    const shown = rv.slice(0, 12);
+    return `<div class="tbl"><table class="ex-list ex-rivlist"><thead><tr><th>River</th><th class="n">km here</th><th>Rises</th><th>Flows into</th></tr></thead><tbody>` +
+      shown.map(r => `<tr class="go${r.n === hiRiver ? " hi" : ""}" data-river="${esc(r.n)}"><td><button type="button" class="linklike" data-river="${esc(r.n)}">${esc(r.n)}</button><span class="ex-card-s"> ${r.L.toFixed(0)} km long${r.k === "canal" ? " · canal" : ""}</span></td>` +
+        `<td class="n">${r.here.toFixed(r.here < 10 ? 1 : 0)}</td><td>${rises(r)}${r.si || code.length < 8 ? "" : ' <span class="meta">outside</span>'} ${gm(r.s)}</td><td>${ends(r)}</td></tr>`).join("") +
+      `</tbody></table></div>${rv.length > shown.length ? `<p class="meta">${rv.length - shown.length} smaller named streams not listed.</p>` : ""}` +
+      `<p class="meta">River lines and names from OpenStreetMap; sources are the highest point of each river's line, elevations from Open-Meteo.</p>`;
+  }
+
+  // ---------- concepts: one animated idea per zoom level, drawn with this unit's own numbers ----------
+  function concept(code, x) {
+    const rv = riversIn(code), nm = esc(label(code)), lvl = (LEVEL[code.length] || "").toLowerCase();
+    const wrap = (title, cap, body) => `<details class="ex-concept" open><summary>${title}</summary><figure><svg viewBox="0 0 360 170" class="dg dg-anim" role="img" aria-label="${esc(title)}">${body}</svg><figcaption>${cap}</figcaption></figure></details>`;
+    const drops = (x0, x1, y0, y1, n, cls = "drip") => Array.from({ length: n }, (_, i) => { const xx = x0 + (x1 - x0) * (i + 0.5) / n; return `<line class="${cls}" x1="${xx.toFixed(0)}" y1="${y0}" x2="${(xx - 6).toFixed(0)}" y2="${y1}" stroke="var(--river)" stroke-width="1.6" style="animation-delay:${(-(i * 0.37) % 1.1).toFixed(2)}s"/>`; }).join("");
+    const water = (d, w, col = "var(--river)", extra = "") => `<path d="${d}" fill="none" stroke="${col}" stroke-width="${w}" stroke-linecap="round"/><path class="flow" d="${d}" fill="none" stroke="var(--river-flow)" stroke-width="${Math.max(1, w * 0.45).toFixed(1)}" stroke-linecap="round" opacity=".9" ${extra}/>`;
+    const cloud = (cx, cy) => `<g fill="var(--surface)" stroke="var(--dg-line)" stroke-width="1.2"><ellipse cx="${cx}" cy="${cy}" rx="34" ry="13"/><ellipse cx="${cx - 16}" cy="${cy - 8}" rx="16" ry="12"/><ellipse cx="${cx + 12}" cy="${cy - 11}" rx="19" ry="14"/></g>`;
+
+    if (code.length <= 2) {
+      // The water cycle: rain on land, rivers carry it to the sea, the sun lifts it back into the clouds.
+      const body = `<rect width="360" height="170" fill="var(--dg-sky)" opacity=".35"/>` +
+        `<circle cx="38" cy="34" r="16" fill="var(--dg-amber)"/>` + cloud(150, 38) +
+        drops(122, 182, 54, 92, 6) +
+        `<path d="M0 120 C40 82 80 78 120 96 C160 112 190 92 230 112 L230 170 L0 170Z" fill="var(--dg-grass)"/>` +
+        `<path d="M226 128 L360 128 L360 170 L218 170Z" fill="var(--dg-water)"/>` +
+        water("M150 102 C175 112 196 118 230 130", 4) +
+        `<path class="rise" d="M300 122 C300 96 270 70 196 44" fill="none" stroke="var(--dg-water-deep)" stroke-width="1.4" stroke-dasharray="3 6" marker-end="url(#ex-arr)"/>` +
+        `<defs><marker id="ex-arr" viewBox="0 0 8 8" refX="6" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L8 4L0 8Z" fill="var(--dg-water-deep)"/></marker></defs>` +
+        `<text class="dg-sub" x="250" y="66">evaporation</text><text class="dg-sub" x="58" y="74">rain</text><text class="dg-sub" x="250" y="152">sea</text><text class="dg-sub" x="128" y="140">river</text>`;
+      const cap = code ? `Rain that falls anywhere in the ${nm.replace(/ region$/i, "")} region runs into its streams and rivers, which carry it toward the sea. Volunteers have sampled <b>${fmt(x.s)}</b> places along the way.`
+        : `Every drop of rain follows the land downhill into a stream, then a river, then the sea. Watersheds are the land that drains to one stream; zoom in to follow the water.`;
+      return wrap("How water moves", cap, body);
+    }
+
+    if (code.length <= 6) {
+      // A river network: small rivers join to make bigger ones.
+      const main = rv.slice().sort((a, b) => b.L - a.L)[0];
+      const tribs = main ? rv.filter(r => r.f === main.n).slice(0, 4) : [];
+      const others = tribs.length ? tribs : rv.filter(r => r !== main).slice(0, 4);
+      let body = `<rect width="360" height="170" fill="var(--dg-grass)" opacity=".25"/>`;
+      body += water("M20 128 C110 118 220 132 345 120", 7);
+      others.forEach((r, i) => {
+        const jx = 70 + i * 72, top = i % 2 ? 26 : 40;
+        body += water(`M${jx - 30} ${top} C${jx - 18} ${top + 40} ${jx + 6} ${top + 56} ${jx + 14} 124`, 2 + Math.min(3, r.L / 40), "var(--river)", `style="animation-delay:-${i * 0.4}s"`) +
+          `<circle cx="${jx + 14}" cy="124" r="3.4" fill="var(--surface)" stroke="var(--dg-water-deep)" stroke-width="1.6"/>` +
+          `<text class="dg-sub" x="${jx - 34}" y="${top - 6}">${esc(r.n.length > 18 ? r.n.slice(0, 17) + "…" : r.n)}</text>`;
+      });
+      body += main ? `<text class="dg-name" x="20" y="154">${esc(main.n)}</text><text class="dg-sub" x="345" y="154" text-anchor="end">${main.t ? "to tidal water" : main.f ? "to " + esc(main.f) : "downstream"} →</text>` : "";
+      const cap = main ? `<b>${esc(main.n)}</b> is the largest river here, ${fmt(main.L)} km from its source${others.length ? `; ${others.map(r => esc(r.n)).slice(0, 3).join(", ")} ${tribs.length ? "flow into it" : "are other main rivers"}` : ""}. Whatever enters a small stream upstream reaches every river below it, so a ${lvl} is only as healthy as its headwaters.`
+        : `Small streams join to make bigger rivers. River lines for this ${lvl} are still being added.`;
+      return wrap("Rivers join", cap, body);
+    }
+
+    if (code.length === 8) {
+      // From source to mouth: the main river's fall, with real end elevations.
+      const r = rv.find(q => num(q.se) && num(q.me) && q.se > q.me) || null;
+      if (!r) return "";
+      const drop = r.se - r.me, X0 = 30, X1 = 330, Y0 = 34, Y1 = 132;
+      const yAt = t => Y0 + (Y1 - Y0) * (1 - Math.pow(1 - t, 2.2));
+      let d = "";
+      for (let i = 0; i <= 24; i++) { const t = i / 24; d += `${i ? "L" : "M"}${(X0 + (X1 - X0) * t).toFixed(1)} ${yAt(t).toFixed(1)}`; }
+      const exag = Math.round((r.L * 1000 / 300) / (drop / 98));
+      const body = `<rect width="360" height="170" fill="var(--dg-sky)" opacity=".3"/>` +
+        `<path d="${d} L${X1} 160 L${X0} 160Z" fill="var(--dg-soil)" opacity=".55"/>` +
+        water(d, 6) +
+        `<g transform="translate(${X0} ${Y0})"><circle class="ripple" r="5" fill="none" stroke="var(--dg-water-deep)" stroke-width="1.4"/><circle r="4" fill="var(--surface)" stroke="var(--dg-water-deep)" stroke-width="2"/></g>` +
+        `<text class="dg-name" x="${X0 + 10}" y="${Y0 - 10}">Source · ${Math.round(r.se)} m</text>` +
+        `<text class="dg-name" x="${X1}" y="${Y1 - 12}" text-anchor="end">${r.t ? "Tidal water" : r.f ? esc(r.f) : "Mouth"} · ${Math.round(r.me)} m</text>` +
+        `<text class="dg-num" x="180" y="152" text-anchor="middle">${fmt(r.L)} km · falls ${fmt(drop)} m</text>` +
+        (exag > 1 ? `<text class="dg-nts" x="352" y="16" text-anchor="end">not to scale · height ×${fmt(exag)}</text>` : "");
+      const cap = `<b>${esc(r.n)}</b> ${r.fb && r.fb.length === 2 && !r.fb.some(n => /canal/i.test(n)) ? `begins where ${esc(r.fb[0])} and ${esc(r.fb[1])} meet` : "rises"} at ${Math.round(r.se)} m and falls ${fmt(drop)} m over ${fmt(r.L)} km${r.t ? " to tidal water" : r.f ? ` before joining ${esc(r.f)}` : ""}. Steep, fast headwaters stay cool and full of oxygen, which is where sensitive animals do best. <span class="meta">Only the two end heights are measured; the curve between is drawn to show the usual shape.</span>`;
+      return wrap("Source to mouth", cap, body);
+    }
+
+    if (code.length === 10) {
+      // Land shapes the water: rain on forest soaks in, rain on pavement runs straight to the creek.
+      if (!num(x.im) && !num(x.fo)) return "";
+      const im = Math.max(0, x.im || 0), fo = Math.max(0, x.fo || 0), other = Math.max(0, 100 - im - fo);
+      const W0 = 20, Wt = 270, a = W0 + Wt * fo / 100, b = a + Wt * other / 100, c = W0 + Wt;
+      let body = `<rect width="360" height="170" fill="var(--dg-sky)" opacity=".3"/>` + cloud(150, 30) + drops(40, 290, 46, 96, 10);
+      body += `<rect x="${W0}" y="104" width="${(a - W0).toFixed(1)}" height="14" fill="var(--dg-leaf)"/>` +
+        `<rect x="${a.toFixed(1)}" y="104" width="${(b - a).toFixed(1)}" height="14" fill="var(--dg-grass)"/>` +
+        `<rect x="${b.toFixed(1)}" y="104" width="${(c - b).toFixed(1)}" height="14" fill="var(--dg-road)"/>` +
+        `<rect x="${W0}" y="118" width="${Wt}" height="40" fill="var(--dg-soil)" opacity=".5"/>`;
+      for (let i = 0; i < 4; i++) { const xx = W0 + (a - W0) * (i + 0.5) / 4; if (a - W0 > 14) body += `<line class="soak" x1="${xx.toFixed(1)}" y1="120" x2="${xx.toFixed(1)}" y2="150" stroke="var(--river)" stroke-width="1.8" stroke-dasharray="3 9"/>`; }
+      if (c - b > 4) body += `<path class="runoff" d="M${b.toFixed(1)} 101 L${c + 18} 101 L${c + 30} 116" fill="none" stroke="var(--river)" stroke-width="2.4" stroke-dasharray="8 6"/>`;
+      body += water(`M${c + 30} 60 L${c + 30} 160`, 12) + `<text class="dg-sub" x="${c + 22}" y="54">creek</text>` +
+        `<text class="dg-sub" x="${W0}" y="${fo > 12 ? 100 : 166}">${fo > 12 ? `forest ${Math.round(fo)}%` : ""}</text>` +
+        `<text class="dg-sub" x="${c}" y="100" text-anchor="end">paved ${im.toFixed(1)}%</text>` +
+        (b - a > 90 ? `<text class="dg-sub" x="${((a + b) / 2).toFixed(0)}" y="136" text-anchor="middle">farms, lawns, other ${Math.round(other)}%</text>` : "");
+      const cap = `In ${nm}, <b>${im.toFixed(1)}%</b> of the land is paved or roofed and <b>${Math.round(fo)}%</b> is forest. Rain on forest soaks in and reaches the creek slowly; rain on pavement runs straight in, carrying heat, silt and, in winter, road salt${num(x.cm) ? ` (median chloride here ${Math.round(x.cm)} mg/L)` : ""}. Studies often find sensitive stream animals decline once about a tenth of a watershed is paved.`;
+      return wrap("Land shapes the water", cap, body);
+    }
+
+    // Subwatershed: life in the riffle. Ten animals: how many are pollution-sensitive, against what is expected here.
+    if (!num(x.so)) return "";
+    const found = Math.round(x.so * 10), exp = num(x.se) ? Math.round(x.se * 10) : null;
+    let body = `<rect width="360" height="170" fill="var(--dg-water)" opacity=".45"/>`;
+    for (let i = 0; i < 3; i++) body += `<path class="flow" d="M0 ${30 + i * 18} C60 ${24 + i * 18} 120 ${36 + i * 18} 180 ${30 + i * 18} S300 ${24 + i * 18} 360 ${30 + i * 18}" fill="none" stroke="var(--surface)" stroke-width="1.4" opacity=".7" style="animation-delay:-${i * 0.5}s"/>`;
+    for (let i = 0; i < 9; i++) body += `<ellipse cx="${20 + i * 40}" cy="${150 + (i % 2) * 4}" rx="${22 + (i % 3) * 4}" ry="12" fill="var(--dg-stone)"/>`;
+    for (let i = 0; i < 10; i++) {
+      const sens = i < found, cx = 30 + i * 32, cy = 112 + (i % 2) * 10;
+      body += `<g class="bob" style="animation-delay:-${(i * 0.3).toFixed(1)}s" transform="translate(${cx} ${cy})">` +
+        (sens ? `<ellipse rx="9" ry="3.6" fill="var(--good)"/><path d="M-9 0 L-17 -4 M-9 0 L-17 0 M-9 0 L-17 4" stroke="var(--good)" stroke-width="1"/><circle cx="7" cy="0" r="2.2" fill="var(--good)"/>`
+              : `<ellipse rx="7" ry="4" fill="var(--grey)"/><path d="M-4 3 l-2 4 M0 3.5 l0 4 M4 3 l2 4" stroke="var(--grey)" stroke-width="1"/>`) + `</g>`;
+    }
+    if (exp != null) body += `<line x1="${30 + exp * 32 - 16}" x2="${30 + exp * 32 - 16}" y1="92" y2="132" stroke="var(--ink)" stroke-dasharray="3 3"/><text class="dg-sub" x="${30 + exp * 32 - 16}" y="88" text-anchor="middle">expected</text>`;
+    body += `<text class="dg-name" x="12" y="18">Out of every 10 animals found</text>`;
+    const cap = `Under the stones of a riffle live the insects volunteers count. In ${nm}, <b>${found} in 10</b> animals found were pollution-sensitive (mayflies, stoneflies, caddisflies; green)${exp != null ? `, against <b>${exp} in 10</b> expected for a stream in this setting` : ""}. They need cool, clean, oxygen-rich water, so they are the first to leave when a stream is harmed.`;
+    return wrap("Life in the riffle", cap, body);
   }
 
   // ---------- site history ----------
@@ -414,7 +586,7 @@
       $(".ex-colorby").value = colorBy; $(".ex-colorby").disabled = !showRings; $(".ex-rings").checked = showRings;
       return renderStates(push);
     }
-    await Promise.all([ensure(cur), ensureGeo(cur)]);
+    await Promise.all([ensure(cur), ensureGeo(cur), ensureRivers(cur)]);
     if (push) { const h = site ? `#s${site}@${cur}` : `#w${cur || "US"}`; try { history.replaceState(null, "", h); } catch (e) { /* keep the old address */ } }
     const x = w(cur) || {}, parent = cur ? w(cur.slice(0, -2)) : null;
     $(".ex-tools-kind").innerHTML = KINDS.map(([k, t]) => `<button type="button" data-kind="${k}" aria-pressed="${k === kind}">${t}</button>`).join("");
@@ -437,8 +609,9 @@
         `${CHAPTER && cur !== CHAPTER ? `<button type="button" class="primary" data-go="${CHAPTER}">Go to Great Seneca Creek</button>` : ""}` +
         `${num(x.la) && cur ? `<a class="btn" href="${gmaps(x.la, x.lo)}" target="_blank" rel="noopener">Google Maps ↗</a>` : ""}</div>`;
       $(".ex-body").innerHTML = (cur === "" ? `<p class="ex-intro">Shaded areas are the water-resource regions of the lower 48, coloured by the measure you pick; orange dots show where volunteers take samples. Click a region to zoom in, or search for a watershed or stream<span class="kbd-hint"> (press <kbd>/</kbd>)</span>.</p>` : "") +
-        cards(x, parent) + `<h3 class="ex-h">${cur.length === 12 ? "Sites" : `${CHILD[cur.length][0].toUpperCase()}${CHILD[cur.length].slice(1)} inside`} <span class="meta">${cur.length === 12 ? "biological sites open their history" : "click a row to zoom in"}</span></h3>` +
-        kidTable(cur) + (cur ? measures(x, parent) : "");
+        cards(x, parent) + concept(cur, x) + `<h3 class="ex-h">${cur.length === 12 ? "Sites" : `${CHILD[cur.length][0].toUpperCase()}${CHILD[cur.length].slice(1)} inside`} <span class="meta">${cur.length === 12 ? "biological sites open their history" : "click a row to zoom in"}</span></h3>` +
+        kidTable(cur) + (cur.length >= 4 ? `<h3 class="ex-h">Rivers <span class="meta">from source to where each one ends; click to trace it</span></h3>` + riverRows(cur) : "") +
+        (cur ? measures(x, parent) : "");
     }
     $(".ex-panel").scrollTop = 0;
   }
@@ -448,27 +621,29 @@
   // ---------- search ----------
   const box = $(".ex-search input"), list = $(".ex-results");
   let hits = [], active = -1;
-  async function loadSearch() { if (!SEARCH) { try { SEARCH = await fetch("data/search.json").then(r => r.json()); } catch (e) { SEARCH = { w: [], s: [] }; } } }
+  async function loadSearch() { if (!SEARCH) { try { SEARCH = await fetch("data/search.json").then(r => r.json()); } catch (e) { SEARCH = { w: [], s: [], r: [] }; } } }
   function search(q) {
     q = q.trim().toLowerCase();
     if (q.length < 2 || !SEARCH) { hits = []; return; }
     const score = n => { const t = n.toLowerCase(); return t.startsWith(q) ? 0 : t.includes(" " + q) ? 1 : t.includes(q) ? 2 : 9; };
     const ws = SEARCH.w.map(([c, n]) => ({ t: "w", c, n, k: score(n) + c.length / 100 })).filter(h => h.k < 9);
     const ss = SEARCH.s.map(([id, n, h]) => ({ t: "s", id, n, c: h, k: score(n) + 0.5 })).filter(h => h.k < 9);
-    hits = ws.concat(ss).sort((a, b) => a.k - b.k).slice(0, 9);
+    const seenR = new Set();
+    const rs = (SEARCH.r || []).map(([n, h]) => ({ t: "r", n, c: h, k: score(n) + 0.3 })).filter(h => h.k < 9 && !seenR.has(h.n + h.c) && seenR.add(h.n + h.c));
+    hits = ws.concat(rs, ss).sort((a, b) => a.k - b.k).slice(0, 9);
   }
   function showHits() {
     active = -1;
     const q = box.value.trim();
     list.hidden = q.length < 2;
-    list.innerHTML = hits.length ? hits.map((h, i) => `<li role="option" id="ex-hit-${i}" data-i="${i}"><b>${esc(h.n)}</b><span>${h.t === "w" ? `${LEVEL[h.c.length]} · HUC ${h.c}` : "Biological site"}</span></li>`).join("")
+    list.innerHTML = hits.length ? hits.map((h, i) => `<li role="option" id="ex-hit-${i}" data-i="${i}"><b>${esc(h.n)}</b><span>${h.t === "w" ? `${LEVEL[h.c.length]} · HUC ${h.c}` : h.t === "r" ? `River · ${esc(label(h.c))}` : "Biological site"}</span></li>`).join("")
       : `<li class="none">No watershed or site matches “${esc(q)}”.</li>`;
     box.setAttribute("aria-expanded", String(!list.hidden));
   }
   function pick(i) {
     const h = hits[i]; if (!h) return;
     list.hidden = true; box.setAttribute("aria-expanded", "false"); box.value = ""; box.blur();
-    if (h.t === "w") go(h.c); else openSite(h.id, h.c);
+    if (h.t === "w") go(h.c); else if (h.t === "r") { hiRiver = h.n; go(h.c); } else openSite(h.id, h.c);
   }
   box.addEventListener("focus", loadSearch);
   box.addEventListener("input", async () => { await loadSearch(); search(box.value); showHits(); });
@@ -495,6 +670,7 @@
     const sb = e.target.closest("[data-st]"); if (sb) { e.preventDefault(); view = "s"; st = sb.dataset.st; render(true); return; }
     const so = e.target.closest("[data-sort]"); if (so) { const key = so.dataset.sort; sortDir = sortKey === key ? -sortDir : key === "n" ? 1 : -1; sortKey = key; render(false); return; }
     if (e.target.closest(".maplink")) return;
+    const rv = e.target.closest("[data-river]"); if (rv) { e.preventDefault(); hiRiver = hiRiver === rv.dataset.river ? null : rv.dataset.river; const top = $(".ex-panel").scrollTop; render(false).then(() => { $(".ex-panel").scrollTop = top; }); return; }
     const siteEl = e.target.closest("[data-site]"); if (siteEl) { e.preventDefault(); openSite(siteEl.dataset.site, cur); return; }
     const g = e.target.closest("[data-go]"); if (g) { e.preventDefault(); go(g.dataset.go); }
   });
@@ -506,6 +682,9 @@
   const hl = (code, on) => root.querySelectorAll(`[data-code="${code}"]`).forEach(el => el.classList.toggle("hl", on));
   root.addEventListener("mouseover", e => { const el = e.target.closest("[data-code]"); if (el) hl(el.dataset.code, true); });
   root.addEventListener("mouseout", e => { const el = e.target.closest("[data-code]"); if (el) hl(el.dataset.code, false); });
+  const hlr = (n, on) => root.querySelectorAll("[data-river]").forEach(el => { if (el.dataset.river === n) el.classList.toggle("hl", on); });
+  root.addEventListener("mouseover", e => { const el = e.target.closest("[data-river]"); if (el) hlr(el.dataset.river, true); });
+  root.addEventListener("mouseout", e => { const el = e.target.closest("[data-river]"); if (el) hlr(el.dataset.river, false); });
 
   function fromHash() {
     const t = location.hash.match(/^#st(?:-([A-Z]{2}))?$/);
