@@ -373,15 +373,3 @@ ol.next { margin: 0; padding-left: 22px; display: flex; flex-direction: column; 
 .linklike { background: none; border: 0; padding: 0; font: inherit; font-weight: 600; color: var(--accent); cursor: pointer; text-align: left; }
 .linklike:hover { text-decoration: underline; }
 
-/* concept animations in the Explore panel, one per zoom level */
-.ex-concept { margin: 14px 0 6px; border: 1px solid var(--rule); border-radius: 10px; background: var(--surface); }
-.ex-concept summary { cursor: pointer; padding: 8px 12px; font: 600 13px var(--display); color: var(--ink); }
-.ex-concept figure { margin: 0; padding: 0 12px 12px; }
-.ex-concept figcaption { font: 13.5px/1.45 var(--body); color: var(--ink); margin-top: 8px; }
-.ex-concept .rise { animation: dg-flow 2.4s linear infinite reverse; }
-.ex-concept .soak { animation: dg-flow 1.8s linear infinite; }
-.ex-concept .runoff { animation: dg-flow .7s linear infinite; }
-.ex-concept .ripple { animation: ex-ripple 2.4s ease-out infinite; transform-box: fill-box; transform-origin: center; }
-.ex-concept .bob { animation: ex-bob 3s ease-in-out infinite alternate; }
-@keyframes ex-bob { from { translate: 0 0; } to { translate: 3px -2px; } }
-@media (prefers-reduced-motion: reduce) { .ex-concept .rise, .ex-concept .soak, .ex-concept .runoff, .ex-concept .ripple, .ex-concept .bob { animation: none; } }

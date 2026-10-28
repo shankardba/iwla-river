@@ -388,109 +388,6 @@
       `<p class="meta">River lines and names from OpenStreetMap; sources are the highest point of each river's line, elevations from Open-Meteo.</p>`;
   }
 
-  // ---------- concepts: one animated idea per zoom level, drawn with this unit's own numbers ----------
-  function concept(code, x) {
-    const rv = riversIn(code), nm = esc(label(code)), lvl = (LEVEL[code.length] || "").toLowerCase();
-    const wrap = (title, cap, body) => `<details class="ex-concept" open><summary>${title}</summary><figure><svg viewBox="0 0 360 170" class="dg dg-anim" role="img" aria-label="${esc(title)}">${body}</svg><figcaption>${cap}</figcaption></figure></details>`;
-    const drops = (x0, x1, y0, y1, n, cls = "drip") => Array.from({ length: n }, (_, i) => { const xx = x0 + (x1 - x0) * (i + 0.5) / n; return `<line class="${cls}" x1="${xx.toFixed(0)}" y1="${y0}" x2="${(xx - 6).toFixed(0)}" y2="${y1}" stroke="var(--river)" stroke-width="1.6" style="animation-delay:${(-(i * 0.37) % 1.1).toFixed(2)}s"/>`; }).join("");
-    const water = (d, w, col = "var(--river)", extra = "") => `<path d="${d}" fill="none" stroke="${col}" stroke-width="${w}" stroke-linecap="round"/><path class="flow" d="${d}" fill="none" stroke="var(--river-flow)" stroke-width="${Math.max(1, w * 0.45).toFixed(1)}" stroke-linecap="round" opacity=".9" ${extra}/>`;
-    const cloud = (cx, cy) => `<g fill="var(--surface)" stroke="var(--dg-line)" stroke-width="1.2"><ellipse cx="${cx}" cy="${cy}" rx="34" ry="13"/><ellipse cx="${cx - 16}" cy="${cy - 8}" rx="16" ry="12"/><ellipse cx="${cx + 12}" cy="${cy - 11}" rx="19" ry="14"/></g>`;
-
-    if (code.length <= 2) {
-      // The water cycle: rain on land, rivers carry it to the sea, the sun lifts it back into the clouds.
-      const body = `<rect width="360" height="170" fill="var(--dg-sky)" opacity=".35"/>` +
-        `<circle cx="38" cy="34" r="16" fill="var(--dg-amber)"/>` + cloud(150, 38) +
-        drops(122, 182, 54, 92, 6) +
-        `<path d="M0 120 C40 82 80 78 120 96 C160 112 190 92 230 112 L230 170 L0 170Z" fill="var(--dg-grass)"/>` +
-        `<path d="M226 128 L360 128 L360 170 L218 170Z" fill="var(--dg-water)"/>` +
-        water("M150 102 C175 112 196 118 230 130", 4) +
-        `<path class="rise" d="M300 122 C300 96 270 70 196 44" fill="none" stroke="var(--dg-water-deep)" stroke-width="1.4" stroke-dasharray="3 6" marker-end="url(#ex-arr)"/>` +
-        `<defs><marker id="ex-arr" viewBox="0 0 8 8" refX="6" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L8 4L0 8Z" fill="var(--dg-water-deep)"/></marker></defs>` +
-        `<text class="dg-sub" x="250" y="66">evaporation</text><text class="dg-sub" x="58" y="74">rain</text><text class="dg-sub" x="250" y="152">sea</text><text class="dg-sub" x="128" y="140">river</text>`;
-      const cap = code ? `Rain that falls anywhere in the ${nm.replace(/ region$/i, "")} region runs into its streams and rivers, which carry it toward the sea. Volunteers have sampled <b>${fmt(x.s)}</b> places along the way.`
-        : `Every drop of rain follows the land downhill into a stream, then a river, then the sea. Watersheds are the land that drains to one stream; zoom in to follow the water.`;
-      return wrap("How water moves", cap, body);
-    }
-
-    if (code.length <= 6) {
-      // A river network: small rivers join to make bigger ones.
-      const main = rv.slice().sort((a, b) => b.L - a.L)[0];
-      const tribs = main ? rv.filter(r => r.f === main.n).slice(0, 4) : [];
-      const others = tribs.length ? tribs : rv.filter(r => r !== main).slice(0, 4);
-      let body = `<rect width="360" height="170" fill="var(--dg-grass)" opacity=".25"/>`;
-      body += water("M20 128 C110 118 220 132 345 120", 7);
-      others.forEach((r, i) => {
-        const jx = 70 + i * 72, top = i % 2 ? 26 : 40;
-        body += water(`M${jx - 30} ${top} C${jx - 18} ${top + 40} ${jx + 6} ${top + 56} ${jx + 14} 124`, 2 + Math.min(3, r.L / 40), "var(--river)", `style="animation-delay:-${i * 0.4}s"`) +
-          `<circle cx="${jx + 14}" cy="124" r="3.4" fill="var(--surface)" stroke="var(--dg-water-deep)" stroke-width="1.6"/>` +
-          `<text class="dg-sub" x="${jx - 34}" y="${top - 6}">${esc(r.n.length > 18 ? r.n.slice(0, 17) + "…" : r.n)}</text>`;
-      });
-      body += main ? `<text class="dg-name" x="20" y="154">${esc(main.n)}</text><text class="dg-sub" x="345" y="154" text-anchor="end">${main.t ? "to tidal water" : main.f ? "to " + esc(main.f) : "downstream"} →</text>` : "";
-      const cap = main ? `<b>${esc(main.n)}</b> is the largest river here, ${fmt(main.L)} km from its source${others.length ? `; ${others.map(r => esc(r.n)).slice(0, 3).join(", ")} ${tribs.length ? "flow into it" : "are other main rivers"}` : ""}. Whatever enters a small stream upstream reaches every river below it, so a ${lvl} is only as healthy as its headwaters.`
-        : `Small streams join to make bigger rivers. River lines for this ${lvl} are still being added.`;
-      return wrap("Rivers join", cap, body);
-    }
-
-    if (code.length === 8) {
-      const rp = rv.find(q => q.pf); if (rp && window.EXTERRAIN) return EXTERRAIN.profileFigure(rp);
-      // From source to mouth: the main river's fall, with real end elevations.
-      const r = rv.find(q => num(q.se) && num(q.me) && q.se > q.me) || null;
-      if (!r) return "";
-      const drop = r.se - r.me, X0 = 30, X1 = 330, Y0 = 34, Y1 = 132;
-      const yAt = t => Y0 + (Y1 - Y0) * (1 - Math.pow(1 - t, 2.2));
-      let d = "";
-      for (let i = 0; i <= 24; i++) { const t = i / 24; d += `${i ? "L" : "M"}${(X0 + (X1 - X0) * t).toFixed(1)} ${yAt(t).toFixed(1)}`; }
-      const exag = Math.round((r.L * 1000 / 300) / (drop / 98));
-      const body = `<rect width="360" height="170" fill="var(--dg-sky)" opacity=".3"/>` +
-        `<path d="${d} L${X1} 160 L${X0} 160Z" fill="var(--dg-soil)" opacity=".55"/>` +
-        water(d, 6) +
-        `<g transform="translate(${X0} ${Y0})"><circle class="ripple" r="5" fill="none" stroke="var(--dg-water-deep)" stroke-width="1.4"/><circle r="4" fill="var(--surface)" stroke="var(--dg-water-deep)" stroke-width="2"/></g>` +
-        `<text class="dg-name" x="${X0 + 10}" y="${Y0 - 10}">Source · ${Math.round(r.se)} m</text>` +
-        `<text class="dg-name" x="${X1}" y="${Y1 - 12}" text-anchor="end">${r.t ? "Tidal water" : r.f ? esc(r.f) : "Mouth"} · ${Math.round(r.me)} m</text>` +
-        `<text class="dg-num" x="180" y="152" text-anchor="middle">${fmt(r.L)} km · falls ${fmt(drop)} m</text>` +
-        (exag > 1 ? `<text class="dg-nts" x="352" y="16" text-anchor="end">not to scale · height ×${fmt(exag)}</text>` : "");
-      const cap = `<b>${esc(r.n)}</b> ${r.fb && r.fb.length === 2 && !r.fb.some(n => /canal/i.test(n)) ? `begins where ${esc(r.fb[0])} and ${esc(r.fb[1])} meet` : "rises"} at ${Math.round(r.se)} m and falls ${fmt(drop)} m over ${fmt(r.L)} km${r.t ? " to tidal water" : r.f ? ` before joining ${esc(r.f)}` : ""}. Steep, fast headwaters stay cool and full of oxygen, which is where sensitive animals do best. <span class="meta">Only the two end heights are measured; the curve between is drawn to show the usual shape.</span>`;
-      return wrap("Source to mouth", cap, body);
-    }
-
-    if (code.length === 10) {
-      // Land shapes the water: rain on forest soaks in, rain on pavement runs straight to the creek.
-      if (!num(x.im) && !num(x.fo)) return "";
-      const im = Math.max(0, x.im || 0), fo = Math.max(0, x.fo || 0), other = Math.max(0, 100 - im - fo);
-      const W0 = 20, Wt = 270, a = W0 + Wt * fo / 100, b = a + Wt * other / 100, c = W0 + Wt;
-      let body = `<rect width="360" height="170" fill="var(--dg-sky)" opacity=".3"/>` + cloud(150, 30) + drops(40, 290, 46, 96, 10);
-      body += `<rect x="${W0}" y="104" width="${(a - W0).toFixed(1)}" height="14" fill="var(--dg-leaf)"/>` +
-        `<rect x="${a.toFixed(1)}" y="104" width="${(b - a).toFixed(1)}" height="14" fill="var(--dg-grass)"/>` +
-        `<rect x="${b.toFixed(1)}" y="104" width="${(c - b).toFixed(1)}" height="14" fill="var(--dg-road)"/>` +
-        `<rect x="${W0}" y="118" width="${Wt}" height="40" fill="var(--dg-soil)" opacity=".5"/>`;
-      for (let i = 0; i < 4; i++) { const xx = W0 + (a - W0) * (i + 0.5) / 4; if (a - W0 > 14) body += `<line class="soak" x1="${xx.toFixed(1)}" y1="120" x2="${xx.toFixed(1)}" y2="150" stroke="var(--river)" stroke-width="1.8" stroke-dasharray="3 9"/>`; }
-      if (c - b > 4) body += `<path class="runoff" d="M${b.toFixed(1)} 101 L${c + 18} 101 L${c + 30} 116" fill="none" stroke="var(--river)" stroke-width="2.4" stroke-dasharray="8 6"/>`;
-      body += water(`M${c + 30} 60 L${c + 30} 160`, 12) + `<text class="dg-sub" x="${c + 22}" y="54">creek</text>` +
-        `<text class="dg-sub" x="${W0}" y="${fo > 12 ? 100 : 166}">${fo > 12 ? `forest ${Math.round(fo)}%` : ""}</text>` +
-        `<text class="dg-sub" x="${c}" y="100" text-anchor="end">paved ${im.toFixed(1)}%</text>` +
-        (b - a > 90 ? `<text class="dg-sub" x="${((a + b) / 2).toFixed(0)}" y="136" text-anchor="middle">farms, lawns, other ${Math.round(other)}%</text>` : "");
-      const cap = `In ${nm}, <b>${im.toFixed(1)}%</b> of the land is paved or roofed and <b>${Math.round(fo)}%</b> is forest. Rain on forest soaks in and reaches the creek slowly; rain on pavement runs straight in, carrying heat, silt and, in winter, road salt${num(x.cm) ? ` (median chloride here ${Math.round(x.cm)} mg/L)` : ""}. Studies often find sensitive stream animals decline once about a tenth of a watershed is paved.`;
-      return wrap("Land shapes the water", cap, body);
-    }
-
-    // Subwatershed: life in the riffle. Ten animals: how many are pollution-sensitive, against what is expected here.
-    if (!num(x.so)) return "";
-    const found = Math.round(x.so * 10), exp = num(x.se) ? Math.round(x.se * 10) : null;
-    let body = `<rect width="360" height="170" fill="var(--dg-water)" opacity=".45"/>`;
-    for (let i = 0; i < 3; i++) body += `<path class="flow" d="M0 ${30 + i * 18} C60 ${24 + i * 18} 120 ${36 + i * 18} 180 ${30 + i * 18} S300 ${24 + i * 18} 360 ${30 + i * 18}" fill="none" stroke="var(--surface)" stroke-width="1.4" opacity=".7" style="animation-delay:-${i * 0.5}s"/>`;
-    for (let i = 0; i < 9; i++) body += `<ellipse cx="${20 + i * 40}" cy="${150 + (i % 2) * 4}" rx="${22 + (i % 3) * 4}" ry="12" fill="var(--dg-stone)"/>`;
-    for (let i = 0; i < 10; i++) {
-      const sens = i < found, cx = 30 + i * 32, cy = 112 + (i % 2) * 10;
-      body += `<g class="bob" style="animation-delay:-${(i * 0.3).toFixed(1)}s" transform="translate(${cx} ${cy})">` +
-        (sens ? `<ellipse rx="9" ry="3.6" fill="var(--good)"/><path d="M-9 0 L-17 -4 M-9 0 L-17 0 M-9 0 L-17 4" stroke="var(--good)" stroke-width="1"/><circle cx="7" cy="0" r="2.2" fill="var(--good)"/>`
-              : `<ellipse rx="7" ry="4" fill="var(--grey)"/><path d="M-4 3 l-2 4 M0 3.5 l0 4 M4 3 l2 4" stroke="var(--grey)" stroke-width="1"/>`) + `</g>`;
-    }
-    if (exp != null) body += `<line x1="${30 + exp * 32 - 16}" x2="${30 + exp * 32 - 16}" y1="92" y2="132" stroke="var(--ink)" stroke-dasharray="3 3"/><text class="dg-sub" x="${30 + exp * 32 - 16}" y="88" text-anchor="middle">expected</text>`;
-    body += `<text class="dg-name" x="12" y="18">Out of every 10 animals found</text>`;
-    const cap = `Under the stones of a riffle live the insects volunteers count. In ${nm}, <b>${found} in 10</b> animals found were pollution-sensitive (mayflies, stoneflies, caddisflies; green)${exp != null ? `, against <b>${exp} in 10</b> expected for a stream in this setting` : ""}. They need cool, clean, oxygen-rich water, so they are the first to leave when a stream is harmed.`;
-    return wrap("Life in the riffle", cap, body);
-  }
-
   // ---------- site history ----------
   function spark(points, opts) {
     const Wd = 340, Hd = 120, L = 30, R = 8, T = 10, B = 22;
@@ -647,7 +544,7 @@
         `${CHAPTER && cur !== CHAPTER ? `<button type="button" class="primary" data-go="${CHAPTER}">Go to Great Seneca Creek</button>` : ""}` +
         `${num(x.la) && cur ? `<a class="btn" href="${gmaps(x.la, x.lo)}" target="_blank" rel="noopener">Google Maps ↗</a>` : ""}</div>`;
       $(".ex-body").innerHTML = (cur === "" ? `<p class="ex-intro">Shaded areas are the water-resource regions of the lower 48, coloured by the measure you pick; orange dots show where volunteers take samples. Click a region to zoom in, or search for a watershed or stream<span class="kbd-hint"> (press <kbd>/</kbd>)</span>.</p>` : "") +
-        cards(x, parent) + concept(cur, x) + `<h3 class="ex-h">${cur.length === 12 ? "Sites" : `${CHILD[cur.length][0].toUpperCase()}${CHILD[cur.length].slice(1)} inside`} <span class="meta">${cur.length === 12 ? "biological sites open their history" : "click a row to zoom in"}</span></h3>` +
+        cards(x, parent) + `<h3 class="ex-h">${cur.length === 12 ? "Sites" : `${CHILD[cur.length][0].toUpperCase()}${CHILD[cur.length].slice(1)} inside`} <span class="meta">${cur.length === 12 ? "biological sites open their history" : "click a row to zoom in"}</span></h3>` +
         kidTable(cur) + (cur.length >= 0 ? `<h3 class="ex-h">${cur ? "Rivers" : "Major rivers"} <span class="meta">from source to where each one ends; click to trace it</span></h3>` + riverRows(cur) : "") +
         (cur ? measures(x, parent) : "");
     }
