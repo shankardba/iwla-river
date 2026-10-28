@@ -32,3 +32,11 @@
 .ex-water path { fill: var(--water-fill); stroke: none; pointer-events: none; }
 .ex-rivers-out path { fill: none; stroke: var(--river); stroke-linecap: round; stroke-linejoin: round; opacity: .42; }
 .ex-label.wn { fill: var(--river); font-style: italic; font-weight: 500; letter-spacing: .04em; }
+
+/* sample types: one colour each, on the map, in the legend and on the buttons */
+:root { --k-bio: #8a4fd0; --k-salt: #e8743b; --k-no3: #2f9e6a; --k-chem: #d4a514; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --k-bio: #c39bff; --k-salt: #ff9a62; --k-no3: #5fd39b; --k-chem: #f2c94c; } }
+:root[data-theme="dark"] { --k-bio: #c39bff; --k-salt: #ff9a62; --k-no3: #5fd39b; --k-chem: #f2c94c; }
+i.dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; vertical-align: 0; }
+.ex-tools-kind button i.dot { margin-right: 5px; }
+.ex-heat circle { stroke: none; }

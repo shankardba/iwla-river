@@ -77,6 +77,10 @@
   const KINDS = [["all", "All samples"], ["bio", "Biological"], ["salt", "Salt"], ["no3", "Nitrate"], ["chem", "Other chemistry"]];
   const cellN = (c, k) => k === "bio" ? c[2] : k === "salt" ? c[3] : k === "no3" ? c[4] : k === "chem" ? c[5] : c[2] + c[3] + c[4] + c[5];
   const siteN = (t, k) => k === "bio" ? t[4] : k === "salt" ? (t[7] || 0) : k === "no3" ? (t[8] || 0) : k === "chem" ? (t[9] || 0) : t[4] + t[5];
+  const KCOL = { bio: "var(--k-bio)", salt: "var(--k-salt)", no3: "var(--k-no3)", chem: "var(--k-chem)" };
+  const cellCol = c => kind !== "all" ? KCOL[kind] : KCOL[["bio", "salt", "no3", "chem"][[c[2], c[3], c[4], c[5]].reduce((b, v, i, a) => v > a[b] ? i : b, 0)]];
+  const siteCol = t => kind !== "all" ? KCOL[kind] : KCOL[["bio", "salt", "no3", "chem"][[t[4], t[7] || 0, t[8] || 0, t[9] || 0].reduce((b, v, i, a) => v > a[b] ? i : b, 0)]];
+  const kindKey = () => (kind === "all" ? ["bio", "salt", "no3", "chem"] : [kind]).map(k => `<span><i class="dot" style="background:${KCOL[k]}"></i>${KINDS.find(x => x[0] === k)[1].toLowerCase()}</span>`).join("");
   const kindWord = () => kind === "all" ? "samples" : `${KINDS.find(k => k[0] === kind)[1].toLowerCase()} samples`;
 
   // ---------- map ----------
@@ -138,14 +142,14 @@
     let sites = [];
     if (isSites) {
       sites = (SITES[huc4(code)] || []).filter(t => t[3] === code && siteN(t, kind) > 0).map(t => ({
-        la: t[1], lo: t[2], id: t[0], bio: t[4] > 0, r: 3.5 + Math.min(6, Math.log2(1 + siteN(t, kind))),
-        color: t[4] ? "var(--c4)" : "var(--heat)",
+        la: t[1], lo: t[2], id: t[0], bio: t[4] > 0, r: 2.6 + Math.min(4, Math.log2(1 + siteN(t, kind)) * 0.7),
+        color: siteCol(t),
         tip: `${t[6] || "Site"}: ${t[4]} biological, ${t[5]} other surveys. ${t[4] ? "Click for its history." : "Click for Google Maps."}` }));
     }
     const inWs = code.length >= 4 ? (SITES[huc4(code)] || []).filter(t => t[3].startsWith(code)) : [];
     const heat = isSites ? [] : code.length >= 4
-      ? inWs.filter(t => siteN(t, kind) > 0).map(t => ({ q: albers(t[1], t[2]), n: siteN(t, kind) }))
-      : HEAT.filter(c => cellN(c, kind) > 0 && c[0] > 24 && c[0] < 50 && c[1] > -125 && c[1] < -66).map(c => ({ q: albers(c[0], c[1]), n: cellN(c, kind), cell: 1 }));
+      ? inWs.filter(t => siteN(t, kind) > 0).map(t => ({ q: albers(t[1], t[2]), n: siteN(t, kind), col: siteCol(t) }))
+      : HEAT.filter(c => cellN(c, kind) > 0 && c[0] > 24 && c[0] < 50 && c[1] > -125 && c[1] < -66).map(c => ({ q: albers(c[0], c[1]), n: cellN(c, kind), cell: 1, col: cellCol(c) }));
     // Frame: the country by its outline; anything smaller by its own boundary, or failing that its areas and sites.
     let fit;
     if (code === "" && GEO) fit = GEO.border.flat().map(([lo, la]) => albers(la, lo));
@@ -213,13 +217,13 @@
     if (shape(code)) s += `<path class="ex-parent${isSites ? " fill" : ""}" d="${pathOf(shape(code))}" fill-rule="evenodd"/>`;
     if (heat.length) {
       const mx = Math.log(1 + Math.max(...heat.map(h => h.n)));
-      const cellPx = code.length < 4 ? Math.max(1.6, Math.abs(X(albers(38, -96.25)) - X(albers(38, -96))) * 0.62) : 0;
+      const cellPx = code.length < 4 ? Math.max(1.6, Math.abs(X(albers(38, -96.25)) - X(albers(38, -96))) * 0.3) : 0;
       s += `<g class="ex-heat">`;
       heat.forEach(h => {
         const x = X(h.q), y = Y(h.q);
         if (x < -10 || x > W + 10 || y < -10 || y > H + 10) return;
         const f = Math.log(1 + h.n) / mx;
-        s += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(cellPx || 2 + 3 * f).toFixed(1)}" fill="var(--heat)" fill-opacity="${(0.2 + 0.7 * f).toFixed(2)}"/>`;
+        s += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(cellPx ? cellPx * (0.7 + 0.5 * f) : 1.4 + 1.8 * f).toFixed(1)}" fill="${h.col}" fill-opacity="${(0.45 + 0.5 * f).toFixed(2)}"/>`;
       });
       s += `</g>`;
     }
@@ -283,13 +287,13 @@
   function legend(code) {
     const parts = [];
     if (code === "st") {
-      parts.push(`<span><i class="heat"></i>samples per ${st ? "5" : "25"} km cell, darker = more</span>`);
+      parts.push(`<span class="lg-title">Samples (per ${st ? "5" : "25"} km, bigger = more)</span>` + kindKey());
       if (showRings) { const cb = COLOR_BY[colorBy]; parts.push(`<span class="lg-title">States: ${esc(cb.name)}</span>` + cb.bins.map(b => `<span><i class="area" style="background:${b[2]}"></i>${esc(b[3])}</span>`).join("") + '<span><i class="area" style="background:var(--nodata)"></i>no data</span>'); }
       return parts.join("");
     }
-    if (code.length < 12) parts.push(`<span><i class="heat"></i>${code.length < 4 ? "samples per 25 km cell" : "samples per site"}, darker = more</span>`);
-    if (code.length === 12) parts.push('<span><i style="background:var(--c4)"></i>biological site (click for history)</span><span><i style="background:var(--heat)"></i>salt, nitrate or chemistry only</span>');
-    else if (showRings) {
+    parts.push(`<span class="lg-title">${code.length === 12 ? "Sites" : code.length < 4 ? "Samples (per 25 km, bigger = more)" : "Samples (per site, bigger = more)"}</span>` + kindKey() +
+      (code.length === 12 ? '<span class="meta">biological sites open their history</span>' : ""));
+    if (code.length !== 12 && showRings) {
       const cb = COLOR_BY[colorBy];
       parts.push(`<span class="lg-title">Watersheds: ${esc(cb.name)}</span>` + cb.bins.map(b => `<span><i class="area" style="background:${b[2]}"></i>${esc(b[3])}</span>`).join("") + '<span><i class="area" style="background:var(--nodata)"></i>no data</span>');
     }
@@ -571,8 +575,8 @@
     const cells = (abbr ? SHEAT[abbr] || [] : HEAT).filter(c => cellN(c, kind) > 0 && c[0] > 24 && c[0] < 50 && c[1] > -125 && c[1] < -66);
     if (cells.length) {
       const mx = Math.log(1 + Math.max(...cells.map(c => cellN(c, kind))));
-      const r = Math.max(1.6, Math.abs(X(albers(38, -96 - step)) - X(albers(38, -96))) * 0.62);
-      s += `<g class="ex-heat">` + cells.map(c => { const q = albers(c[0], c[1]), f = Math.log(1 + cellN(c, kind)) / mx; return `<circle cx="${X(q).toFixed(1)}" cy="${Y(q).toFixed(1)}" r="${r.toFixed(1)}" fill="var(--heat)" fill-opacity="${(0.2 + 0.7 * f).toFixed(2)}"/>`; }).join("") + `</g>`;
+      const r = Math.max(1, Math.abs(X(albers(38, -96 - step)) - X(albers(38, -96))) * 0.3);
+      s += `<g class="ex-heat">` + cells.map(c => { const q = albers(c[0], c[1]), f = Math.log(1 + cellN(c, kind)) / mx; return `<circle cx="${X(q).toFixed(1)}" cy="${Y(q).toFixed(1)}" r="${(r * (0.7 + 0.5 * f)).toFixed(1)}" fill="${cellCol(c)}" fill-opacity="${(0.45 + 0.5 * f).toFixed(2)}"/>`; }).join("") + `</g>`;
     }
     s += "</g>";
     const boxes = [], free = (bx, by, bw, bh) => !boxes.some(b => bx < b[0] + b[2] && bx + bw > b[0] && by < b[1] + b[3] && by + bh > b[1]);
@@ -616,14 +620,14 @@
   async function render(push) {
     root.querySelectorAll("[data-view]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.view === view)));
     if (view === "s") {
-      $(".ex-tools-kind").innerHTML = KINDS.map(([k, t]) => `<button type="button" data-kind="${k}" aria-pressed="${k === kind}">${t}</button>`).join("");
+      $(".ex-tools-kind").innerHTML = KINDS.map(([k, t]) => `<button type="button" data-kind="${k}" aria-pressed="${k === kind}">${KCOL[k] ? `<i class="dot" style="background:${KCOL[k]}"></i>` : ""}${t}</button>`).join("");
       $(".ex-colorby").value = colorBy; $(".ex-colorby").disabled = !showRings; $(".ex-rings").checked = showRings;
       return renderStates(push);
     }
     await Promise.all([ensure(cur), ensureGeo(cur), ensureRivers(cur), ensureWater(cur)]);
     if (push) { const h = site ? `#s${site}@${cur}` : `#w${cur || "US"}`; try { history.replaceState(null, "", h); } catch (e) { /* keep the old address */ } }
     const x = w(cur) || {}, parent = cur ? w(cur.slice(0, -2)) : null;
-    $(".ex-tools-kind").innerHTML = KINDS.map(([k, t]) => `<button type="button" data-kind="${k}" aria-pressed="${k === kind}">${t}</button>`).join("");
+    $(".ex-tools-kind").innerHTML = KINDS.map(([k, t]) => `<button type="button" data-kind="${k}" aria-pressed="${k === kind}">${KCOL[k] ? `<i class="dot" style="background:${KCOL[k]}"></i>` : ""}${t}</button>`).join("");
     $(".ex-colorby").value = colorBy;
     $(".ex-colorby").disabled = cur.length === 12 || !showRings;
     $(".ex-rings").checked = showRings;
