@@ -26,7 +26,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="assets/site.css?v=c0d3bebf">
+<link rel="stylesheet" href="assets/site.css?v=777722d1">
 <link rel="stylesheet" href="assets/terrain.css?v=1c9a0bfe">
 </head>
 <body class="">
@@ -72,7 +72,7 @@
         <li class="has-menu">
           <button class="nav-link" type="button" aria-expanded="false" aria-controls="menu-data" >Data<svg viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></button>
           <div class="menu" id="menu-data" hidden>
-            <ul><li><a href="data--data-quality.html" ><b>How clean the data is</b><span class="meta">83,297 of 88,511 records (94%) are usable after removing undated,...</span></a></li><li><a href="data--temperature-units.html" ><b>Water temperature switches units</b><span class="meta">The Hub stores no temperature unit; chapter readings switch from °C...</span></a></li><li><a href="data--methods.html" ><b>Sources and methods</b><span class="meta">Built from a Clean Water Hub snapshot of 2026-10-27, with public...</span></a></li><li><a href="data--downloads.html" ><b>Downloads</b><span class="meta">Watershed-level figures and every finding, free to download.</span></a></li></ul>
+            <ul><li><a href="data--data-quality.html" ><b>How clean the data is</b><span class="meta">83,297 of 88,511 records (94%) are usable after removing undated,...</span></a></li><li><a href="data--temperature-units.html" ><b>Water temperature switches units</b><span class="meta">The Hub stores no temperature unit; chapter readings switch from °C...</span></a></li><li><a href="data--methods.html" ><b>Sources and methods</b><span class="meta">Built from a Clean Water Hub snapshot of 2026-10-27, with public...</span></a></li><li><a href="data--references.html" ><b>References</b><span class="meta">Every number on this site traces to 25 data sources, 18 published...</span></a></li><li><a href="data--downloads.html" ><b>Downloads</b><span class="meta">Watershed-level figures and every finding, free to download.</span></a></li></ul>
           </div>
         </li>
         <li><a class="nav-link" href="about.html" >About</a></li>
@@ -111,7 +111,7 @@
     </details>
     <details >
       <summary>Data and methods</summary>
-      <ul><li><a href="data.html">Section overview</a></li><li><a href="data--data-quality.html"><span class="dot info"></span>How clean the data is</a></li><li><a href="data--temperature-units.html"><span class="dot info"></span>Water temperature switches units</a></li><li><a href="data--methods.html"><span class="dot info"></span>Sources and methods</a></li><li><a href="data--downloads.html"><span class="dot info"></span>Downloads</a></li></ul>
+      <ul><li><a href="data.html">Section overview</a></li><li><a href="data--data-quality.html"><span class="dot info"></span>How clean the data is</a></li><li><a href="data--temperature-units.html"><span class="dot info"></span>Water temperature switches units</a></li><li><a href="data--methods.html"><span class="dot info"></span>Sources and methods</a></li><li><a href="data--references.html"><span class="dot info"></span>References</a></li><li><a href="data--downloads.html"><span class="dot info"></span>Downloads</a></li></ul>
     </details>
     <a class="sheet-top" href="about.html">About</a>
   </nav>
@@ -141,6 +141,11 @@
 <li><a href="national--model.html">How the expected-score model works</a> <span class="meta">— how the model works and how accurate it is</span></li><li><a href="national--paving.html">Paved watersheds lose sensitive animals</a> <span class="meta">— the national pattern behind it</span></li>    </ul></div>
 
     <details class="method"><summary>How this was worked out</summary><p>Gradient-boosted trees, five folds grouped by site; residual trend by the seasonal Kendall test.</p></details>
+    <section class="sources" aria-label="Sources">
+      <h2>Sources</h2>
+      <ol><li>Izaak Walton League of America. Clean Water Hub: Save Our Streams biological, chemical, Salt Watch and Nitrate Watch surveys. Snapshot downloaded through the Hub&#39;s public API. <a href="https://www.cleanwaterhub.org/" target="_blank" rel="noopener">www.cleanwaterhub.org/</a></li><li>Hill, R.A., Weber, M.H., Leibowitz, S.G., Olsen, A.R. and Thornbrugh, D.J. (2016). The Stream-Catchment (StreamCat) Dataset: a database of watershed metrics for the conterminous United States. Journal of the American Water Resources Association 52(1): 120–128. <a href="https://doi.org/10.1111/1752-1688.12372" target="_blank" rel="noopener">doi:10.1111/1752-1688.12372</a></li><li>Dewitz, J. (2021). National Land Cover Database (NLCD) 2019 Products. U.S. Geological Survey data release. <a href="https://doi.org/10.5066/P9KZCM54" target="_blank" rel="noopener">doi:10.5066/P9KZCM54</a></li><li>Zippenfenig, P. (2023). Open-Meteo.com Weather API. Zenodo. Historical weather from its archive (ERA5-based reanalysis, see Hersbach et al. 2020). <a href="https://doi.org/10.5281/zenodo.7970649" target="_blank" rel="noopener">doi:10.5281/zenodo.7970649</a></li><li>Hersbach, H. et al. (2020). The ERA5 global reanalysis. Quarterly Journal of the Royal Meteorological Society 146(730): 1999–2049. <a href="https://doi.org/10.1002/qj.3803" target="_blank" rel="noopener">doi:10.1002/qj.3803</a></li><li>Friedman, J.H. (2001). Greedy function approximation: a gradient boosting machine. Annals of Statistics 29(5): 1189–1232. <a href="https://doi.org/10.1214/aos/1013203451" target="_blank" rel="noopener">doi:10.1214/aos/1013203451</a></li><li>Pedregosa, F. et al. (2011). Scikit-learn: machine learning in Python. Journal of Machine Learning Research 12: 2825–2830. <a href="https://jmlr.org/papers/v12/pedregosa11a.html" target="_blank" rel="noopener">jmlr.org/papers/v12/pedregosa11a.html</a></li><li>Hirsch, R.M., Slack, J.R. and Smith, R.A. (1982). Techniques of trend analysis for monthly water quality data. Water Resources Research 18(1): 107–121. <a href="https://doi.org/10.1029/WR018i001p00107" target="_blank" rel="noopener">doi:10.1029/WR018i001p00107</a></li><li>Sen, P.K. (1968). Estimates of the regression coefficient based on Kendall&#39;s tau. Journal of the American Statistical Association 63(324): 1379–1389. <a href="https://doi.org/10.1080/01621459.1968.10480934" target="_blank" rel="noopener">doi:10.1080/01621459.1968.10480934</a></li></ol>
+      <p class="meta">All sources: <a href="data--references.html">References</a>. Code and every query behind these numbers: <a href="https://github.com/shankardba/iwla-river">github.com/shankardba/iwla-river</a>.</p>
+    </section>
     <nav class="pager" aria-label="More in Great Seneca Creek">
 <span></span><a class="nx" href="chapter--score-trend.html"><span class="meta">Next →</span>The score has held steady</a>    </nav>
   </article>

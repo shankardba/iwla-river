@@ -45,7 +45,7 @@ def road_salt(db):
             "series": [{"color": c, "line": True, "r": 4, "points": [{"x": r["date"], "y": r["value"],
                         "tip": f"{CHEM_LABEL[s]}, {r['date']}: {r['value']:.0f} mg/L chloride"} for r in cl if r["site_id"] == s]}
                        for s, c in ((creek_id, "accent"), (lake_id, "grey"))]}
-    return Page(
+    return Page(refs=["cwh", "sos", "epa-chloride", "kaushal2005", "kaushal2018", "corsi2010"], 
         headline=f"Chloride in the creek climbs from about {s_med:.0f} mg/L in summer to winter peaks of {peak:.0f}, still below the EPA's 230.",
         status="watch",
         numbers=[(f"{peak:.0f} mg/L", "highest winter chloride in the creek"), (f"{md:.0f} mg/L", "Maryland Salt Watch median")],
@@ -70,7 +70,7 @@ def nitrate(db):
         if v:
             rows.append([name, len(v), f"{min(v):g}", f"{max(v):g}", f"{no3[0]['date'][:4]}–{no3[-1]['date'][:4]}"])
     creek_vals = sorted({r["value"] for r in no3 if r["site_id"] == list(CHEM_LABEL)[0]})
-    return Page(
+    return Page(refs=["cwh", "sos", "epa-nitrate"], 
         headline=f"Nitrate strips have read {' or '.join(f'{v:g}' for v in creek_vals)} mg/L at the creek on every visit.",
         status="good",
         blocks=[table([("Sampling point",), ("Readings", 1), ("Lowest, mg/L", 1), ("Highest, mg/L", 1), ("Years",)], rows),

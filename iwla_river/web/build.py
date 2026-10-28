@@ -22,6 +22,7 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 from .. import config as C
 from . import findings as findings_pkg
 from .db import DB, fmt
+from . import refs
 from .registry import FINDINGS, SECTIONS, STATUS_WORDS
 
 HERE = Path(__file__).resolve().parent
@@ -45,8 +46,20 @@ def run_findings(db: DB) -> list[dict]:
         page = f.fn(db)
         if page is None:
             continue
+        refs.check(page.refs)
         out.append({"section": f.section, "id": f.id, "title": f.title, "order": f.order, "key": f.key,
                     "url": url(f.section, f.id), "page": page})
+    # The References page lists every source with the findings that cite it.
+    cited = {}
+    for it in out:
+        for k in it["page"].refs:
+            cited.setdefault(k, []).append({"title": it["title"], "url": it["url"]})
+    for it in out:
+        if it["section"] == "data" and it["id"] == "references":
+            it["page"].blocks.append({"kind": "reflist", "groups": [
+                {"title": t, "items": [{"key": k, **r, "link": refs.link(k), "cited": cited.get(k, [])}
+                                       for k, r in sorted(refs.REFS.items(), key=lambda kv: kv[1]["short"].lower()) if r["kind"] == kind]}
+                for kind, t in refs.KIND_TITLES.items()]})
     return out
 
 
@@ -337,7 +350,7 @@ def build(db_path=C.DB_PATH, out: Path = OUT, body_out: Path = BODY_OUT) -> Path
     from .share import SHARE_VERSION
     import hashlib
     asset_v = {a.name: hashlib.sha1(a.read_bytes()).hexdigest()[:8] for a in (HERE / "assets").iterdir() if a.is_file()}
-    common = {"sections": sections, "meta": meta, "status_words": STATUS_WORDS, "by_id": by_id, "asset_v": asset_v,
+    common = {"refs": refs.REFS, "ref_link": refs.link, "accessed": refs.ACCESSED, "sections": sections, "meta": meta, "status_words": STATUS_WORDS, "by_id": by_id, "asset_v": asset_v,
               "site_url": C.SITE_URL, "share_v": SHARE_VERSION}
 
     def render(template: str, name: str, **ctx) -> str:

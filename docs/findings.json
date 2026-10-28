@@ -284,6 +284,16 @@
   },
   {
    "section": "data",
+   "id": "references",
+   "title": "References",
+   "url": "data--references.html",
+   "key": false,
+   "headline": "Every number on this site traces to 25 data sources, 18 published methods and 8 studies that explain what the readings mean.",
+   "status": "info",
+   "numbers": []
+  },
+  {
+   "section": "data",
    "id": "downloads",
    "title": "Downloads",
    "url": "data--downloads.html",

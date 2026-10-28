@@ -40,6 +40,14 @@
       <tbody>{% for r in b.rows %}<tr>{% for c in r %}<td class="{{ 'n' if b.cols[loop.index0].num }}">{{ cell(c) }}</td>{% endfor %}</tr>{% endfor %}</tbody>
     </table></div>
     {% if b.note %}<p class="meta">{{ b.note }}</p>{% endif %}
+  {% elif b.kind == "reflist" %}
+    {% for g in b.groups %}
+    <h2>{{ g.title }}</h2>
+    <ol class="reflist">{% for r in g["items"] %}
+      <li id="ref-{{ r.key }}">{{ r.full }} <a href="{{ r.link }}" target="_blank" rel="noopener">{% if r.doi %}doi:{{ r.doi }}{% else %}{{ r.link | replace("https://", "") }}{% endif %}</a>{% if r.kind == "data" %} <span class="meta">Accessed {{ accessed }}.</span>{% endif %}
+        {% if r.cited %}<span class="meta">Cited in: {% for c in r.cited %}<a href="{{ c.url }}">{{ c.title }}</a>{% if not loop.last %}; {% endif %}{% endfor %}.</span>{% endif %}</li>
+    {% endfor %}</ol>
+    {% endfor %}
   {% elif b.kind == "links" %}
     {% set ok = b["items"] | selectattr(0, "in", by_id) | list %}
     {% if ok %}

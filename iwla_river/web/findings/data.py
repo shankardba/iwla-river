@@ -23,7 +23,7 @@ def data_quality(db):
                              round(100 * avg((group_size IS NOT NULL)::int)) AS team
                       FROM usable_surveys WHERE protocol IN ('sos_bio', 'va_rocky', 'va_muddy') GROUP BY 1 ORDER BY usable DESC""")
     total, usable = sum(r["records"] for r in rows), sum(r["usable"] for r in rows)
-    return Page(
+    return Page(refs=["cwh"], 
         headline=f"{fmt(usable)} of {fmt(total)} records ({round(100 * usable / total)}%) are usable after removing undated, deleted and duplicate surveys.",
         status="info",
         numbers=[(fmt(total), "records downloaded"), (fmt(usable), "usable")],
@@ -54,7 +54,7 @@ def temperature_units(db):
             "series": [{"color": c, "opacity": 1, "points": [{"x": r["date"], "y": r["raw"],
                         "tip": f"{LABEL[r['site_id']]}, {r['date']}: entered {r['raw']:g}" + (f" → {r['c']:g} °C" if r["c"] is not None else "")}
                         for r in rows if color.get(r["rule"], "bad") == c]} for c in ("accent", "warn", "bad")]}
-    return Page(
+    return Page(refs=["cwh"], 
         headline=f"The Hub stores no temperature unit; chapter readings switch from °C to °F in {first_f}, and {fmt(n.get('fahrenheit_converted', 0))} readings nationwide needed converting.",
         status="info",
         blocks=[chart(spec, "Water temperature as entered at the chapter sites."),
@@ -66,7 +66,7 @@ def temperature_units(db):
 @finding("data", "methods", "Sources and methods", order=30)
 def methods(db):
     snap = db.snapshot()
-    return Page(
+    return Page(refs=["cwh", "sos", "nldi", "nhdplus", "streamcat", "nlcd2019", "openmeteo", "era5", "wbd", "mann", "hirsch1982", "sen1968", "good2005", "friedman2001", "sklearn"], 
         headline=f"Built from a Clean Water Hub snapshot of {snap}, with public land-cover and weather data.",
         status="info",
         blocks=[table([("Source",), ("What it provides",)], [
@@ -97,10 +97,23 @@ def downloads(db):
         [{"href": "findings.json", "text": "findings.json"}, "Every finding on this site: title, headline, status and key figures", size("findings.json")],
         [{"href": "data/watersheds.json", "text": "watersheds.json"}, "Regions to subbasins and the sample heat cells, as used by Explore", size("data/watersheds.json")],
     ]
-    return Page(
+    return Page(refs=["cwh"], 
         headline="Watershed-level figures and every finding, free to download.",
         status="info",
         blocks=[table([("File",), ("What it holds",), ("Size", 1)], rows),
                 text("Downloads are aggregates. Site-level records stay with the Izaak Walton League's Clean Water Hub, "
                      "where volunteers entered them; many sites are home taps and are not republished here.",
                      "Code that rebuilds everything from the Hub: github.com/shankardba/iwla-river.")])
+
+
+@finding("data", "references", "References", order=35)
+def references(db):
+    from ..refs import REFS
+    n = {k: sum(1 for r in REFS.values() if r["kind"] == k) for k in ("data", "method", "science")}
+    return Page(
+        headline=f"Every number on this site traces to {n['data']} data sources, {n['method']} published methods and "
+                 f"{n['science']} studies that explain what the readings mean.",
+        status="info",
+        blocks=[text("Each finding lists its own sources at the foot of the page. Below is the full list, with the findings "
+                     "that cite each source. DOIs were checked against Crossref and DataCite; data sources show when they "
+                     "were accessed for this site.")])

@@ -19,6 +19,13 @@
     {% if item.page.method %}
     <details class="method"><summary>How this was worked out</summary><p>{{ item.page.method }}</p></details>
     {% endif %}
+    {% if item.page.refs %}
+    <section class="sources" aria-label="Sources">
+      <h2>Sources</h2>
+      <ol>{% for k in item.page.refs %}{% set r = refs[k] %}<li>{{ r.full }} <a href="{{ ref_link(k) }}" target="_blank" rel="noopener">{% if r.doi %}doi:{{ r.doi }}{% else %}{{ ref_link(k) | replace("https://", "") }}{% endif %}</a></li>{% endfor %}</ol>
+      <p class="meta">All sources: <a href="data--references.html">References</a>. Code and every query behind these numbers: <a href="https://github.com/shankardba/iwla-river">github.com/shankardba/iwla-river</a>.</p>
+    </section>
+    {% endif %}
     <nav class="pager" aria-label="More in {{ section.title }}">
       {% if prev %}<a href="{{ prev.url }}"><span class="meta">← Previous</span>{{ prev.title }}</a>{% else %}<span></span>{% endif %}
       {% if next %}<a class="nx" href="{{ next.url }}"><span class="meta">Next →</span>{{ next.title }}</a>{% endif %}

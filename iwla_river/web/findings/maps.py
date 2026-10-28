@@ -94,7 +94,7 @@ def national_map(db):
             "height": round(H), "points": pts, "opacity": 0.6, "paths": outline_paths(P),
             "labels": [{"x": cx, "y": cy, "tx": cx - 50, "ty": cy + 70, "text": "Great Seneca Creek", "anchor": "end"}],
             "note": "Dot size: surveys in each quarter-degree cell. Alaska and Hawaii not shown. Outlines: US Census Bureau. Click a dot to open it in Google Maps."}
-    return Page(
+    return Page(refs=["cwh", "census-boundaries"], 
         headline=f"{fmt(n_sites)} sites across the lower 48 states have usable surveys; most are in {', '.join(s['state'] for s in states[:3])}.",
         status="info",
         numbers=[(fmt(n_sites), "sites with usable surveys"), (", ".join(s["state"] for s in states[:5]), "states with the most sites")],
@@ -163,7 +163,7 @@ def local_map(db):
             "labels": [{"x": cx, "y": cy, "tx": cx + 70, "ty": cy - 60, "text": "Great Seneca Creek", "sub": "chapter sites"}],
             "words": [{"x": cx + 110, "y": cy + 60, "text": "MARYLAND"}, {"x": cx - 170, "y": cy + 175, "text": "VIRGINIA"}],
             "note": "North is up. Big dots: sites with a score-trend test. Click any dot to open it in Google Maps."}
-    return Page(
+    return Page(refs=["cwh", "census-boundaries"], 
         headline=f"{len(rows)} Clean Water Hub sites with surveys lie within {R} km of the chapter; the long-record ones cluster to the southwest, across the Potomac.",
         status="info",
         blocks=[chart(spec, "Sites placed by their own coordinates (kilometres from the chapter's teaching site); no basemap is loaded."),

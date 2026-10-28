@@ -44,6 +44,7 @@ class Page:
     blocks: list = field(default_factory=list)
     numbers: list = field(default_factory=list)   # [(value, label)] shown as key figures
     method: str | None = None          # short note on how the result was worked out
+    refs: list = field(default_factory=list)      # keys into refs.REFS: every source the page relies on
 
 
 SECTIONS: dict[str, Section] = {}

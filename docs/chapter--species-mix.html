@@ -26,7 +26,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="assets/site.css?v=c0d3bebf">
+<link rel="stylesheet" href="assets/site.css?v=777722d1">
 <link rel="stylesheet" href="assets/terrain.css?v=1c9a0bfe">
 </head>
 <body class="">
@@ -72,7 +72,7 @@
         <li class="has-menu">
           <button class="nav-link" type="button" aria-expanded="false" aria-controls="menu-data" >Data<svg viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></button>
           <div class="menu" id="menu-data" hidden>
-            <ul><li><a href="data--data-quality.html" ><b>How clean the data is</b><span class="meta">83,297 of 88,511 records (94%) are usable after removing undated,...</span></a></li><li><a href="data--temperature-units.html" ><b>Water temperature switches units</b><span class="meta">The Hub stores no temperature unit; chapter readings switch from °C...</span></a></li><li><a href="data--methods.html" ><b>Sources and methods</b><span class="meta">Built from a Clean Water Hub snapshot of 2026-10-27, with public...</span></a></li><li><a href="data--downloads.html" ><b>Downloads</b><span class="meta">Watershed-level figures and every finding, free to download.</span></a></li></ul>
+            <ul><li><a href="data--data-quality.html" ><b>How clean the data is</b><span class="meta">83,297 of 88,511 records (94%) are usable after removing undated,...</span></a></li><li><a href="data--temperature-units.html" ><b>Water temperature switches units</b><span class="meta">The Hub stores no temperature unit; chapter readings switch from °C...</span></a></li><li><a href="data--methods.html" ><b>Sources and methods</b><span class="meta">Built from a Clean Water Hub snapshot of 2026-10-27, with public...</span></a></li><li><a href="data--references.html" ><b>References</b><span class="meta">Every number on this site traces to 25 data sources, 18 published...</span></a></li><li><a href="data--downloads.html" ><b>Downloads</b><span class="meta">Watershed-level figures and every finding, free to download.</span></a></li></ul>
           </div>
         </li>
         <li><a class="nav-link" href="about.html" >About</a></li>
@@ -111,7 +111,7 @@
     </details>
     <details >
       <summary>Data and methods</summary>
-      <ul><li><a href="data.html">Section overview</a></li><li><a href="data--data-quality.html"><span class="dot info"></span>How clean the data is</a></li><li><a href="data--temperature-units.html"><span class="dot info"></span>Water temperature switches units</a></li><li><a href="data--methods.html"><span class="dot info"></span>Sources and methods</a></li><li><a href="data--downloads.html"><span class="dot info"></span>Downloads</a></li></ul>
+      <ul><li><a href="data.html">Section overview</a></li><li><a href="data--data-quality.html"><span class="dot info"></span>How clean the data is</a></li><li><a href="data--temperature-units.html"><span class="dot info"></span>Water temperature switches units</a></li><li><a href="data--methods.html"><span class="dot info"></span>Sources and methods</a></li><li><a href="data--references.html"><span class="dot info"></span>References</a></li><li><a href="data--downloads.html"><span class="dot info"></span>Downloads</a></li></ul>
     </details>
     <a class="sheet-top" href="about.html">About</a>
   </nav>
@@ -137,6 +137,11 @@
     <div class="related"><h3>Related</h3><ul>
 <li><a href="chapter--trend-tests.html">Trend tests</a> <span class="meta">— whether the shift is statistically clear</span></li><li><a href="chapter--expected.html">Compared with what its setting predicts</a> <span class="meta">— whether season, weather or team explain it</span></li>    </ul></div>
 
+    <section class="sources" aria-label="Sources">
+      <h2>Sources</h2>
+      <ol><li>Izaak Walton League of America. Clean Water Hub: Save Our Streams biological, chemical, Salt Watch and Nitrate Watch surveys. Snapshot downloaded through the Hub&#39;s public API. <a href="https://www.cleanwaterhub.org/" target="_blank" rel="noopener">www.cleanwaterhub.org/</a></li><li>Izaak Walton League of America. Save Our Streams stream monitoring: biological survey method, macroinvertebrate identification and stream health score. <a href="https://www.iwla.org/save-our-streams" target="_blank" rel="noopener">www.iwla.org/save-our-streams</a></li><li>Barbour, M.T., Gerritsen, J., Snyder, B.D. and Stribling, J.B. (1999). Rapid Bioassessment Protocols for Use in Streams and Wadeable Rivers: Periphyton, Benthic Macroinvertebrates and Fish, 2nd edition. EPA 841-B-99-002. U.S. Environmental Protection Agency. <a href="https://www.epa.gov/sites/default/files/2019-02/documents/rapid-bioassessment-streams-rivers-1999.pdf" target="_blank" rel="noopener">www.epa.gov/sites/default/files/2019-02/documents/rapid-bioassessment-streams-rivers-1999.pdf</a></li></ol>
+      <p class="meta">All sources: <a href="data--references.html">References</a>. Code and every query behind these numbers: <a href="https://github.com/shankardba/iwla-river">github.com/shankardba/iwla-river</a>.</p>
+    </section>
     <nav class="pager" aria-label="More in Great Seneca Creek">
 <a href="chapter--score-trend.html"><span class="meta">← Previous</span>The score has held steady</a><a class="nx" href="chapter--trend-tests.html"><span class="meta">Next →</span>Trend tests</a>    </nav>
   </article>

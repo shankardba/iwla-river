@@ -373,3 +373,10 @@ ol.next { margin: 0; padding-left: 22px; display: flex; flex-direction: column; 
 .linklike { background: none; border: 0; padding: 0; font: inherit; font-weight: 600; color: var(--accent); cursor: pointer; text-align: left; }
 .linklike:hover { text-decoration: underline; }
 
+/* sources under each finding, and the References page */
+.sources { margin-top: 22px; border-top: 1px solid var(--rule); padding-top: 10px; }
+.sources h2 { font: 600 15px/1.4 var(--display); margin: 0 0 6px; }
+.sources ol, .reflist { padding-left: 22px; font-size: 14px; line-height: 1.5; }
+.sources li, .reflist li { margin: 4px 0; overflow-wrap: anywhere; }
+.reflist li .meta { display: block; }
+.reflist li:target { background: color-mix(in srgb, var(--heat) 12%, transparent); border-radius: 4px; }

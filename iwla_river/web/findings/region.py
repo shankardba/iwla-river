@@ -40,7 +40,7 @@ def neighbour_trends(db):
                       "color": color.get(r["verdict"], "grey"),
                       "tip": f"{r['site_name']} ({r['stream']}), {r['n']} surveys {year(r['first'])}–{year(r['last'])}: "
                              f"{r['slope_per_decade']:.1f} per decade, {pfmt(r['p'])}"} for r in rows]}
-    return Page(
+    return Page(refs=["cwh", "mann", "hirsch1982", "sen1968"], 
         headline=f"{imp} of {len(rows)} long-record sites within {C.NEIGHBOUR_KM} km show improving scores, the opposite of Site 1's direction.",
         status="good",
         numbers=[(f"{imp} of {len(rows)}", "neighbour sites improving"), (f"about {round(len(rows) * 0.1)}", "expected by chance alone")],
@@ -75,7 +75,7 @@ def nearby_sites(db):
             r["stream"] = ""
         r["site_name"] = name
     names = {"sos_bio": "SOS bio", "va_rocky": "VA rocky", "va_muddy": "VA muddy", "sos_chem": "SOS chem", "salt": "Salt", "nitrate": "Nitrate"}
-    return Page(
+    return Page(refs=["cwh"], 
         headline=f"{len(rows)} other Hub sites within 10 km have usable surveys, mostly salt and nitrate readings.",
         status="info",
         blocks=[text("Site names open in Google Maps. Sites with many surveys can show whether a change at Great Seneca Creek is local or shared across the area. "

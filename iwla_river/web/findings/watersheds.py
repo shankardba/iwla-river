@@ -62,7 +62,7 @@ def great_seneca(db):
     gv = lambda r: r["gap_verdict"] if r.get("gap_verdict") == r.get("gap_verdict") and r.get("gap_verdict") else "—"
     num = lambda v, f: "—" if v is None or v != v else f(v)
     up = next((r for r in rows[1:] if r["sens_obs"] == r["sens_obs"] and r["sens_obs"] is not None), None)
-    return Page(
+    return Page(refs=["cwh", "wbd", "mann", "hirsch1982", "sen1968"], 
         headline=(f"Great Seneca Creek's subwatershed finds {pct(me['sens_obs'])} sensitive groups against {pct(me['sens_exp'])} expected; "
                   f"its wider {LEVEL[up['digits']].lower()}, {up['name']}, finds {pct(up['sens_obs'])}.") if up and me["sens_obs"] == me["sens_obs"]
                  else f"Great Seneca Creek sits in subwatershed {huc}.",

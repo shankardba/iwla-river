@@ -39,7 +39,7 @@ def score_trend(db):
         "refs": [{"y": mE, "x0": f"{first}-01-01", "x1": "2012-12-31"}, {"y": mL, "x0": "2013-01-01", "x1": f"{last}-12-31"}],
         "notes": [{"text": f"No SOS survey in {', '.join(map(str, gaps))}"}] if gaps else [],
     }
-    return Page(
+    return Page(refs=["cwh", "sos", "mann", "hirsch1982", "sen1968"], 
         headline=f"Scores held near {mE:.1f} before 2013 and {mL:.1f} since; the overall score shows no trend.",
         status="steady",
         numbers=[(f"{mE:.1f} → {mL:.1f}", "mean SOS score, before and since 2013"),
@@ -89,7 +89,7 @@ def species_mix(db):
             "cols": periods, "colNotes": [f"{n_per[p]} surveys" for p in periods], "blocks": blocks_spec}
     plate = plates.community("mix", [{"taxon": k, "tolerance": v["tol"], "early": share(v, first), "late": share(v, last)}
                                      for k, v in taxa.items()], first, last)
-    return Page(
+    return Page(refs=["cwh", "sos", "barbour1999"], 
         headline=f"Between {first} and {last}, {drops[0]} and {drops[1]} became rarer while {rises[0]} and {rises[1]} became regulars.",
         status="watch",
         numbers=[(sh("damselflies"), "damselflies, share of surveys"), (sh("aquatic worms"), "aquatic worms, share of surveys")],
@@ -125,7 +125,7 @@ def trend_tests(db):
     turn = db.rows("SELECT split_before, p FROM turning_points WHERE site_id = 467") if db.has("turning_points") else []
     tn = (f"No sudden shift stands out at either site: the strongest candidate at Site 1, around {year(turn[0]['split_before'])}, "
           f"would arise by chance {round(100 * turn[0]['p'])}% of the time.") if turn else ""
-    return Page(
+    return Page(refs=["cwh", "mann", "hirsch1982", "sen1968", "good2005"], 
         headline=f"At Site 1 the share of pollution-sensitive groups is {ss.get('verdict')} ({pfmt(ss['p'])}) while the total score shows {s1.get('verdict')}.",
         status="concern" if ss.get("verdict") == "declining" else "steady",
         blocks=[
@@ -188,7 +188,7 @@ def expected(db):
     declining = s1.get("verdict") == "declining"
     firm = declining and s1["p"] < 0.05  # p from 0.05 to 0.1: a signal to watch, not a settled result
     widening = "is widening" if firm else "appears to be widening"
-    return Page(
+    return Page(refs=["cwh", "streamcat", "nlcd2019", "openmeteo", "era5", "friedman2001", "sklearn", "hirsch1982", "sen1968"], 
         headline=(f"Site 1 finds fewer pollution-sensitive animals than its setting predicts, and the gap {widening} "
                   f"({pfmt(s1['p'])}, about {abs(round(100 * s1['slope_per_decade']))} percentage points a decade).") if declining
                  else f"Site 1 shows {s1.get('verdict')} against what its setting predicts ({pfmt(s1.get('p', 1))}).",
@@ -248,7 +248,7 @@ def score_parts(db):
                          ORDER BY t.tolerance, t.taxon""")
     build_svg = plates.score_build("score", {"site": LABEL[467], "date": latest["date"], "groups": groups,
                                              "sens": latest["sens"], "less": latest["less"], "tol": latest["tol"], "total": latest["total"]})
-    return Page(
+    return Page(refs=["cwh", "sos", "barbour1999"], 
         headline=f"Pollution-sensitive animals drive the swings: they add {min(sens):.0f} to {max(sens):.0f} points per survey.",
         status="info",
         blocks=[text("The SOS score counts three points for each pollution-sensitive group found, two for each less-sensitive "
@@ -271,7 +271,7 @@ def season_effect(db):
             "x": {"min": 0, "max": 30, "ticks": [0, 10, 20, 30]},
             "groups": [{"label": n, "sub": f"{len(g)} surveys", "mean": means[n], "meanLabel": f"{means[n]:.1f}",
                         "values": [{"v": r["total"], "tip": f"{n} {r['date']}: {r['total']:.0f}"} for r in g]} for n, g in groups]}
-    return Page(
+    return Page(refs=["cwh", "sos"], 
         headline=f"Spring surveys average {diff:.1f} points more than summer ones, so trends must compare like seasons.",
         status="info",
         blocks=[chart(spec, "Spring = March to June, summer = July to September, fall = October to February."),
@@ -289,7 +289,7 @@ def survey_forms(db):
     cls = lambda c: "good" if (c or "").lower().startswith("accept") else "warn" if "gray" in (c or "").lower() else "bad"
     same = lambda r: next((x["total"] for x in sos if x["date"] == r["date"] and x["site_id"] == r["site_id"]), None)
     both = [r for r in va if same(r) is not None]
-    return Page(
+    return Page(refs=["cwh", "sos", "engel-voshell2002"], 
         headline=f"Since {year(va[0]['date'])} the chapter has also used the Virginia form, which the Hub's own site page does not chart.",
         status="info",
         blocks=[text("The Virginia Save Our Streams form scores 0 to 12 and rates a stream Acceptable (9 and up), Gray Zone (8) or "

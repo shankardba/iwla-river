@@ -33,7 +33,7 @@ def paving(db):
                       "color": "accent" if r["bin"] == ch_bin else "grey", "opacity": 1 if r["bin"] == ch_bin else 0.55,
                       "note": f"Great Seneca ({ci:.1f}%)" if r["bin"] == ch_bin else None,
                       "tip": f"{r['label']} paved: {pct(r['mean'])} sensitive, {fmt(r['surveys'])} surveys at {fmt(r['sites'])} sites"} for r in ib]}
-    return Page(
+    return Page(refs=["cwh", "streamcat", "nlcd2019", "paul-meyer2001", "walsh2005"], 
         headline=f"Nationally, sensitive animals fall from {pct(ib[0]['mean'])} of groups found in near-natural watersheds to {pct(ib[-1]['mean'])} where a quarter or more is paved.",
         status="info",
         numbers=[(f"{ci:.1f}%", "of the chapter's watershed paved or roofed (2019)") if ci is not None else ("—", ""),
@@ -62,7 +62,7 @@ def model(db):
     spec = {"type": "hbars", "title": f"{imp[0]['group']} carries most of the prediction",
             "rows": [{"label": r["group"], "value": r["r2_drop"], "valueLabel": f"{r['r2_drop']:.2f}",
                       "color": "accent" if i == 0 else "grey", "opacity": 1 if i == 0 else 0.6} for i, r in enumerate(imp)]}
-    return Page(
+    return Page(refs=["cwh", "streamcat", "nlcd2019", "openmeteo", "era5", "friedman2001", "sklearn", "breiman2001"], 
         headline=f"Trained on {fmt(ms['surveys'])} surveys at {fmt(ms['sites'])} sites, it explains {round(100 * ms['r2'])}% of the variation at sites it never saw.",
         status="info",
         numbers=[(f"{ms['r2']:.2f}", "held-out R², sensitive share"), (f"{max(0, ms['baseline_r2']):.2f}", "season and form alone")],
@@ -106,7 +106,7 @@ def monitoring_growth(db):
                       for i, p in enumerate(protos)]} for y in years]}
     bio = db.one("SELECT count(*) FROM usable_surveys WHERE protocol IN ('sos_bio', 'va_rocky', 'va_muddy')")
     total = db.one("SELECT count(*) FROM usable_surveys")
-    return Page(
+    return Page(refs=["cwh"], 
         headline=f"The Hub holds {fmt(total)} usable surveys; {fmt(bio)} are biological, enough to train a national model.",
         status="info",
         blocks=[chart(spec, "Usable surveys per year, all Hub sites, by survey form (2000 on)."),
