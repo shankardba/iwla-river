@@ -1,6 +1,9 @@
 """Every finding cites its sources, and every cited key exists."""
 
-from iwla_river.web import findings  # noqa: F401  (registers the findings)
+import importlib
+import pkgutil
+
+from iwla_river.web import findings
 from iwla_river.web.refs import REFS, link
 from iwla_river.web.registry import FINDINGS
 
@@ -14,6 +17,9 @@ def test_every_ref_has_a_link_and_text():
 
 def test_every_finding_cites_known_sources():
     import inspect
+    for m in pkgutil.iter_modules(findings.__path__):
+        importlib.import_module(f"{findings.__name__}.{m.name}")
+    assert len(FINDINGS) > 20
     for f in FINDINGS:
         src = inspect.getsource(f.fn)
         if f.id == "references":

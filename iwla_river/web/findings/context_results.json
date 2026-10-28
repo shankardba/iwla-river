@@ -1,0 +1,304 @@
+{
+ "generated": "2026-10-28",
+ "inputs": {
+  "clean_water_hub_snapshot": "2026-10-27",
+  "streams_dataset": "2026-10-28"
+ },
+ "chloride_validation": {
+  "salt": {
+   "pairs": 3887,
+   "sites": 2209,
+   "watersheds": 274,
+   "log_r": 0.47,
+   "log_r_ci": [
+    0.365,
+    0.587
+   ],
+   "rho": 0.472,
+   "median_ratio": 1.044,
+   "within_factor_2": 0.584,
+   "winter_pairs": 2633,
+   "winter_vol_median": 97.0,
+   "winter_agency_median": 80.4,
+   "winter_wilcoxon_p": 1.1e-15
+  },
+  "sos_chem": {
+   "pairs": 4845,
+   "sites": 377,
+   "watersheds": 87,
+   "log_r": 0.702,
+   "log_r_ci": [
+    0.584,
+    0.791
+   ],
+   "rho": 0.775,
+   "median_ratio": 1.0,
+   "within_factor_2": 0.864,
+   "winter_pairs": 1078,
+   "winter_vol_median": 91.0,
+   "winter_agency_median": 103.5,
+   "winter_wilcoxon_p": 0.074
+  }
+ },
+ "chloride_trend": {
+  "readings": 39690,
+  "sites": 3050,
+  "months": 188,
+  "first": "2002-05",
+  "last": "2026-10",
+  "zero_readings": 2138,
+  "implausible_readings": 1,
+  "max_reading": 534545.0,
+  "sk_p": 0.1,
+  "sk_z": -1.622,
+  "pct_per_year": -0.1,
+  "pct_per_decade": -1.0,
+  "shift_at": "2015-10",
+  "shift_p": 0.002,
+  "shift_change_pct": -8.9,
+  "site_tests": 396,
+  "sites_rising_q05": 69,
+  "sites_falling_q05": 12,
+  "site_median_pct_per_year": null,
+  "rising_median_pct_per_year": 6.3
+ },
+ "development_vs_salt": {
+  "watershed_years": 401,
+  "watersheds": 140,
+  "between_imperv_coef": -0.05,
+  "between_imperv_p": 1.1e-11,
+  "between_salt_coef": 0.027,
+  "between_salt_p": 0.71,
+  "salt_alone_coef": -0.369,
+  "salt_alone_p": 9.3e-09,
+  "corr_imperv_salt": 0.661,
+  "within_watersheds": 78,
+  "within_rows": 339,
+  "within_salt_coef": -0.089,
+  "within_salt_se": 0.076,
+  "within_salt_p": 0.25
+ },
+ "impaired_biology": {
+  "sos": {
+   "impaired_sites": 46,
+   "other_sites": 242,
+   "impaired_median": 14.5,
+   "other_median": 15.75,
+   "p": 0.93
+  },
+  "va": {
+   "impaired_sites": 571,
+   "other_sites": 287,
+   "impaired_median": 8.0,
+   "other_median": 10.0,
+   "p": 5.7e-20
+  },
+  "mbss_MD": {
+   "impaired_sites": 58,
+   "other_sites": 1481,
+   "impaired_median": 2.12,
+   "other_median": 3.0,
+   "p": 0.0001
+  },
+  "nrsa_VA": {
+   "impaired_sites": 15,
+   "other_sites": 25,
+   "impaired_median": 35.15,
+   "other_median": 59.47,
+   "p": 0.024
+  }
+ },
+ "volunteer_vs_professional": {
+  "sos_bio|mbss|same watershed": {
+   "pairs": 63,
+   "rho": 0.223,
+   "rho_p": 0.078,
+   "same_class": 0.32,
+   "kappa_w": 0.07,
+   "vol_good": 35,
+   "vol_good_pro_fair_or_poor": 20,
+   "vol_higher": 31,
+   "vol_lower": 12,
+   "sites": 21
+  },
+  "va_rocky|mbss|same watershed": {
+   "pairs": 143,
+   "rho": 0.154,
+   "rho_p": 0.066,
+   "same_class": 0.43,
+   "kappa_w": 0.05,
+   "vol_good": 44,
+   "vol_good_pro_fair_or_poor": 37,
+   "vol_higher": 55,
+   "vol_lower": 26,
+   "sites": 33
+  },
+  "va_rocky|mbss|within 1 km": {
+   "pairs": 18,
+   "rho": 0.713,
+   "rho_p": 0.0009,
+   "same_class": 0.67,
+   "kappa_w": 0.5,
+   "vol_good": 7,
+   "vol_good_pro_fair_or_poor": 1,
+   "vol_higher": 3,
+   "vol_lower": 3,
+   "sites": 7
+  },
+  "sos_bio|nrsa|same watershed": {
+   "pairs": 17,
+   "rho": -0.004,
+   "rho_p": 0.99,
+   "same_class": 0.41,
+   "kappa_w": 0.09,
+   "vol_good": 6,
+   "vol_good_pro_fair_or_poor": 4,
+   "vol_higher": 7,
+   "vol_lower": 3,
+   "sites": 13
+  },
+  "va_rocky|nrsa|same watershed": {
+   "pairs": 54,
+   "rho": 0.458,
+   "rho_p": 0.00049,
+   "same_class": 0.51,
+   "kappa_w": 0.34,
+   "vol_good": 27,
+   "vol_good_pro_fair_or_poor": 11,
+   "vol_higher": 17,
+   "vol_lower": 9,
+   "sites": 33
+  },
+  "stream_waders|mbss|within 1 km": {
+   "pairs": 1680,
+   "rho": 0.556,
+   "rho_p": 3.6e-137,
+   "same_class": 0.5,
+   "kappa_w": 0.36,
+   "vol_good": 422,
+   "vol_good_pro_fair_or_poor": 149,
+   "vol_higher": 247,
+   "vol_lower": 590
+  }
+ },
+ "monitoring_gaps": {
+  "watersheds": 22697,
+  "basins": null,
+  "with_active_bug_site": 278,
+  "high_need": 1093,
+  "high_need_unmonitored": 1039,
+  "high_need_unmonitored_within_25km": 135,
+  "coverage_by_need": {
+   "0\u20131": [
+    14615,
+    91
+   ],
+   "2\u20133": [
+    5716,
+    93
+   ],
+   "4\u20135": [
+    1928,
+    71
+   ],
+   "6\u20139": [
+    438,
+    23
+   ]
+  },
+  "income_monitored_high_need": 108189.0,
+  "income_unmonitored_high_need": 92081.0,
+  "income_p": 0.02,
+  "income_near_monitored": 108189.0,
+  "income_near_unmonitored": 96379.0,
+  "income_near_p": 0.081,
+  "top_recruitable": [
+   [
+    "Pennsauken Creek",
+    "PA",
+    18.0,
+    8
+   ],
+   [
+    "Rancocas Creek",
+    "PA",
+    18.0,
+    8
+   ],
+   [
+    "Saint Anthony Falls-Mississippi River",
+    "MN",
+    24.0,
+    8
+   ],
+   [
+    "Black Dog Lake-Minnesota River",
+    "MN",
+    8.0,
+    7
+   ],
+   [
+    "Willow Creek-Little Calumet River",
+    "IN",
+    10.0,
+    7
+   ],
+   [
+    "Little Eagle Creek",
+    "IN",
+    12.0,
+    7
+   ],
+   [
+    "Wiley Thompson Ditch-White Lick Creek",
+    "IN",
+    13.0,
+    7
+   ],
+   [
+    "Sulphur Spring Run-Opequon Creek",
+    "VA",
+    16.0,
+    7
+   ],
+   [
+    "Plum Creek-Hart Ditch",
+    "IL",
+    17.0,
+    7
+   ],
+   [
+    "Headwaters East Fork White Lick Creek",
+    "IN",
+    18.0,
+    7
+   ]
+  ]
+ },
+ "restoration": {
+  "real": {
+   "projects": 58,
+   "did_mean": 0.4,
+   "did_ci": [
+    0.18,
+    0.613
+   ],
+   "treated_change": 0.37,
+   "control_change": -0.04,
+   "treated_start": 5.28,
+   "control_start": 9.19
+  },
+  "placebo": {
+   "projects": 38,
+   "did_mean": 0.5,
+   "did_ci": [
+    0.294,
+    0.724
+   ],
+   "treated_change": 0.49,
+   "control_change": -0.01,
+   "treated_start": 4.69,
+   "control_start": 9.25
+  }
+ }
+}

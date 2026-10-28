@@ -244,6 +244,163 @@
    "numbers": []
   },
   {
+   "section": "context",
+   "id": "chloride-check",
+   "title": "Volunteer chloride tracks agency lab chloride",
+   "url": "context--chloride-check.html",
+   "key": true,
+   "headline": "Where a state or federal agency measured chloride in the same small watershed within a week, volunteer SOS chemistry readings agree closely (correlation 0.70; 86% within a factor of two); Salt Watch strips agree more loosely (0.47).",
+   "status": "good",
+   "numbers": [
+    {
+     "value": "0.70",
+     "label": "SOS chemistry vs agency lab (log scale)"
+    },
+    {
+     "value": "0.47",
+     "label": "Salt Watch strip vs agency lab"
+    },
+    {
+     "value": "8,732",
+     "label": "matched readings"
+    }
+   ]
+  },
+  {
+   "section": "context",
+   "id": "chloride-sites",
+   "title": "Chloride is rising at more sites than it is falling",
+   "url": "context--chloride-sites.html",
+   "key": true,
+   "headline": "Of 396 sites with at least eight chloride readings over four or more years, 69 show a rising trend and 12 a falling one after correcting for testing many sites at once.",
+   "status": "watch",
+   "numbers": [
+    {
+     "value": "69",
+     "label": "sites rising"
+    },
+    {
+     "value": "12",
+     "label": "sites falling"
+    },
+    {
+     "value": "+6%",
+     "label": "a year, median at rising sites"
+    }
+   ]
+  },
+  {
+   "section": "context",
+   "id": "development-salt",
+   "title": "Paved land, more than winter salt, tracks low bug scores",
+   "url": "context--development-salt.html",
+   "key": true,
+   "headline": "Across 140 watersheds, saltier winters go with lower spring bug scores, but that link disappears once paved area is accounted for; paving remains a strong predictor (p < 0.001).",
+   "status": "info",
+   "numbers": [
+    {
+     "value": "0.66",
+     "label": "correlation of paving with winter salt"
+    },
+    {
+     "value": "-0.5",
+     "label": "SD of score per 10 points of paving"
+    },
+    {
+     "value": "401",
+     "label": "watershed-years"
+    }
+   ]
+  },
+  {
+   "section": "context",
+   "id": "impaired-biology",
+   "title": "State impairment listings match the bug surveys",
+   "url": "context--impaired-biology.html",
+   "key": false,
+   "headline": "Volunteer sites in watersheds the state lists as impaired for aquatic life score lower (8 vs 10 on the Virginia SOS scale), and professional surveys show the same gap.",
+   "status": "info",
+   "numbers": [
+    {
+     "value": "8 vs 10",
+     "label": "Virginia SOS median, listed vs not"
+    },
+    {
+     "value": "571",
+     "label": "volunteer sites in listed watersheds"
+    }
+   ]
+  },
+  {
+   "section": "context",
+   "id": "volunteers-vs-professionals",
+   "title": "Volunteers and professionals mostly agree, but volunteers rate generously",
+   "url": "context--volunteers-vs-professionals.html",
+   "key": true,
+   "headline": "Where a Virginia SOS survey sits within 1 km of a Maryland state survey, the two agree on condition 67% of the time (weighted kappa 0.50), as well as Maryland's own trained volunteers do; volunteers more often call a stream healthier than the professionals.",
+   "status": "info",
+   "numbers": [
+    {
+     "value": "0.71",
+     "label": "rank correlation, Virginia SOS vs MBSS within 1 km"
+    },
+    {
+     "value": "0.56",
+     "label": "Stream Waders vs MBSS (benchmark)"
+    },
+    {
+     "value": "11 of 27",
+     "label": "volunteer 'Good' rated Fair or Poor by EPA NRSA"
+    }
+   ]
+  },
+  {
+   "section": "context",
+   "id": "monitoring-gaps",
+   "title": "Most high-need watersheds have no volunteer monitor",
+   "url": "context--monitoring-gaps.html",
+   "key": true,
+   "headline": "Of 1,093 watersheds with five or more pressures, 1,039 have no active volunteer bug site; 135 of those are within 25 km of one.",
+   "status": "concern",
+   "numbers": [
+    {
+     "value": "278",
+     "label": "of 22,697 watersheds with an active bug site"
+    },
+    {
+     "value": "1,039",
+     "label": "high-need watersheds unmonitored"
+    },
+    {
+     "value": "135",
+     "label": "of them within 25 km of a volunteer"
+    }
+   ]
+  },
+  {
+   "section": "context",
+   "id": "restoration",
+   "title": "Stream restoration: no gain beyond what a placebo shows",
+   "url": "context--restoration.html",
+   "key": false,
+   "headline": "Virginia SOS scores near completed stream restorations rise +0.40 points more than at comparison sites, but a fake completion date five years earlier shows a rise just as large (+0.50).",
+   "status": "info",
+   "numbers": [
+    {
+     "value": "+0.40",
+     "label": "gain vs comparison sites"
+    },
+    {
+     "value": "+0.50",
+     "label": "same test with a fake date"
+    },
+    {
+     "value": "5.3 vs 9.2",
+     "label": "starting scores, restored vs comparison"
+    }
+   ]
+  },
+  {
    "section": "data",
    "id": "data-quality",
    "title": "How clean the data is",
@@ -288,7 +445,7 @@
    "title": "References",
    "url": "data--references.html",
    "key": false,
-   "headline": "Every number on this site traces to 25 data sources, 18 published methods and 8 studies that explain what the readings mean.",
+   "headline": "Every number on this site traces to 26 data sources, 21 published methods and 8 studies that explain what the readings mean.",
    "status": "info",
    "numbers": []
   },

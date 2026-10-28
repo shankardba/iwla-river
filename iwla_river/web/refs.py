@@ -112,7 +112,21 @@ REFS: dict[str, dict] = {
                              "nitrate maximum contaminant level 10 mg/L as nitrogen.",
                         url="https://www.epa.gov/ground-water-and-drinking-water/national-primary-drinking-water-regulations"),
 
+    "va-deq-partners": dict(kind="data", short="Virginia DEQ, monitoring partners",
+                            full="Virginia Department of Environmental Quality. Monitoring Partner Resources: volunteer and partner "
+                                 "data solicited for potential use in the state's water quality assessment process (data levels I–III).",
+                            url="https://www.deq.virginia.gov/water/water-quality/monitoring/monitoring-partner-resources"),
+
     # ---- methods ----
+    "wilcoxon1945": dict(kind="method", short="Wilcoxon 1945",
+                         full="Wilcoxon, F. (1945). Individual comparisons by ranking methods. Biometrics Bulletin 1(6): 80–83.",
+                         doi="10.2307/3001968"),
+    "white1980": dict(kind="method", short="White 1980 (robust standard errors)",
+                      full="White, H. (1980). A heteroskedasticity-consistent covariance matrix estimator and a direct test for "
+                           "heteroskedasticity. Econometrica 48(4): 817–838.", doi="10.2307/1912934"),
+    "cameron-miller2015": dict(kind="method", short="Cameron and Miller 2015 (clustered errors)",
+                               full="Cameron, A.C. and Miller, D.L. (2015). A practitioner's guide to cluster-robust inference. "
+                                    "Journal of Human Resources 50(2): 317–372.", doi="10.3368/jhr.50.2.317"),
     "mann": dict(kind="method", short="Mann 1945",
                  full="Mann, H.B. (1945). Nonparametric tests against trend. Econometrica 13(3): 245–259.", doi="10.2307/1907187"),
     "hirsch1982": dict(kind="method", short="Hirsch, Slack and Smith 1982",

@@ -90,6 +90,8 @@ downstream, marks each source, lists them in the panel, finds them in search, an
 
 ## The findings site
 
+`python -m iwla_river.context` recomputes the "In context" findings (volunteer data checked against USGS, EPA, state and Census data) from `data/river.duckdb` and DataLab's joined `streams` dataset (`DATALAB_STREAMS`), and writes the aggregate results to `iwla_river/web/findings/context_results.json`, which is committed so the site rebuilds without DataLab. Every finding cites its sources from `iwla_river/web/refs.py` (DOIs checked against Crossref/DataCite); the build fails on an unknown key.
+
 `python -m iwla_river.site` builds the site into `docs/`, served by GitHub Pages at https://shankardba.github.io/iwla-river/. It is organised as a tool, with a top menu (a full-screen sheet on phones):
 
 | Menu | Page | What it is |
