@@ -80,6 +80,17 @@
   const KCOL = { bio: "var(--k-bio)", salt: "var(--k-salt)", no3: "var(--k-no3)", chem: "var(--k-chem)" };
   const cellCol = c => kind !== "all" ? KCOL[kind] : KCOL[["bio", "salt", "no3", "chem"][[c[2], c[3], c[4], c[5]].reduce((b, v, i, a) => v > a[b] ? i : b, 0)]];
   const siteCol = t => kind !== "all" ? KCOL[kind] : KCOL[["bio", "salt", "no3", "chem"][[t[4], t[7] || 0, t[8] || 0, t[9] || 0].reduce((b, v, i, a) => v > a[b] ? i : b, 0)]];
+  // Sample bubbles: one per cell or site at its samples' average position; area grows with the count, so
+  // dense places read as big overlapping blobs and lone sites as small dots. Biggest drawn first.
+  function bubbles(items, rmax, X, Y) {
+    const mx = Math.max(...items.map(h => h.n));
+    return `<g class="ex-heat">` + items.slice().sort((a, b) => b.n - a.n).map(h => {
+      const x = X(h.q), y = Y(h.q);
+      if (x < -20 || x > W + 20 || y < -20 || y > H + 20) return "";
+      const r = Math.max(2, rmax * Math.sqrt(h.n / mx));
+      return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r.toFixed(1)}" fill="${h.col}" fill-opacity=".5" stroke="${h.col}" stroke-opacity=".75" stroke-width=".6"/>`;
+    }).join("") + `</g>`;
+  }
   const kindKey = () => (kind === "all" ? ["bio", "salt", "no3", "chem"] : [kind]).map(k => `<span><i class="dot" style="background:${KCOL[k]}"></i>${KINDS.find(x => x[0] === k)[1].toLowerCase()}</span>`).join("");
   const kindWord = () => kind === "all" ? "samples" : `${KINDS.find(k => k[0] === kind)[1].toLowerCase()} samples`;
 
@@ -215,18 +226,7 @@
       labels.push({ x: X(q), y: Y(q) + r + 10, area: r * r * 3, n: x.n || x.c });
     });
     if (shape(code)) s += `<path class="ex-parent${isSites ? " fill" : ""}" d="${pathOf(shape(code))}" fill-rule="evenodd"/>`;
-    if (heat.length) {
-      const mx = Math.log(1 + Math.max(...heat.map(h => h.n)));
-      const cellPx = code.length < 4 ? Math.max(1.6, Math.abs(X(albers(38, -96.25)) - X(albers(38, -96))) * 0.3) : 0;
-      s += `<g class="ex-heat">`;
-      heat.forEach(h => {
-        const x = X(h.q), y = Y(h.q);
-        if (x < -10 || x > W + 10 || y < -10 || y > H + 10) return;
-        const f = Math.log(1 + h.n) / mx;
-        s += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(cellPx ? cellPx * (0.7 + 0.5 * f) : 1.4 + 1.8 * f).toFixed(1)}" fill="${h.col}" fill-opacity="${(0.45 + 0.5 * f).toFixed(2)}"/>`;
-      });
-      s += `</g>`;
-    }
+    if (heat.length) s += bubbles(heat, code.length < 4 ? 24 : 14, X, Y);
     // rivers, drawn in the direction they flow, with water moving along them; a spring marks each source in view
     const rv = riversIn(code).slice(0, code === "" ? 60 : code.length <= 6 ? 30 : 40);
     if (rv.length) {
@@ -467,13 +467,10 @@
       const c = centre(SGEO[k].r);
       if (c.p) labels.push({ x: c.p[0], y: c.p[1], area: c.area, n: abbr ? SGEO[k].n : k, here });
     });
-    // Heat: 25 km cells for the country; 5 km cells inside a state.
-    const step = abbr ? 0.05 : 0.25;
+    // Sample bubbles: 25 km cells for the country, 5 km cells inside a state.
     const cells = (abbr ? SHEAT[abbr] || [] : HEAT).filter(c => cellN(c, kind) > 0 && c[0] > 24 && c[0] < 50 && c[1] > -125 && c[1] < -66);
     if (cells.length) {
-      const mx = Math.log(1 + Math.max(...cells.map(c => cellN(c, kind))));
-      const r = Math.max(1, Math.abs(X(albers(38, -96 - step)) - X(albers(38, -96))) * 0.3);
-      s += `<g class="ex-heat">` + cells.map(c => { const q = albers(c[0], c[1]), f = Math.log(1 + cellN(c, kind)) / mx; return `<circle cx="${X(q).toFixed(1)}" cy="${Y(q).toFixed(1)}" r="${(r * (0.7 + 0.5 * f)).toFixed(1)}" fill="${cellCol(c)}" fill-opacity="${(0.45 + 0.5 * f).toFixed(2)}"/>`; }).join("") + `</g>`;
+      s += bubbles(cells.map(c => ({ q: albers(c[0], c[1]), n: cellN(c, kind), col: cellCol(c) })), abbr ? 16 : 24, X, Y);
     }
     s += "</g>";
     const boxes = [], free = (bx, by, bw, bh) => !boxes.some(b => bx < b[0] + b[2] && bx + bw > b[0] && by < b[1] + b[3] && by + bh > b[1]);

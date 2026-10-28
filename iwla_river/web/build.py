@@ -87,14 +87,15 @@ def write_watershed_data(db: DB, out: Path) -> None:
     top[""] = pack({"code": "", "name": "United States", "sites": us["sites"], "bio_surveys": bio, **nat}) | \
         {"so": round(so["so"], 3), "se": round(so["se"], 3), "g": round(so["g"], 3)}
     (out / "data" / "huc4").mkdir(parents=True, exist_ok=True)
-    # Heat cells of a quarter degree (about 25 km) by sample type: aggregated, so no single site is located by them.
+    # Heat cells of a quarter degree (about 25 km) by sample type, each placed at its samples' average position
+    # rounded to 0.01 degree (no finer than public_site), so the map shows where samples are, not a grid.
     heat = db.rows("""
-        SELECT round(lat * 4) / 4 AS la, round(lon * 4) / 4 AS lo,
+        SELECT round(avg(lat), 2) AS la, round(avg(lon), 2) AS lo,
                count(*) FILTER (WHERE protocol IN ('sos_bio', 'va_rocky', 'va_muddy')) AS bio,
                count(*) FILTER (WHERE protocol = 'salt') AS salt,
                count(*) FILTER (WHERE protocol = 'nitrate') AS no3,
                count(*) FILTER (WHERE protocol = 'sos_chem') AS chem
-        FROM usable_surveys WHERE lat IS NOT NULL AND lon IS NOT NULL GROUP BY 1, 2""")
+        FROM usable_surveys WHERE lat IS NOT NULL AND lon IS NOT NULL GROUP BY round(lat * 4), round(lon * 4)""")
     heat = [[r["la"], r["lo"], r["bio"], r["salt"], r["no3"], r["chem"]] for r in heat]
     # States: the same measures per state, plus the subbasins with sites in each (to step into watersheds).
     st = {}
@@ -112,11 +113,12 @@ def write_watershed_data(db: DB, out: Path) -> None:
             shutil.rmtree(hd)
         hd.mkdir(parents=True)
         cells = db.rows("""
-            SELECT s.state, round(u.lat * 20) / 20 AS la, round(u.lon * 20) / 20 AS lo,
+            SELECT s.state, round(avg(u.lat), 2) AS la, round(avg(u.lon), 2) AS lo,
                    count(*) FILTER (WHERE u.protocol IN ('sos_bio', 'va_rocky', 'va_muddy')) AS bio,
                    count(*) FILTER (WHERE u.protocol = 'salt') AS salt, count(*) FILTER (WHERE u.protocol = 'nitrate') AS no3,
                    count(*) FILTER (WHERE u.protocol = 'sos_chem') AS chem
-            FROM usable_surveys u JOIN site_state s USING (site_id) WHERE s.state <> '' GROUP BY ALL""")
+            FROM usable_surveys u JOIN site_state s USING (site_id) WHERE s.state <> ''
+            GROUP BY s.state, round(u.lat * 20), round(u.lon * 20)""")
         by_state = {}
         for r in cells:
             by_state.setdefault(r["state"], []).append([round(r["la"], 2), round(r["lo"], 2), r["bio"], r["salt"], r["no3"], r["chem"]])
