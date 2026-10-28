@@ -246,6 +246,25 @@ def write_rivers(out: Path) -> list:
         pack.setdefault(d["huc8"][:4], {})[d["huc8"]] = rows
     for h, v in pack.items():
         (rdir / f"{h}.json").write_text(json.dumps(v, separators=(",", ":")))
+    nat = C.DATA / "cache" / "rivers_national.json"
+    if nat.exists():
+        rows = [{"n": r["name"], "k": "river", "L": r["len_km"], "Li": r["len_km"], "s": r["source"], "se": r["source_elev_m"], "si": True,
+                 "m": r["mouth"], "me": r["mouth_elev_m"], "f": r["flows_into"], "t": r["tidal"], "fb": r["formed_by"], "u": r["u"], "p": r["paths"]}
+                for r in json.loads(nat.read_text())["rivers"]]
+        # Country view: the longest rivers, coarsely; each region: its own major rivers.
+        def coarse(r, nd, step):
+            pts = [[[round(x, nd), round(y, nd)] for x, y in path[::step] + [path[-1]]] for path in r["p"]]
+            return {**r, "p": [q for q in pts if len(q) > 1]}
+        (rdir / "national.json").write_text(json.dumps([coarse(r, 2, 3) for r in rows if r["L"] >= 250], separators=(",", ":")))
+        regions = {}
+        for r in rows:
+            for k in r["u"]:
+                if len(k) == 2:
+                    regions.setdefault(k, []).append(coarse(r, 3, 1))
+        for k, v in regions.items():
+            (rdir / f"n{k}.json").write_text(json.dumps(v, separators=(",", ":")))
+        known = {s[0] for s in search}
+        search += [[r["n"], max(r["u"], key=lambda k: (len(k) == 6, r["u"][k])) if r["u"] else "", -1] for r in rows if r["n"] not in known and r["u"]]
     return search
 
 

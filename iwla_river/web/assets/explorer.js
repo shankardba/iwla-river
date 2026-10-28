@@ -93,12 +93,19 @@
   // se source elevation m, si source inside the subbasin, m mouth, me mouth elevation, f flows into, t reaches tidal water,
   // fb the two rivers that meet to form it, u {huc10/huc12: km}, p paths in the direction of flow}. From OpenStreetMap.
   const RIV = {}; let hiRiver = null;
+  const NAT = {};   // major rivers: "" = the longest in the lower 48; "<region>" = a region's major rivers (for regions down to basins)
   async function ensureRivers(code) {
+    const nk = code.slice(0, 2);
+    if (code.length <= 6 && !NAT[nk]) NAT[nk] = await fetch(nk ? `data/rivers/n${nk}.json` : "data/rivers/national.json").then(r => r.ok ? r.json() : []).catch(() => []);
     if (code.length < 4 || RIV[huc4(code)]) return;
     RIV[huc4(code)] = await fetch(`data/rivers/${huc4(code)}.json`).then(r => r.ok ? r.json() : {}).catch(() => ({}));
   }
   function riversIn(code) {
-    if (code.length < 4) return [];
+    if (code.length <= 6) {
+      // Major rivers by km through this unit (the whole country at the top).
+      return (NAT[code.slice(0, 2)] || []).map(r => ({ ...r, key: r.n + "|" + (r.s || []).join(","), here: code ? (r.u[code] || 0) : r.L }))
+        .filter(r => r.here >= (code.length <= 2 ? 25 : 8) || r.n === hiRiver).sort((a, b) => b.here - a.here);
+    }
     const pack = RIV[huc4(code)] || {}, out = [], seen = new Set();
     Object.entries(pack).forEach(([h8, list]) => {
       if (!h8.startsWith(code) && !(code.length > 8 && code.startsWith(h8))) return;
@@ -200,15 +207,16 @@
       s += `</g>`;
     }
     // rivers, drawn in the direction they flow, with water moving along them; a spring marks each source in view
-    const rv = riversIn(code).slice(0, code.length <= 6 ? 14 : 40);
+    const rv = riversIn(code).slice(0, code === "" ? 60 : code.length <= 6 ? 30 : 40);
     if (rv.length) {
       const line = pts => { let d = "", last = null; pts.forEach(([lo, la]) => { const q = albers(la, lo), x = X(q), y = Y(q); if (last && Math.abs(x - last[0]) + Math.abs(y - last[1]) < 1) return; d += `${d ? "L" : "M"}${x.toFixed(1)} ${y.toFixed(1)}`; last = [x, y]; }); return d; };
       const top = Math.max(...rv.map(r => r.L));
-      s += `<g class="ex-rivers">`;
+      const clip = shape(code) ? `<clipPath id="exriv"><path d="${pathOf(shape(code))}"/></clipPath>` : "";
+      s += `${clip}<g class="ex-rivers"${clip ? ' clip-path="url(#exriv)"' : ""}>`;
       rv.forEach(r => {
         const d = r.p.map(line).filter(x => x.includes("L")).join("");
         if (!d) return;
-        const wdt = (0.9 + 2.6 * Math.sqrt(r.L / top)).toFixed(1), hi = r.n === hiRiver;
+        const wdt = ((code.length <= 2 ? 0.5 : 0.9) + (code.length <= 2 ? 2 : 2.6) * Math.sqrt(r.L / top)).toFixed(1), hi = r.n === hiRiver;
         s += `<g class="ex-river${hi ? " hi" : ""}" data-river="${esc(r.n)}"><path d="${d}" stroke-width="${wdt}"/><path class="flow" d="${d}" stroke-width="${(wdt * 0.55).toFixed(1)}"/><path class="hit" d="${d}"><title>${esc(r.n)}: ${r.L.toFixed(0)} km long${num(r.se) ? `, rises at ${Math.round(r.se)} m` : ""}${r.t ? ", reaches tidal water" : r.f ? `, flows into ${esc(r.f)}` : ""}</title></path></g>`;
       });
       rv.filter(r => r.s && (code.length >= 8 || r.L >= 30)).forEach(r => {
@@ -338,7 +346,7 @@
 
   function riverRows(code) {
     const rv = riversIn(code);
-    if (!rv.length) return code.length >= 4 ? '<p class="meta">No river lines for this area yet (its state map is still downloading).</p>' : "";
+    if (!rv.length) return code.length >= 4 ? '<p class="meta">No named rivers mapped here yet.</p>' : "";
     const gm = p => p ? `<a class="maplink" href="${gmaps(p[1], p[0])}" target="_blank" rel="noopener">map ↗</a>` : "";
     const rises = r => r.fb && r.fb.length === 2 && !r.fb.some(n => /canal/i.test(n)) ? `where ${esc(r.fb[0])} and ${esc(r.fb[1])} meet` :
       num(r.se) ? `at ${Math.round(r.se)} m` : "";
@@ -610,7 +618,7 @@
         `${num(x.la) && cur ? `<a class="btn" href="${gmaps(x.la, x.lo)}" target="_blank" rel="noopener">Google Maps ↗</a>` : ""}</div>`;
       $(".ex-body").innerHTML = (cur === "" ? `<p class="ex-intro">Shaded areas are the water-resource regions of the lower 48, coloured by the measure you pick; orange dots show where volunteers take samples. Click a region to zoom in, or search for a watershed or stream<span class="kbd-hint"> (press <kbd>/</kbd>)</span>.</p>` : "") +
         cards(x, parent) + concept(cur, x) + `<h3 class="ex-h">${cur.length === 12 ? "Sites" : `${CHILD[cur.length][0].toUpperCase()}${CHILD[cur.length].slice(1)} inside`} <span class="meta">${cur.length === 12 ? "biological sites open their history" : "click a row to zoom in"}</span></h3>` +
-        kidTable(cur) + (cur.length >= 4 ? `<h3 class="ex-h">Rivers <span class="meta">from source to where each one ends; click to trace it</span></h3>` + riverRows(cur) : "") +
+        kidTable(cur) + (cur.length >= 0 ? `<h3 class="ex-h">${cur ? "Rivers" : "Major rivers"} <span class="meta">from source to where each one ends; click to trace it</span></h3>` + riverRows(cur) : "") +
         (cur ? measures(x, parent) : "");
     }
     $(".ex-panel").scrollTop = 0;

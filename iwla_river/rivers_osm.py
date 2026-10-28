@@ -61,10 +61,11 @@ class Maps:
                 continue
             self.files.append((p.stem, r, (h["min_lon_e7"] / 1e7, h["min_lat_e7"] / 1e7, h["max_lon_e7"] / 1e7, h["max_lat_e7"] / 1e7)))
         self.memo = {}
+        self.kinds = KINDS
 
     def lines(self, z, x, y):
         """Named water lines in one tile as (kind, name, [(lon, lat), ...]), clipped to the tile itself."""
-        key = (z, x, y)
+        key = (z, x, y, tuple(sorted(self.kinds)))
         if key in self.memo:
             return self.memo[key]
         lon0, lat1 = num2deg(x, y, z)
@@ -88,7 +89,7 @@ class Maps:
             ext = layer.get("extent", 4096)
             for ft in layer["features"]:
                 pr, g = ft["properties"], ft["geometry"]
-                if pr.get("kind") not in KINDS or not pr.get("name") or "LineString" not in g["type"]:
+                if pr.get("kind") not in self.kinds or not pr.get("name") or "LineString" not in g["type"]:
                     continue
                 parts = [g["coordinates"]] if g["type"] == "LineString" else g["coordinates"]
                 for part in parts:
@@ -255,8 +256,13 @@ def collect(maps, tiles):
     return [ln for t in sorted(tiles) for ln in maps.lines(*t)]
 
 
+USE_OPEN_METEO = True
+
+
 def elevations(points):
-    """Elevation in metres from Open-Meteo (Copernicus 90 m DEM), 100 points a call."""
+    """Elevation in metres from Open-Meteo (Copernicus 90 m DEM), 100 points a call. With --no-elev, None (filled later from terrain tiles)."""
+    if not USE_OPEN_METEO:
+        return [None] * len(points)
     out = []
     for i in range(0, len(points), 100):
         chunk = points[i:i + 100]
@@ -275,7 +281,7 @@ def elevations(points):
     return out
 
 
-def subbasin(maps, huc8, rings, z, units):
+def subbasin(maps, huc8, rings, z, units, follow=MAX_FOLLOW):
     """Every named river in one subbasin."""
     xs = [p[0] for r in rings for p in r]
     ys = [p[1] for r in rings for p in r]
@@ -303,7 +309,7 @@ def subbasin(maps, huc8, rings, z, units):
                         t = (z, tx + dx, ty + dy)
                         if t not in tiles:
                             frontier.add(t)
-        if not frontier or read > MAX_FOLLOW:
+        if not frontier or read > follow:
             break
         read += len(frontier)
         tiles |= frontier
@@ -343,8 +349,13 @@ def subbasin(maps, huc8, rings, z, units):
     for r in rivers:
         hs = [h for h in r["heads"] if el.get(h) is not None] or r["heads"]
         ts = [t for t in r["tails"] if el.get(t) is not None] or r["tails"]
-        src = max(hs, key=lambda p: el.get(p) or -1e9) if hs else None
-        mouth = min(ts, key=lambda p: el.get(p) if el.get(p) is not None else 1e9) if ts else None
+        if any(el.get(p) is not None for p in hs + ts):
+            src = max(hs, key=lambda p: el.get(p) or -1e9) if hs else None
+            mouth = min(ts, key=lambda p: el.get(p) if el.get(p) is not None else 1e9) if ts else None
+        else:
+            # No heights yet: the mouth is the open end farthest from every start, the source the start farthest from the mouth.
+            mouth = max(ts, key=lambda t: min((metres(t, h) for h in hs), default=0)) if ts else None
+            src = max(hs, key=lambda h: metres(h, mouth)) if hs and mouth else (hs[0] if hs else None)
         r["source"] = [round(src[0], 5), round(src[1], 5)] if src else None
         r["source_elev_m"] = el.get(src) if src else None
         r["mouth"] = [round(mouth[0], 5), round(mouth[1], 5)] if mouth else None
@@ -363,10 +374,10 @@ def subbasin(maps, huc8, rings, z, units):
             "tiles_read": len(tiles), "rivers": rivers}
 
 
-def run(only=None, z=12):
+def run(only=None, z=12, streams=False, redo=False, every=False):
     OUT.mkdir(parents=True, exist_ok=True)
     con = duckdb.connect(str(C.DB_PATH), read_only=True)
-    codes = [r[0] for r in con.execute("SELECT code FROM watershed_metrics WHERE digits = 8 AND bio_surveys > 0 ORDER BY code").fetchall()]
+    codes = [r[0] for r in con.execute("SELECT code FROM watershed_metrics WHERE digits = 8" + ("" if every else " AND bio_surveys > 0") + " ORDER BY bio_surveys DESC, code").fetchall()]
     con.close()
     if only:
         codes = [c for c in codes if c in only] or list(only)
@@ -381,7 +392,7 @@ def run(only=None, z=12):
     done = 0
     for code in codes:
         path = OUT / f"{code}.json"
-        if path.exists() and not only:
+        if path.exists() and not only and not (redo and "streams_zoom" not in json.loads(path.read_text())):
             continue
         rings = w8.get(code)
         if not rings:
@@ -390,6 +401,15 @@ def run(only=None, z=12):
         t0 = time.time()
         mine = [u for u in units if u[0].startswith(code)]
         res = subbasin(maps, code, rings, z, mine)
+        if streams:
+            # Small named creeks appear only at zoom 14; read them inside the subbasin (and a little beyond).
+            maps.kinds = {"stream"}
+            have = {r["name"] for r in res["rivers"]}
+            extra = subbasin(maps, code, rings, 14, mine, follow=250)["rivers"]
+            maps.kinds = KINDS
+            res["rivers"] += [r for r in extra if r["name"] not in have and r["len_in_km"] >= 0.5]
+            res["rivers"].sort(key=lambda r: -r["len_in_km"])
+            res["streams_zoom"] = 14
         if not res["rivers"]:
             print(code, "no rivers yet (its state map is not downloaded?)", flush=True)
             continue
@@ -400,9 +420,77 @@ def run(only=None, z=12):
     return done
 
 
+# ---------- national pass: the major rivers, for regions, subregions and basins ----------
+def national(z=9, min_km=40):
+    """Major named rivers of the lower 48 from zoom-9 tiles; km through each region, subregion and basin."""
+    t0 = time.time()
+    maps = Maps()
+    maps.kinds = {"river"}
+    tiles = tiles_over((-125, 24.3, -66.8, 49.5), z)
+    pieces = collect(maps, tiles)
+    print(f"{len(tiles)} tiles, {len(pieces)} pieces {time.time() - t0:.0f}s", flush=True)
+    units = []
+    for lvl in (2, 4, 6):
+        p = CACHE / f"wbd_{lvl}.json"
+        for code, rr in (json.loads(p.read_text()).items() if p.exists() else []):
+            xs = [q[0] for r in rr for q in r]
+            ys = [q[1] for r in rr for q in r]
+            units.append((code, rr, (min(xs), min(ys), max(xs), max(ys))))
+    rivers = []
+    for name, ids in components(pieces):
+        total = sum(length_km(pieces[i][2]) for i in ids)
+        if total < min_km:
+            continue
+        heads, tails = open_ends(pieces, ids)
+        u = defaultdict(float)
+        for i in ids:
+            pts = pieces[i][2]
+            for a, b in zip(pts, pts[1:]):
+                m = ((a[0] + b[0]) / 2, (a[1] + b[1]) / 2)
+                for code, rr, bx in units:
+                    if bx[0] <= m[0] <= bx[2] and bx[1] <= m[1] <= bx[3] and _inside(m[0], m[1], rr):
+                        u[code] += metres(a, b) / 1000
+        rivers.append({"name": name, "kind": "river", "len_km": round(total, 1), "len_in_km": round(total, 1), "heads": heads, "tails": tails,
+                       "u": {k: round(v, 1) for k, v in u.items() if v >= 1},
+                       "paths": [[[round(x, 3), round(y, 3)] for x, y in simplify(pieces[i][2], 0.003)] for i in ids]})
+    print(len(rivers), f"rivers of {min_km} km or more", flush=True)
+    ends = sorted({p for r in rivers for p in r["heads"] + r["tails"]})
+    el = dict(zip(ends, elevations(ends)))
+    joins = Grid(0.01)
+    for kind, name, pts in pieces:
+        for q in pts[:: max(1, len(pts) // 20)] + [pts[-1]]:
+            joins.add(q, name)
+    for r in rivers:
+        hs = [h for h in r["heads"] if el.get(h) is not None] or r["heads"]
+        ts = [t for t in r["tails"] if el.get(t) is not None] or r["tails"]
+        src = max(hs, key=lambda p: el.get(p) or -1e9) if hs else None
+        mouth = min(ts, key=lambda p: el.get(p) if el.get(p) is not None else 1e9) if ts else None
+        others = lambda p, m: sorted({n for n in joins.near(p, m) if n != r["name"]})
+        r.update({"source": [round(src[0], 4), round(src[1], 4)] if src else None, "source_elev_m": el.get(src) if src else None,
+                  "mouth": [round(mouth[0], 4), round(mouth[1], 4)] if mouth else None, "mouth_elev_m": el.get(mouth) if mouth else None,
+                  "source_in_unit": True, "mouth_in_unit": True})
+        r["tidal"] = bool(r["mouth_elev_m"] is not None and r["mouth_elev_m"] <= 2)
+        r["flows_into"] = None if r["tidal"] else ((others(mouth, 600) or [None])[0] if mouth else None)
+        r["formed_by"] = others(src, 600)[:2] if src else []
+        del r["heads"], r["tails"]
+    rivers.sort(key=lambda r: -r["len_km"])
+    (OUT.parent / "rivers_national.json").write_text(json.dumps({"zoom": z, "rivers": rivers}, separators=(",", ":")))
+    print("national rivers written", len(rivers), f"{time.time() - t0:.0f}s", flush=True)
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--only", nargs="*")
     ap.add_argument("--zoom", type=int, default=12)
+    ap.add_argument("--streams", action="store_true", help="also read small named streams at zoom 14")
+    ap.add_argument("--redo", action="store_true", help="with --streams: redo subbasins that have no streams yet")
+    ap.add_argument("--all", action="store_true", help="every subbasin with samples, not only those with biological surveys")
+    ap.add_argument("--national", action="store_true", help="the major rivers of the lower 48 (zoom 9)")
+    ap.add_argument("--no-elev", action="store_true", help="skip Open-Meteo; heights come from terrain tiles at build time")
     a = ap.parse_args()
-    run(a.only, a.zoom)
+    if a.no_elev:
+        USE_OPEN_METEO = False
+    if a.national:
+        national()
+    else:
+        run(a.only, a.zoom, a.streams, a.redo, a.all)
