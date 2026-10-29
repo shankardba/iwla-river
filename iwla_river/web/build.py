@@ -30,6 +30,26 @@ OUT = C.ROOT / "docs"
 BODY_OUT = C.REPORTS / "site"  # body-only copy of index.html for hosts that add their own <html> shell
 
 
+
+# About page: each joined dataset as (name, refs key, what it adds, how it joins, [(finding, page)]).
+_WF = ("Watershed findings", "watersheds--watershed-findings.html")
+ABOUT_DATASETS = [
+    ("USGS Watershed Boundary Dataset", "wbd", "HUC2 to HUC12 watersheds", "Site location inside the polygon", [("Explore", "index.html"), _WF]),
+    ("NHDPlus V2 via USGS NLDI", "nhdplus", "Stream segment (COMID) for each public site", "Nearest flowline to the site", [("Volunteers vs professionals", "context--volunteers-vs-professionals.html")]),
+    ("EPA StreamCat", "streamcat", "Catchment land cover, soils, dams, climate", "Stream segment", [("Expected-score model", "national--model.html"), _WF]),
+    ("USGS Annual NLCD", "annual-nlcd", "Paved share of each watershed, 1985–2025", "HUC12, each year", [("Paving trend", "context--development-trend.html"), _WF]),
+    ("EPA ATTAINS", "attains", "Impaired waters and their causes", "HUC12", [("Impairment listings", "context--impaired-biology.html"), _WF]),
+    ("EPA ECHO", "echo", "Discharge permits", "HUC12", [_WF]),
+    ("USGS USMIN", "usmin", "Mine features", "HUC12", [_WF]),
+    ("Census ACS 2020–2024", "acs", "Population, income, poverty", "HUC12", [("Monitoring gaps", "context--monitoring-gaps.html")]),
+    ("Water Quality Portal", "wqp", "Agency lab chloride", "HUC12, within 7 days", [("Chloride check", "context--chloride-check.html")]),
+    ("USGS NWIS gauges", "nwis", "Flow percentile on the survey day", "HUC12 (else HUC10), same day", [("Storm timing", "context--storm-timing.html")]),
+    ("EPA NRSA", "nrsa", "Professional bug surveys", "Same segment, ≤1 km or HUC12; ≤2 years", [("Volunteers vs professionals", "context--volunteers-vs-professionals.html")]),
+    ("Maryland MBSS and Stream Waders", "mbss", "Maryland professional and volunteer bug surveys", "≤1 km, ≤2 years", [("Volunteers vs professionals", "context--volunteers-vs-professionals.html")]),
+    ("EPA 319 and county restoration records", "epa319", "Restoration projects and dates", "≤5 km, before and after", [("Restoration", "context--restoration.html")]),
+    ("Open-Meteo (ERA5)", "openmeteo", "Rain 1, 3 and 7 days before; recent heat", "Site and survey date", [("Expected-score model", "national--model.html")]),
+]
+
 def load_findings() -> None:
     for mod in pkgutil.iter_modules(findings_pkg.__path__):
         importlib.import_module(f"{findings_pkg.__name__}.{mod.name}")
@@ -382,7 +402,10 @@ def build(db_path=C.DB_PATH, out: Path = OUT, body_out: Path = BODY_OUT) -> Path
                                   key=[i for s in sections for i in s["findings"] if i["key"]])}
     key = [i for s in sections for i in s["findings"] if i["key"]]
     pages["findings.html"] = render("findings.html", "findings.html", key=key)
-    pages["about.html"] = render("about.html", "about.html", hero_svg=plates.riffle("about"))
+    from .diagrams import about as about_dg
+    pages["about.html"] = render("about.html", "about.html", datasets=ABOUT_DATASETS,
+                                 joins_svg=about_dg.joins(meta["sites"], meta["usable"]),
+                                 pipeline_svg=about_dg.pipeline(meta["wsf_units"]))
     for s in sections:
         pages[s["url"]] = render("section.html", s["url"], section=s)
         for n, i in enumerate(s["findings"]):

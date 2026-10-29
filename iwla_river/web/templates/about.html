@@ -1,31 +1,68 @@
 {% extends "base.html" %}
 {% block title %}About · Save Our Streams Record{% endblock %}
-{% block description %}What this is, how Save Our Streams volunteers sample, where the data comes from and how to use the explorer.{% endblock %}
+{% block description %}What this record is, which public datasets are joined to the Save Our Streams data and how, and how each finding is tested and cited.{% endblock %}
 {% block main %}
 <header class="hero">
   <div class="eyebrow">About</div>
   <h1>About this record</h1>
-  <p class="lede">An independent analysis of the Izaak Walton League's Save Our Streams volunteer data, nationwide wherever it is available: how streams are changing, what each watershed shows, and how the volunteer data compares with professional measurements. It is not an official IWLA product. One creek, Great Seneca Creek (the Rockville Chapter's sites in Germantown, Maryland), is followed in depth as a case study.</p>
+  <p class="lede">An independent analysis of the Izaak Walton League's Save Our Streams data, for the people who run monitoring programs and the scientists who use the results. It joins the volunteer record with public datasets on land, water quality, flow, permits and professional surveys, tests each question with a stated method, and cites every source. It is not an official IWLA product.</p>
 </header>
 
 <section class="block">
-  <h2>How volunteers sample</h2>
-  <p>Save Our Streams volunteers work in riffles, the fast, shallow, stony stretches of a stream. They stir the stones upstream of a net, then sort and count the animals that wash in. Insects such as mayflies and stoneflies only live in clean water, so the mix of animals found says how healthy the stream is. Other volunteers test water for chloride from road salt and for nitrate with test-strip kits.</p>
-  {% if hero_svg %}<figure class="diagram">{{ hero_svg | safe }}<figcaption>Illustration. Animals in the lens are drawn far larger than true.</figcaption></figure>{% endif %}
+  <h2>What was joined</h2>
+  <p>Every volunteer site is first placed in its HUC12 watershed and on its stream segment. That spine is what lets the other datasets attach: some by segment, most by watershed, some by watershed and date, and the paired comparisons by distance and date. Hidden kit and tap sites join by watershed only.</p>
+  <figure class="diagram">{{ joins_svg | safe }}<figcaption>Join rules as run in the analysis. Distances are straight-line; dates are survey dates.</figcaption></figure>
+  <div class="tbl"><table>
+    <thead><tr><th>Dataset</th><th>What it adds</th><th>Joined by</th><th>Used in</th></tr></thead>
+    <tbody>
+    {% for name, key, adds, how, used in datasets %}
+      <tr><td><a href="{{ ref_link(key) }}">{{ name }}</a></td><td>{{ adds }}</td><td>{{ how }}</td>
+        <td>{% for title, url in used %}<a href="{{ url }}">{{ title }}</a>{% if not loop.last %}, {% endif %}{% endfor %}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table></div>
+  <p class="meta">Survey snapshot {{ meta.snapshot }}. Full citations with DOIs: <a href="data--references.html">References</a>.</p>
 </section>
 
 <section class="block">
-  <h2>How to use it</h2>
-  <ol class="next">
-    <li><a href="index.html">Explore</a> opens on a map of where samples are taken. Filter by sample type, colour the watershed rings by the measure you care about, and click a ring to zoom from a region down to a small subwatershed. Press <kbd>/</kbd> to search.</li>
-    <li>At the smallest watersheds, click a biological site to see its own history: every survey, what it found, and what was expected for its season and setting.</li>
-    <li><a href="findings.html">Findings</a> collects the results, each with the evidence and method behind it. <a href="chapter.html">Case study: Great Seneca Creek</a> follows one creek in depth.</li>
-  </ol>
+  <h2>How each finding is made</h2>
+  <p>Each question gets the test that fits it, chosen before the result is known, and every result reports its effect size, its uncertainty and its q-value. Results that come out null are kept and shown.</p>
+  <figure class="diagram">{{ pipeline_svg | safe }}<figcaption>The same pipeline runs for the national findings and for each watershed's own findings in Explore.</figcaption></figure>
 </section>
 
 <section class="block">
-  <h2>Sources and care</h2>
-  <p>Survey data comes from the Izaak Walton League's <a href="https://www.cleanwaterhub.org/">Clean Water Hub</a> (snapshot {{ meta.snapshot }}). Watersheds are USGS hydrologic units; watershed land cover is from EPA StreamCat; rainfall from the Open-Meteo archive; state outlines from the US Census Bureau. See <a href="data--methods.html">Sources and methods</a>; every finding lists its own sources, and <a href="data--references.html">References</a> collects them all.</p>
-  <p>Personal details are never shown. Many salt and nitrate kits test home taps, so those sites carry no names and their locations are rounded to about 1 km. Volunteer data is valuable and noisy: every result here says how strong its evidence is.</p>
+  <h2>Safeguards</h2>
+  <ul>
+    <li><b>Repeat visits.</b> Sites are surveyed many times. Intervals come from a cluster bootstrap that resamples whole sites or watersheds, and regressions use cluster-robust errors, so one busy site cannot pass for many.</li>
+    <li><b>Many tests.</b> Trends are tested at hundreds of sites and thousands of watersheds. Each family of tests is corrected with Benjamini–Hochberg q-values, and only those under 0.05 are called a trend.</li>
+    <li><b>Models scored fairly.</b> The driver models are scored on sites they never saw (five repeats of five-fold cross-validation grouped by site), and their range across repeats is reported.</li>
+    <li><b>Policy effects.</b> Before-and-after comparisons near restoration projects are run again on a placebo date. When the placebo shift is as large as the real one, as it is here, the finding says no benefit is detectable.</li>
+    <li><b>Volunteer data checked against professionals.</b> Volunteer chloride is compared with agency lab results, and volunteer bug scores with professional surveys at the same places. See <a href="context--chloride-check.html">the chloride check</a> and <a href="context--volunteers-vs-professionals.html">volunteers vs professionals</a>.</li>
+  </ul>
+</section>
+
+<section class="block">
+  <h2>Limits</h2>
+  <ul>
+    <li>Volunteer sites are chosen by volunteers, not at random, so national figures describe the monitored streams, not all streams. <a href="context--monitoring-gaps.html">Monitoring gaps</a> shows where coverage is thin.</li>
+    <li>A watershed join matches the same HUC12, not always the same reach; associations at watershed level do not prove what happens at a single site.</li>
+    <li>Associations are not causes. Where a finding says "linked with", that is all it claims.</li>
+    <li>Test-strip chemistry is less precise than lab chemistry; how much less is measured in the chloride check, not assumed.</li>
+  </ul>
+</section>
+
+<section class="block">
+  <h2>Reproduce it</h2>
+  <p>The code is public at <a href="https://github.com/shankardba/iwla-river">github.com/shankardba/iwla-river</a>. Every finding page lists its sources, and the site build stops if a finding cites a source that is not in <a href="data--references.html">References</a>. <a href="data--methods.html">Sources and methods</a> describes the cleaning rules and the score.</p>
+</section>
+
+<section class="block">
+  <h2>Privacy</h2>
+  <p>Personal details are removed when the data is downloaded and never shown. Many salt and nitrate kits test home taps, so those sites carry no names and their locations are rounded to about 1 km.</p>
+</section>
+
+<section class="block">
+  <h2>Using Explore</h2>
+  <p><a href="index.html">Explore</a> maps every sample. Browse by watershed, from region down to subwatershed, or by state, where each state's subbasins are drawn inside it. Each watershed shows its own cited findings; press <kbd>/</kbd> to search. <a href="findings.html">Findings</a> collects the national results, and <a href="chapter.html">Case study: Great Seneca Creek</a> follows one creek in depth.</p>
 </section>
 {% endblock %}
