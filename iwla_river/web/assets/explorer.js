@@ -309,7 +309,7 @@
     const parts = [];
     if (code === "st") {
       parts.push(`<span class="lg-title">Samples (per ${st ? "5" : "25"} km, bigger = more)</span>` + kindKey());
-      if (showRings) { const cb = COLOR_BY[colorBy]; parts.push(`<span class="lg-title">States: ${esc(cb.name)}</span>` + cb.bins.map(b => `<span><i class="area" style="background:${b[2]}"></i>${esc(b[3])}</span>`).join("") + '<span><i class="area" style="background:var(--nodata)"></i>no data</span>'); }
+      if (showRings) { const cb = COLOR_BY[colorBy]; parts.push(`<span class="lg-title">${st ? "Subbasins" : "States"}: ${esc(cb.name)}</span>` + cb.bins.map(b => `<span><i class="area" style="background:${b[2]}"></i>${esc(b[3])}</span>`).join("") + '<span><i class="area" style="background:var(--nodata)"></i>no data</span>'); }
       return parts.join("");
     }
     parts.push(`<span class="lg-title">${code.length === 12 ? "Sites" : code.length < 4 ? "Samples (per 25 km, bigger = more)" : "Samples (per site, bigger = more)"}</span>` + kindKey() +
@@ -483,11 +483,32 @@
     const labels = [];
     all.forEach(k => {
       const x = ST[k], here = k === abbr, show = !abbr || here;
-      const fill = showRings && x ? colorOf(x) : "transparent";
+      const fill = showRings && x && !abbr ? colorOf(x) : "transparent";
       s += `<a href="#st-${k}" data-st="${k}" data-code="st-${k}" class="ex-area${here ? " chapter" : ""}${show ? "" : " dim"}"><path d="${pathOf(SGEO[k].r)}" fill="${show ? fill : "transparent"}" fill-rule="evenodd"><title>${esc(SGEO[k].n)}${x ? `: ${fmt(x.s)} sites, ${fmt(x.bv)} biological surveys${num(x.g) ? `, ${pts(x.g)} sensitive vs expected` : ""}` : ": no samples"}. Click to zoom in.</title></path></a>`;
       const c = centre(SGEO[k].r);
-      if (c.p) labels.push({ x: c.p[0], y: c.p[1], area: c.area, n: abbr ? SGEO[k].n : k, here });
+      if (c.p && !here) labels.push({ x: c.p[0], y: c.p[1], area: c.area, n: abbr ? SGEO[k].n : k, here });
     });
+    // Inside a state: its subbasins, filled inside the state line, with each one's full outline dashed beyond it.
+    if (abbr) {
+      const sd = pathOf(own), inState = (px, py) => inPoly(px, py, own.map(r => r.map(([lo, la]) => { const q = albers(la, lo); return [X(q), Y(q)]; })));
+      s += `<clipPath id="exst"><path d="${sd}" fill-rule="evenodd"/></clipPath>`;
+      let outl = "";
+      ((ST[abbr] || {}).hb || []).forEach(([h, n]) => {
+        const shp = (GSUB[h.slice(0, 4)] || {})[h], u = w(h) || {};
+        if (!shp) return;
+        const d = pathOf(shp), fill = showRings ? colorOf(u) : "var(--grey)";
+        s += `<a href="#w${h}" data-go="${h}" data-view-to="w" data-code="${h}" class="ex-area ex-hb"><path d="${d}" clip-path="url(#exst)" fill="${fill}" fill-rule="evenodd"><title>${esc(label(h))} (subbasin ${h}): ${fmt(n)} of its ${fmt(u.s)} sites are in ${esc(SGEO[abbr].n)}. Click to open it in the watershed view.</title></path></a>`;
+        outl += `<path d="${d}" fill="none" fill-rule="evenodd" class="ex-hb-out"/>`;
+        // Label where the subbasin actually is inside the state.
+        let c = centre(shp);
+        if (c.p && !inState(c.p[0], c.p[1])) {
+          const pin = shp.flat().map(([lo, la]) => { const q = albers(la, lo); return [X(q), Y(q)]; }).filter(q => inState(q[0], q[1]));
+          c = pin.length ? { p: [pin.reduce((a, q) => a + q[0], 0) / pin.length, pin.reduce((a, q) => a + q[1], 0) / pin.length], area: c.area / 3 } : { p: null };
+        }
+        if (c.p) labels.push({ x: c.p[0], y: c.p[1], area: c.area * 4, n: label(h), here: false, hb: true });
+      });
+      s += `<g class="ex-hb-outs" aria-hidden="true">${outl}</g><path d="${sd}" class="ex-st-line" fill="none" fill-rule="evenodd"/>`;
+    }
     // Sample bubbles: 25 km cells for the country, 5 km cells inside a state.
     const cells = (abbr ? SHEAT[abbr] || [] : HEAT).filter(c => cellN(c, kind) > 0 && c[0] > 24 && c[0] < 50 && c[1] > -125 && c[1] < -66);
     if (cells.length) {
@@ -500,7 +521,7 @@
       if (!l.here && l.area < tw * 12) return;
       if (l.x < tw / 2 || l.x > W - tw / 2 || l.y < 12 || l.y > H - 6 || !free(l.x - tw / 2, l.y - 7, tw, 14)) return;
       boxes.push([l.x - tw / 2, l.y - 7, tw, 14]);
-      s += `<text class="ex-label${l.here ? " ch" : ""}" x="${l.x.toFixed(1)}" y="${(l.y + 4).toFixed(1)}" text-anchor="middle">${esc(l.n)}</text>`;
+      s += `<text class="ex-label${l.here ? " ch" : ""}${l.hb ? " hb" : ""}" x="${l.x.toFixed(1)}" y="${(l.y + 4).toFixed(1)}" text-anchor="middle">${esc(l.n)}</text>`;
     });
     return s + "</svg>";
   }
@@ -509,14 +530,30 @@
       const rows = (ST[abbr] || {}).hb || [];
       if (!rows.length) return '<p class="meta">No samples in this state.</p>';
       return `<div class="tbl"><table class="ex-list"><thead><tr><th>Subbasin</th><th class="n">Sites here</th><th class="n">Bio surveys</th></tr></thead><tbody>` +
-        rows.map(([h, n, b]) => `<tr class="go" data-go="${h}" data-view-to="w"><td><span class="sw" style="border-color:${colorOf(w(h))}"></span><a href="#w${h}" data-go="${h}" data-view-to="w">${esc(label(h))}</a></td><td class="n">${fmt(n)}</td><td class="n">${fmt(b)}</td></tr>`).join("") + "</tbody></table></div>";
+        rows.map(([h, n, b]) => `<tr class="go" data-go="${h}" data-view-to="w" data-code="${h}"><td><span class="sw" style="border-color:${colorOf(w(h))}"></span><a href="#w${h}" data-go="${h}" data-view-to="w">${esc(label(h))}</a></td><td class="n">${fmt(n)}${num((w(h) || {}).s) && w(h).s > n ? ` <span class="meta">of ${fmt(w(h).s)}</span>` : ""}</td><td class="n">${fmt(b)}</td></tr>`).join("") + "</tbody></table></div>";
     }
     const rows = Object.keys(ST).map(k => ST[k]).sort((a, b) => (num(b[sortKey]) ? b[sortKey] : -1) - (num(a[sortKey]) ? a[sortKey] : -1));
     return `<div class="tbl"><table class="ex-list"><thead><tr><th>State</th><th class="n">Sites</th><th class="n">Bio surveys</th><th class="n">Sensitive</th><th class="n">vs exp.</th></tr></thead><tbody>` +
       rows.map(x => `<tr class="go" data-st="${x.c}" data-code="st-${x.c}"><td><span class="sw" style="border-color:${colorOf(x)}"></span><a href="#st-${x.c}" data-st="${x.c}">${esc(x.n)}</a></td><td class="n">${fmt(x.s)}</td><td class="n">${fmt(x.bv)}</td><td class="n">${pct(x.so)}</td><td class="n">${pts(x.g)}</td></tr>`).join("") + "</tbody></table></div>";
   }
+  // States a watershed lies in, from each state's subbasin list: [[code, name, sites], ...], most sites first.
+  function statesOf(code) {
+    if (!code) return [];
+    return Object.keys(ST).map(k => {
+      const n = (ST[k].hb || []).filter(([h]) => code.length <= 8 ? h.startsWith(code) : code.startsWith(h)).reduce((a, r) => a + r[1], 0);
+      return [k, ST[k].n, n];
+    }).filter(r => r[2] > 0).sort((a, b) => b[2] - a[2]);
+  }
+  function statesLine(code) {
+    const ss = statesOf(code);
+    if (!ss.length) return "";
+    const shown = ss.slice(0, 8).map(([k, n, c]) => `<a href="#st-${k}" data-st="${k}" title="${fmt(c)} of its sites are in ${esc(n)}">${esc(n)}</a>`).join(", ");
+    const lead = code.length > 8 ? `Its subbasin is in ${ss.length === 1 ? "" : `${ss.length} states: `}` : `In ${ss.length === 1 ? "" : `${ss.length} states: `}`;
+    return `<p class="ex-states">${lead}${shown}${ss.length > 8 ? ` and ${ss.length - 8} more` : ""}</p>`;
+  }
   async function renderStates(push) {
     await ensureStates();
+    if (st) for (const h4 of new Set(((ST[st] || {}).hb || []).map(r => r[0].slice(0, 4)))) await ensureGeo(h4);   // one at a time: shared files load once
     if (st && !SHEAT[st]) { try { SHEAT[st] = await fetch(`data/states/${st}.json`).then(r => r.json()); } catch (e) { SHEAT[st] = []; } }
     if (push) { try { history.replaceState(null, "", st ? `#st-${st}` : "#st"); } catch (e) { /* keep the old address */ } }
     const x = st ? ST[st] || {} : w("") || {}, parent = st ? w("") : null;
@@ -526,8 +563,8 @@
     $(".ex-head").innerHTML = `<h2 class="ex-title">${esc(st ? x.n || st : "United States")}</h2><p class="ex-sub">${st ? `State · ${st}` : "By state"}</p>` +
       `<div class="ex-actions">${st ? `<button type="button" data-st="">↑ All states</button>` : `<button type="button" class="primary" data-st="MD">Maryland</button>`}` +
       `${st && num(x.la) ? `<a class="btn" href="${gmaps(x.la, x.lo)}" target="_blank" rel="noopener">Google Maps ↗</a>` : ""}</div>`;
-    $(".ex-body").innerHTML = (st ? "" : `<p class="ex-intro">The same samples grouped by state. Click a state to zoom in; from a state, its subbasins open in the watershed view.</p>`) +
-      cards(x, parent) + `<h3 class="ex-h">${st ? `Subbasins with samples in ${esc(x.n || st)}` : "States"} <span class="meta">${st ? "click to open in the watershed view" : "click a row to zoom in"}</span></h3>` + stateTable(st);
+    $(".ex-body").innerHTML = (st ? "" : `<p class="ex-intro">The same samples grouped by state. Click a state to zoom in: its subbasins (8-digit watersheds) are drawn inside it, and each opens in the watershed view.</p>`) +
+      cards(x, parent) + `<h3 class="ex-h">${st ? `Subbasins with samples in ${esc(x.n || st)}` : "States"} <span class="meta">${st ? "on the map, coloured by the measure; click to open in the watershed view" : "click a row to zoom in"}</span></h3>` + stateTable(st);
     $(".ex-panel").scrollTop = 0;
   }
 
@@ -557,7 +594,7 @@
       $(".ex-body").innerHTML = siteView(site, cur);
     } else {
       $(".ex-head").innerHTML = `<h2 class="ex-title">${esc(label(cur))}</h2>` +
-        `<p class="ex-sub">${LEVEL[cur.length]}${cur ? ` · HUC ${cur}` : ""}</p>` +
+        `<p class="ex-sub">${LEVEL[cur.length]}${cur ? ` · HUC ${cur}` : ""}</p>` + statesLine(cur) +
         `<div class="ex-actions">${cur ? `<button type="button" data-go="${cur.slice(0, -2)}">↑ ${esc(cur.length > 2 ? label(cur.slice(0, -2)) : "United States")}</button>` : ""}` +
         `${CHAPTER && cur !== CHAPTER ? `<button type="button" class="primary" data-go="${CHAPTER}">Go to Great Seneca Creek</button>` : ""}` +
         `${num(x.la) && cur ? `<a class="btn" href="${gmaps(x.la, x.lo)}" target="_blank" rel="noopener">Google Maps ↗</a>` : ""}</div>`;

@@ -389,3 +389,12 @@ ol.next { margin: 0; padding-left: 22px; display: flex; flex-direction: column; 
 .wsf-src { font-size: 13px; margin-bottom: 10px; }
 .wsf-src summary { cursor: pointer; color: var(--muted, inherit); }
 .wsf-src ol { padding-left: 20px; margin: 4px 0; }
+
+/* State view: the state's subbasins inside its border, full outlines dashed beyond it. */
+.ex-hb-outs path { stroke: var(--muted); stroke-width: .8; stroke-dasharray: 3 3; opacity: .55; pointer-events: none; }
+.ex-st-line { stroke: var(--ink); stroke-width: 2; pointer-events: none; }
+.ex-label.hb { font-size: 10.5px; fill: var(--ink); font-weight: 600; }
+.ex-states { margin: .2rem 0 .6rem; font: 500 .85rem/1.4 var(--display); color: var(--muted); }
+.ex-states a { color: var(--accent); }
+.ex-area.ex-hb path { stroke: var(--muted); stroke-width: 1; stroke-opacity: .8; }
+.ex-area.ex-hb:hover path, .ex-area.ex-hb.hl path { stroke: var(--ink); stroke-width: 2; }
