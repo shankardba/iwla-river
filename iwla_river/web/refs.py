@@ -27,9 +27,10 @@ REFS: dict[str, dict] = {
     "nlcd2019": dict(kind="data", short="Dewitz 2021 (NLCD 2019)",
                      full="Dewitz, J. (2021). National Land Cover Database (NLCD) 2019 Products. U.S. Geological Survey data release.",
                      doi="10.5066/P9KZCM54"),
-    "annual-nlcd": dict(kind="data", short="USGS Annual NLCD Collection 1",
-                        full="U.S. Geological Survey (2024). Annual National Land Cover Database (NLCD) Collection 1 Science Products: "
-                             "fractional impervious surface, 1985–2024. Files from ScienceBase item 697b907eb66b0197c3043c9f.",
+    "annual-nlcd": dict(kind="data", short="USGS Annual NLCD Collection 1.2",
+                        full="U.S. Geological Survey. Annual National Land Cover Database (NLCD) Collection 1.2 Science Products: "
+                             "fractional impervious surface, conterminous United States, 1985–2025 (30 m). Files from ScienceBase "
+                             "item 697b907eb66b0197c3043c9f; 21 of the 41 years used here.",
                         url="https://www.sciencebase.gov/catalog/item/697b907eb66b0197c3043c9f"),
     "nhdplus": dict(kind="data", short="McKay et al. 2012 (NHDPlus V2)",
                     full="McKay, L., Bondelid, T., Dewald, T., Johnston, J., Moore, R. and Rea, A. (2012). NHDPlus Version 2: User "
@@ -103,6 +104,10 @@ REFS: dict[str, dict] = {
                              "projects, Montgomery County Department of Environmental Protection projects, the Maryland Chesapeake "
                              "and Atlantic Coastal Bays Trust Fund, and the American Rivers Dam Removal Database (figshare).",
                         doi="10.6084/m9.figshare.5234068"),
+    "epa319": dict(kind="data", short="EPA Grants Reporting and Tracking System (Section 319)",
+                   full="U.S. Environmental Protection Agency. Grants Reporting and Tracking System (GRTS): Clean Water Act "
+                        "Section 319 nonpoint-source projects by 12-digit watershed, and Nonpoint Source Success Stories.",
+                   url="https://www.epa.gov/nps/grants-reporting-and-tracking-system-grts"),
     "epa-chloride": dict(kind="data", short="US EPA 1988 (chloride criteria)",
                          full="U.S. Environmental Protection Agency (1988). Ambient Water Quality Criteria for Chloride — 1988. "
                               "EPA 440/5-88-001. Chronic criterion 230 mg/L.",

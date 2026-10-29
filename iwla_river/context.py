@@ -330,6 +330,78 @@ def restoration(r, s):
     return out
 
 
+# ---------- 8. paving over time (Annual NLCD, every downloaded year) ----------
+def development_trend(s, f):
+    y = s.sql("SELECT huc12, year, impervious_pct FROM impervious_yearly").df()
+    iwla = set(f.huc12.dropna())
+    y["iwla"] = y.huc12.isin(iwla)
+    years = sorted(int(v) for v in y.year.unique())
+    med = y.groupby(["iwla", "year"]).impervious_pct.median().unstack(0)
+    first, last = years[0], years[-1]
+    w = y.pivot_table(index="huc12", columns="year", values="impervious_pct")
+    gain = (w[last] - w[first]).dropna()
+    gi = gain[gain.index.isin(iwla)]
+    # within watersheds: does a watershed's spring score fall as it paves? watershed and year effects removed
+    sp = f[f.month.between(3, 5)].groupby(["huc12", "year"]).z.mean().rename("score").reset_index()
+    yy = np.array(years)
+    sp = sp[sp.huc12.isin(w.index)].copy()
+    sp["imperv"] = [np.interp(t, yy, w.loc[h, years].to_numpy(float)) for h, t in zip(sp.huc12, sp.year)]
+    sp = sp.dropna()
+    wi = sp[sp.groupby("huc12").year.transform("size") >= 3].copy()
+    for col in ("score", "imperv"):
+        x = wi[col].to_numpy(float).copy()
+        for _ in range(50):
+            x = x - wi.assign(v=x).groupby("huc12").v.transform("mean").to_numpy()
+            x = x - wi.assign(v=x).groupby("year").v.transform("mean").to_numpy()
+        wi[col + "_w"] = x
+    cw, sew, pw = ols(wi.score_w.to_numpy(), wi[["imperv_w"]].to_numpy(), cluster=wi.huc12.to_numpy())
+    return {"years": years, "n_years": len(years),
+            "median_iwla": {int(k): r3(v, 2) for k, v in med[True].items()},
+            "median_other": {int(k): r3(v, 2) for k, v in med[False].items()},
+            "iwla_watersheds": int(len(gi)), "other_watersheds": int(len(gain) - len(gi)),
+            "iwla_gain_median": r3(gi.median(), 2), "other_gain_median": r3(gain[~gain.index.isin(iwla)].median(), 2),
+            "iwla_gain5_share": r3((gi >= 5).mean()), "iwla_gain10_share": r3((gi >= 10).mean()),
+            "within_watersheds": int(wi.huc12.nunique()), "within_rows": int(len(wi)),
+            "within_imperv_coef": r3(cw[0]), "within_imperv_se": r3(sew[0]), "within_imperv_p": pf(pw[0])}
+
+
+# ---------- 9. storms before a survey (USGS gauge flow) ----------
+def storm_timing(s, f):
+    c = s.sql("SELECT survey_uid, storm_in_week, high_flow_day, flow_pct FROM survey_conditions WHERE flow_pct IS NOT NULL").df()
+    d = f.merge(c, on="survey_uid")
+    d = d[d.groupby("site_id").storm_in_week.transform("nunique") == 2].copy()   # sites surveyed both with and without a storm
+    out = {"surveys": int(len(d)), "sites": int(d.site_id.nunique()), "storm_share": r3(d.storm_in_week.mean())}
+    x = d.z.to_numpy(float).copy()
+    st = d.storm_in_week.astype(float).to_numpy().copy()
+    for _ in range(50):
+        x = x - d.assign(v=x).groupby("site_id").v.transform("mean").to_numpy()
+        x = x - d.assign(v=x).groupby("year").v.transform("mean").to_numpy()
+        st = st - d.assign(v=st).groupby("site_id").v.transform("mean").to_numpy()
+        st = st - d.assign(v=st).groupby("year").v.transform("mean").to_numpy()
+    cw, sew, pw = ols(x, st[:, None], cluster=d.site_id.to_numpy())
+    raw = d.groupby("storm_in_week").z.mean()
+    out.update({"within_storm_coef": r3(cw[0]), "within_storm_ci": [r3(cw[0] - 1.96 * sew[0]), r3(cw[0] + 1.96 * sew[0])],
+                "within_storm_p": pf(pw[0]), "raw_storm_z": r3(raw.get(True)), "raw_calm_z": r3(raw.get(False))})
+    return out
+
+
+# ---------- 10. what each public dataset added ----------
+def enrichment(s, f):
+    q = lambda sql: s.sql(sql).fetchall()[0][0]
+    return {"sites": int(q("SELECT count(*) FROM site_spine")), "sites_public": int(q("SELECT count(*) FILTER (WHERE is_public) FROM site_spine")),
+            "watersheds_with_sites": int(q("SELECT count(DISTINCT huc12) FROM site_spine WHERE huc12 IS NOT NULL")),
+            "usgs_gauges": int(q("SELECT count(*) FROM usgs_gauges")),
+            "surveys_with_flow": int(q("SELECT count(flow_pct) FROM survey_conditions")),
+            "wqp_stations": int(q("SELECT count(*) FROM wqp_stations")), "chloride_pairs": int(q("SELECT count(*) FROM chloride_pairs")),
+            "streamcat_catchments": int(q("SELECT count(*) FROM streamcat")),
+            "nlcd_years": int(q("SELECT count(DISTINCT year) FROM impervious_yearly")),
+            "nlcd_watersheds": int(q("SELECT count(DISTINCT huc12) FROM impervious_yearly")),
+            "prof_visits": int(q("SELECT count(*) FROM prof_visits")),
+            "restoration_events": int(q("SELECT count(*) FROM restoration_events")),
+            "epa319_projects": int(q("SELECT count(*) FROM epa319_projects")),
+            "gap_watersheds": int(q("SELECT count(*) FROM monitoring_gaps"))}
+
+
 def main():
     r = duckdb.connect(str(C.DB_PATH), read_only=True)
     s = duckdb.connect(str(STREAMS), read_only=True, config={"enable_external_access": False})
@@ -345,6 +417,9 @@ def main():
         "volunteer_vs_professional": volunteer_vs_professional(s),
         "monitoring_gaps": monitoring_gaps(s),
         "restoration": restoration(r, s),
+        "development_trend": development_trend(s, f),
+        "storm_timing": storm_timing(s, f),
+        "enrichment": enrichment(s, f),
     }
     OUT.write_text(json.dumps(res, indent=1, default=str))
     print(json.dumps(res, indent=1, default=str)[:6000])

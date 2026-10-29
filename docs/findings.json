@@ -268,6 +268,29 @@
   },
   {
    "section": "context",
+   "id": "enrichment",
+   "title": "What each public dataset added",
+   "url": "context--enrichment.html",
+   "key": false,
+   "headline": "The 20,384 Save Our Streams sites were joined to 20 public datasets from USGS, EPA, the Census Bureau, Maryland and county governments, so each survey can be read against its watershed, its weather and other people's measurements.",
+   "status": "info",
+   "numbers": [
+    {
+     "value": "20",
+     "label": "public datasets joined"
+    },
+    {
+     "value": "3,433",
+     "label": "watersheds with IWLA sites"
+    },
+    {
+     "value": "22,697",
+     "label": "watersheds compared in all"
+    }
+   ]
+  },
+  {
+   "section": "context",
    "id": "chloride-check",
    "title": "Volunteer chloride tracks agency lab chloride",
    "url": "context--chloride-check.html",
@@ -332,6 +355,52 @@
     {
      "value": "401",
      "label": "watershed-years"
+    }
+   ]
+  },
+  {
+   "section": "context",
+   "id": "development-trend",
+   "title": "Paving keeps spreading, fastest where volunteers work",
+   "url": "context--development-trend.html",
+   "key": false,
+   "headline": "The median watershed with an IWLA bug site went from 1.3% to 2.0% paved between 1985 and 2025, gaining more than other watersheds nearby (+0.6 vs +0.35 points); within a watershed, bug scores have not yet tracked that growth.",
+   "status": "watch",
+   "numbers": [
+    {
+     "value": "1.3% \u2192 2.0%",
+     "label": "median paved, IWLA watersheds, 1985\u20132025"
+    },
+    {
+     "value": "12%",
+     "label": "of IWLA watersheds gained 5+ points of paving"
+    },
+    {
+     "value": "p = 0.27",
+     "label": "score change as a watershed paves"
+    }
+   ]
+  },
+  {
+   "section": "context",
+   "id": "storm-timing",
+   "title": "A storm the week before does not change a site's score",
+   "url": "context--storm-timing.html",
+   "key": false,
+   "headline": "Comparing each site with itself, surveys taken in the week after high water score the same as calm-week surveys (-0.004 standard deviations, 95% CI -0.05 to +0.04).",
+   "status": "good",
+   "numbers": [
+    {
+     "value": "3,680",
+     "label": "surveys with a gauge reading"
+    },
+    {
+     "value": "283",
+     "label": "sites surveyed both after storms and in calm weeks"
+    },
+    {
+     "value": "25%",
+     "label": "of those surveys followed high water"
     }
    ]
   },
@@ -468,7 +537,7 @@
    "title": "References",
    "url": "data--references.html",
    "key": false,
-   "headline": "Every number on this site traces to 26 data sources, 21 published methods and 8 studies that explain what the readings mean.",
+   "headline": "Every number on this site traces to 27 data sources, 21 published methods and 8 studies that explain what the readings mean.",
    "status": "info",
    "numbers": []
   },

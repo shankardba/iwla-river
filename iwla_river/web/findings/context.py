@@ -259,3 +259,107 @@ def restoration(db):
                      "channel stability or nutrient credits rather than stream animals, and recovery can take longer than five years.")],
         method=f"Completed stream restoration projects 1995–2022 with a place and year; difference in differences with "
                f"comparison sites; 95% intervals from 2,000 bootstrap resamples of projects. {inputs()}. Code: iwla_river/context.py.")
+
+
+@finding("context", "enrichment", "What each public dataset added", order=5)
+def enrichment(db):
+    e = res("enrichment")
+    if not e:
+        return None
+    rows = [
+        ["Watershed Boundary Dataset (USGS, NRCS)", "The 12-digit watershed (HUC12) of every site: the key every other dataset joins on", f"{fmt(e['watersheds_with_sites'])} watersheds with sites; {fmt(e['gap_watersheds'])} in the basins studied"],
+        ["NHDPlus V2 and NLDI (USGS)", "The stream segment (COMID) under each public site", f"{fmt(e['sites_public'])} public sites"],
+        ["EPA StreamCat", "Watershed roads, permits, mines, dams, septic, fertilizer and manure for public sites", f"{fmt(e['streamcat_catchments'])} catchments"],
+        ["USGS Water Data (NWIS)", "Daily streamflow and conductance: was the creek high, or had it stormed, before each survey", f"{fmt(e['usgs_gauges'])} gauges; {fmt(e['surveys_with_flow'])} surveys with flow"],
+        ["Water Quality Portal", "Agency laboratory chloride to check volunteer kits against", f"{fmt(e['wqp_stations'])} stations; {fmt(e['chloride_pairs'])} matched readings"],
+        ["Annual NLCD 1.2 (USGS)", "Share of each watershed paved or built, year by year", f"{e['nlcd_years']} years × {fmt(e['nlcd_watersheds'])} watersheds"],
+        ["EPA ATTAINS", "State lists of impaired waters, including impaired biology and salt", "every watershed studied"],
+        ["EPA ECHO", "Discharge permits and serious noncompliance", "every watershed studied"],
+        ["USGS USMIN", "Coal and hard-rock mine features", "every watershed studied"],
+        ["Census ACS 2020–2024", "Population, median household income and poverty", "every watershed studied"],
+        ["EPA NRSA, Maryland MBSS, Stream Waders", "Professional (and state volunteer) bug surveys to compare with IWLA", f"{fmt(e['prof_visits'])} visits"],
+        ["County and state project records, American Rivers", "Completed stream restorations, pond retrofits and dam removals with a year", f"{fmt(e['restoration_events'])} projects"],
+        ["EPA Section 319 (GRTS)", "Nonpoint-source projects by watershed", f"{fmt(e['epa319_projects'])} projects"],
+        ["Open-Meteo (ERA5)", "Rain and air temperature in the week before each survey", "every survey"],
+    ]
+    return Page(refs=["cwh", "sos", "wbd", "nhdplus", "nldi", "streamcat", "nwis", "wqp", "annual-nlcd", "attains", "echo", "usmin",
+                      "acs", "nrsa", "mbss", "stream-waders", "restoration", "epa319", "openmeteo", "era5"],
+        headline=f"The {fmt(e['sites'])} Save Our Streams sites were joined to 20 public datasets from USGS, EPA, the Census Bureau, "
+                 f"Maryland and county governments, so each survey can be read against its watershed, its weather and other "
+                 f"people's measurements.",
+        status="info",
+        numbers=[("20", "public datasets joined"), (fmt(e["watersheds_with_sites"]), "watersheds with IWLA sites"),
+                 (fmt(e["gap_watersheds"]), "watersheds compared in all")],
+        blocks=[table([("Dataset",), ("What it adds",), ("Coverage",)], rows,
+                      "Full citations for every dataset are listed under Sources below and on the References page."),
+                text("Every join goes through the watershed code or the stream segment, never a home address. Kit and tap sites, "
+                     "which are often homes, join by watershed only, and nothing site-level from them is published.",
+                     "The joining was done in a separate, private workbench; this site shows only the aggregate results."),
+                links([("chloride-check", "volunteer chloride against agency labs"), ("development-trend", "paving over time"),
+                       ("monitoring-gaps", "watersheds with no volunteer monitor")])],
+        method=f"{inputs()}. Code for the statistics: iwla_river/context.py.")
+
+
+@finding("context", "development-trend", "Paving keeps spreading, fastest where volunteers work", order=35)
+def development_trend(db):
+    t = res("development_trend")
+    if not t:
+        return None
+    mi, mo = t["median_iwla"], t["median_other"]
+    yrs = t["years"]
+    spec = {"type": "time", "title": "Median share paved, watersheds with and without IWLA bug sites",
+            "legend": [{"name": "With IWLA bug sites", "color": "accent"}, {"name": "Other watersheds in the same basins", "color": "grey"}],
+            "y": {"min": 0, "max": 2.5, "ticks": [0, 0.5, 1, 1.5, 2, 2.5], "unit": "%"}, "height": 280,
+            "x": {"from": f"{yrs[0]}-01-01", "to": f"{yrs[-1] + 1}-01-01"},
+            "series": [{"color": c, "line": True, "r": 3.5, "points": [{"x": f"{y}-07-01", "y": m[str(y)],
+                        "tip": f"{y}: median {m[str(y)]:.2f}% paved ({name})"} for y in yrs]}
+                       for m, c, name in ((mi, "accent", "with IWLA sites"), (mo, "grey", "other watersheds"))]}
+    return Page(refs=["cwh", "annual-nlcd", "wbd", "cameron-miller2015", "walsh2005", "paul-meyer2001"],
+        headline=f"The median watershed with an IWLA bug site went from {mi[str(yrs[0])]:.1f}% to {mi[str(yrs[-1])]:.1f}% paved between "
+                 f"{yrs[0]} and {yrs[-1]}, gaining more than other watersheds nearby ({t['iwla_gain_median']:+.1f} vs "
+                 f"{t['other_gain_median']:+.2f} points); within a watershed, bug scores have not yet tracked that growth.",
+        status="watch",
+        numbers=[(f"{mi[str(yrs[0])]:.1f}% → {mi[str(yrs[-1])]:.1f}%", f"median paved, IWLA watersheds, {yrs[0]}–{yrs[-1]}"),
+                 (f"{round(100 * t['iwla_gain5_share'])}%", "of IWLA watersheds gained 5+ points of paving"),
+                 (f"p = {t['within_imperv_p']:.2f}", "score change as a watershed paves")],
+        blocks=[chart(spec, f"USGS Annual NLCD impervious surface averaged over each 12-digit watershed; {t['n_years']} of the 41 "
+                            f"annual maps so far. {fmt(t['iwla_watersheds'])} watersheds with IWLA bug surveys, "
+                            f"{fmt(t['other_watersheds'])} others in the same river basins."),
+                text(f"Volunteers monitor where people live, so their watersheds are more built up to begin with and are being "
+                     f"built up faster. {round(100 * t['iwla_gain5_share'])}% of them gained five or more percentage points of "
+                     f"paving since {yrs[0]}, and {round(100 * t['iwla_gain10_share'])}% gained ten or more.",
+                     f"Between watersheds, more paving goes with lower bug scores (see the salt and development page). Within "
+                     f"a watershed over time, the change is too small and slow to show yet: comparing each watershed with itself "
+                     f"across years ({fmt(t['within_watersheds'])} watersheds, {fmt(t['within_rows'])} watershed-years), spring "
+                     f"scores move {t['within_imperv_coef']:+.3f} standard deviations per point of new paving (p = "
+                     f"{t['within_imperv_p']:.2f}). Most of these watersheds gained under one point in the years volunteers "
+                     f"surveyed them."),
+                links([("development-salt", "paved land and winter salt against bug scores"), ("enrichment", "every dataset joined")])],
+        method=f"Annual NLCD fractional impervious, pixels averaged inside each HUC12 outline. Within-watershed test: spring "
+               f"scores (SOS and Virginia forms on one standardised scale) and paving with watershed and year means removed, "
+               f"least squares with standard errors clustered by watershed; watersheds with three or more surveyed years. "
+               f"{inputs()}. Code: iwla_river/context.py.")
+
+
+@finding("context", "storm-timing", "A storm the week before does not change a site's score", order=37)
+def storm_timing(db):
+    t = res("storm_timing")
+    if not t:
+        return None
+    return Page(refs=["cwh", "nwis", "cameron-miller2015"],
+        headline=f"Comparing each site with itself, surveys taken in the week after high water score the same as calm-week "
+                 f"surveys ({t['within_storm_coef']:+.3f} standard deviations, 95% CI {t['within_storm_ci'][0]:+.2f} to "
+                 f"{t['within_storm_ci'][1]:+.2f}).",
+        status="good",
+        numbers=[(fmt(t["surveys"]), "surveys with a gauge reading"), (fmt(t["sites"]), "sites surveyed both after storms and in calm weeks"),
+                 (f"{round(100 * t['storm_share'])}%", "of those surveys followed high water")],
+        blocks=[text(f"A spate can scour animals off the stream bed, so a survey soon after one might undercount them. Each bug "
+                     f"survey was matched to the nearest USGS stream gauge in its watershed; a storm week is one where daily flow "
+                     f"reached the top 10% for that gauge in the seven days before.",
+                     f"Taken at face value, post-storm surveys score lower ({t['raw_storm_z']:+.2f} vs {t['raw_calm_z']:+.2f} "
+                     f"standard deviations). That gap comes from which sites and years get stormy, not from the storm itself: "
+                     f"once each site is compared with itself and year-to-year swings are removed, it disappears (p = "
+                     f"{t['within_storm_p']:.2f}). On this evidence, surveying soon after high water does not bias a site's score.")],
+        method=f"Flow percentile of the nearest gauge in the same HUC12 (else HUC10), from USGS daily values. Scores standardised "
+               f"within each form (SOS, Virginia SOS). Site and year means removed; least squares with standard errors clustered "
+               f"by site; sites with both storm and calm surveys. {inputs()}. Code: iwla_river/context.py.")
