@@ -8,7 +8,7 @@ from ..registry import Page, chart, diagram, finding, links, section, table, tex
 
 section("national", "National picture",
         "What thousands of volunteer surveys across the country show, and the expected-score model trained on them "
-        "that the chapter's sites are judged against.", order=40)
+        "that every survey is judged against.", order=10)
 
 
 @finding("national", "paving", "Paved watersheds lose sensitive animals", order=10, key=True)
@@ -23,29 +23,26 @@ def paving(db):
         SELECT bin, ['0–2%', '2–5%', '5–10%', '10–15%', '15–25%', '25% +'][bin + 1] AS label,
                count(*) AS surveys, count(DISTINCT site_id) AS sites, avg(observed) AS mean
         FROM b GROUP BY ALL ORDER BY bin""")
-    ctx = db.context(467)
-    ci = ctx.get("ws_impervious_pct")
-    ch_bin = None if ci is None else 0 if ci < 2 else 1 if ci < 5 else 2 if ci < 10 else 3 if ci < 15 else 4 if ci < 25 else 5
     spec = {"type": "bars", "title": f"Sensitive animals make up {pct(ib[0]['mean'])} of groups found in near-natural watersheds and {pct(ib[-1]['mean'])} where a quarter is paved",
             "y": {"min": 0, "max": 0.5, "ticks": [0, 0.1, 0.2, 0.3, 0.4, 0.5], "fmt": "pct"},
             "xLabel": "share of the watershed that is paved or roofed", "height": 310,
             "cats": [{"label": r["label"], "sub": f"{fmt(r['sites'])} sites", "value": r["mean"], "valueLabel": pct(r["mean"]),
-                      "color": "accent" if r["bin"] == ch_bin else "grey", "opacity": 1 if r["bin"] == ch_bin else 0.55,
-                      "note": f"Great Seneca ({ci:.1f}%)" if r["bin"] == ch_bin else None,
+                      "color": "accent",
                       "tip": f"{r['label']} paved: {pct(r['mean'])} sensitive, {fmt(r['surveys'])} surveys at {fmt(r['sites'])} sites"} for r in ib]}
     return Page(refs=["cwh", "streamcat", "nlcd2019", "paul-meyer2001", "walsh2005"], 
         headline=f"Nationally, sensitive animals fall from {pct(ib[0]['mean'])} of groups found in near-natural watersheds to {pct(ib[-1]['mean'])} where a quarter or more is paved.",
         status="info",
-        numbers=[(f"{ci:.1f}%", "of the chapter's watershed paved or roofed (2019)") if ci is not None else ("—", ""),
-                 (f"{ctx.get('ws_forest_pct', 0):.0f}%", "of it forest")],
+        numbers=[(pct(ib[0]["mean"]), f"sensitive share where under 2% is paved"), (pct(ib[-1]["mean"]), "where a quarter or more is paved"),
+                 (fmt(sum(r["surveys"] for r in ib)), "surveys")],
         blocks=[text("Stream ecologists call this the urban stream syndrome: the more of a watershed is paved or roofed, the faster "
                      "rain runs off it, carrying heat, salt and sediment, and the fewer pollution-sensitive animals live downstream."),
-                diagram(plates.watershed("ws", ib, ctx), "Illustration of two watersheds; the figures under each come from the national surveys, the bar from EPA StreamCat (NLCD 2019)."),
+                diagram(plates.watershed("ws", ib, None), "Illustration of two watersheds; the figures under each come from the national surveys."),
                 chart(spec, "All usable biological surveys with watershed land cover (EPA StreamCat, NLCD 2019). Observed averages, not model output."),
-                text(f"The watershed above the chapter's sites is {ci:.1f}% paved and roofed, in the band where losses usually start to "
-                     "show. Paving there grew only from 11.8% to 12.8% between 2001 and 2019 (StreamCat), so the next step is to look for "
-                     "local causes that land-cover maps miss: construction, stormwater outfalls, sewer leaks or a spill."),
-                links([("model", "the model that turns this pattern into an expected value for each survey")])])
+                text("The steepest losses come early: sensitive animals thin out well before a watershed is a quarter paved. "
+                     "Paving explains low scores better than winter road salt does once both are measured, and each watershed's own "
+                     "paving since 1985 is shown when you pick it on the Explore map."),
+                links([("model", "the model that turns this pattern into an expected value for each survey"),
+                       ("development-salt", "paved land versus winter salt"), ("watershed-findings", "findings for each watershed")])])
 
 
 @finding("national", "model", "How the expected-score model works", order=20)
@@ -80,7 +77,7 @@ def model(db):
                 text(f"Rainfall in the week before each survey {'is included' if rain else 'is still being added'}. Volunteer data is "
                      "noisy, so an R² near 0.4 at unseen sites is useful: enough to set an expected range for each survey and to tell "
                      "a change in the stream from a change in the season or team."),
-                links([("expected", "what the model says about the chapter's sites"), ("paving", "the land-cover pattern it relies on")])],
+                links([("paving", "the land-cover pattern it relies on"), ("expected", "the model applied to one creek (case study)")])],
         method="scikit-learn HistGradientBoostingRegressor (500 iterations, learning rate 0.04, 15 leaves, at least 40 surveys per "
                "leaf); importance by scrambling each input group on held-out folds.")
 

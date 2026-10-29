@@ -346,7 +346,9 @@ def build(db_path=C.DB_PATH, out: Path = OUT, body_out: Path = BODY_OUT) -> Path
     totals = db.rows("""SELECT count(*) FILTER (WHERE usable) AS usable, count(DISTINCT site_id) FILTER (WHERE usable) AS sites
                         FROM surveys""")[0]
     sos, va = db.sos(), db.va()
+    wsf_meta = HERE / "wsf" / "meta.json"
     meta = {"snapshot": db.snapshot(), "chapter_surveys": len(sos) + len(va),
+            "wsf_units": json.loads(wsf_meta.read_text())["units"] if wsf_meta.exists() else 0,
             "first_year": min(int(r["date"][:4]) for r in sos) if sos else None,
             "last_year": max(int(r["date"][:4]) for r in sos + va) if sos else None,
             "usable": totals["usable"], "sites": totals["sites"]}
@@ -376,7 +378,7 @@ def build(db_path=C.DB_PATH, out: Path = OUT, body_out: Path = BODY_OUT) -> Path
     from .diagrams import plates
     from .findings.watersheds import chapter_huc, complete
     pages = {"index.html": render("home.html", "index.html",
-                                  explorer_chapter=(chapter_huc(db) or "") if complete(db) else None,
+                                  explorer_chapter="" if complete(db) else None,
                                   key=[i for s in sections for i in s["findings"] if i["key"]])}
     key = [i for s in sections for i in s["findings"] if i["key"]]
     pages["findings.html"] = render("findings.html", "findings.html", key=key)
@@ -387,6 +389,15 @@ def build(db_path=C.DB_PATH, out: Path = OUT, body_out: Path = BODY_OUT) -> Path
             prev = s["findings"][n - 1] if n else None
             nxt = s["findings"][n + 1] if n + 1 < len(s["findings"]) else None
             pages[i["url"]] = render("finding.html", i["url"], section=s, item=i, prev=prev, next=nxt)
+    # Pages that moved into the Great Seneca Creek case study keep working at their old addresses.
+    moved = {"chemistry.html": "chapter.html", "chemistry--road-salt.html": "chapter--road-salt.html",
+             "chemistry--nitrate.html": "chapter--nitrate.html", "region.html": "chapter.html",
+             "region--neighbour-trends.html": "chapter--neighbour-trends.html", "region--nearby-sites.html": "chapter--nearby-sites.html",
+             "region--local-map.html": "chapter--local-map.html", "watersheds--great-seneca.html": "chapter--great-seneca.html"}
+    for old, new in moved.items():
+        if old not in pages and new in pages:
+            pages[old] = (f'<!doctype html><meta charset="utf-8"><title>Moved</title><link rel="canonical" href="{new}">'
+                          f'<meta http-equiv="refresh" content="0; url={new}"><p>This page moved to <a href="{new}">{new}</a>.</p>')
     for name, html in pages.items():
         (out / name).write_text(html)
 

@@ -2,204 +2,6 @@
  "snapshot": "2026-10-27",
  "findings": [
   {
-   "section": "chapter",
-   "id": "expected",
-   "title": "Compared with what its setting predicts",
-   "url": "chapter--expected.html",
-   "key": true,
-   "headline": "Site 1 finds fewer pollution-sensitive animals than its setting predicts, and the gap appears to be widening (p = 0.055, about 11 percentage points a decade).",
-   "status": "watch",
-   "numbers": [
-    {
-     "value": "11 pts",
-     "label": "per decade, widening gap at Site 1"
-    },
-    {
-     "value": "2 of 3",
-     "label": "latest Site 1 surveys below the expected range"
-    }
-   ]
-  },
-  {
-   "section": "chapter",
-   "id": "score-trend",
-   "title": "The score has held steady",
-   "url": "chapter--score-trend.html",
-   "key": true,
-   "headline": "Scores held near 16.5 before 2013 and 16.6 since; the overall score shows no trend.",
-   "status": "steady",
-   "numbers": [
-    {
-     "value": "16.5 \u2192 16.6",
-     "label": "mean SOS score, before and since 2013"
-    },
-    {
-     "value": "3.4",
-     "label": "points between the two sites on the same day"
-    }
-   ]
-  },
-  {
-   "section": "chapter",
-   "id": "species-mix",
-   "title": "The mix of animals is shifting",
-   "url": "chapter--species-mix.html",
-   "key": true,
-   "headline": "Between 2005\u20132009 and 2020\u20132024, damselflies and common net-spinning caddisflies became rarer while dobsonflies and aquatic worms became regulars.",
-   "status": "watch",
-   "numbers": [
-    {
-     "value": "65% \u2192 15%",
-     "label": "damselflies, share of surveys"
-    },
-    {
-     "value": "47% \u2192 92%",
-     "label": "aquatic worms, share of surveys"
-    }
-   ]
-  },
-  {
-   "section": "chapter",
-   "id": "trend-tests",
-   "title": "Trend tests",
-   "url": "chapter--trend-tests.html",
-   "key": false,
-   "headline": "At Site 1 the share of pollution-sensitive groups is declining (p = 0.042) while the total score shows no clear trend.",
-   "status": "concern",
-   "numbers": []
-  },
-  {
-   "section": "chapter",
-   "id": "score-parts",
-   "title": "What moves the score",
-   "url": "chapter--score-parts.html",
-   "key": false,
-   "headline": "Pollution-sensitive animals drive the swings: they add 2 to 18 points per survey.",
-   "status": "info",
-   "numbers": []
-  },
-  {
-   "section": "chapter",
-   "id": "season",
-   "title": "Season matters",
-   "url": "chapter--season.html",
-   "key": false,
-   "headline": "Spring surveys average 2.6 points more than summer ones, so trends must compare like seasons.",
-   "status": "info",
-   "numbers": []
-  },
-  {
-   "section": "chapter",
-   "id": "survey-forms",
-   "title": "The chapter changed survey forms in 2024",
-   "url": "chapter--survey-forms.html",
-   "key": false,
-   "headline": "Since 2024 the chapter has also used the Virginia form, which the Hub's own site page does not chart.",
-   "status": "info",
-   "numbers": []
-  },
-  {
-   "section": "watersheds",
-   "id": "great-seneca",
-   "title": "Great Seneca Creek within its watersheds",
-   "url": "watersheds--great-seneca.html",
-   "key": false,
-   "headline": "Great Seneca Creek's subwatershed finds 39% sensitive groups against 39% expected; its wider watershed, Seneca Creek, finds 39%.",
-   "status": "info",
-   "numbers": []
-  },
-  {
-   "section": "watersheds",
-   "id": "watershed-findings",
-   "title": "How the findings for each watershed are worked out",
-   "url": "watersheds--watershed-findings.html",
-   "key": false,
-   "headline": "Pick any watershed on the Explore map to see what the data show there: 28,015 units have findings of their own, each a plain sentence with its numbers and numbered sources.",
-   "status": "info",
-   "numbers": [
-    {
-     "value": "28,015",
-     "label": "watersheds with findings"
-    },
-    {
-     "value": "271",
-     "label": "trend tests"
-    },
-    {
-     "value": "13",
-     "label": "driver models"
-    }
-   ]
-  },
-  {
-   "section": "chemistry",
-   "id": "road-salt",
-   "title": "Road salt reaches the creek every winter",
-   "url": "chemistry--road-salt.html",
-   "key": true,
-   "headline": "Chloride in the creek climbs from about 85 mg/L in summer to winter peaks of 159, still below the EPA's 230.",
-   "status": "watch",
-   "numbers": [
-    {
-     "value": "159 mg/L",
-     "label": "highest winter chloride in the creek"
-    },
-    {
-     "value": "132 mg/L",
-     "label": "Maryland Salt Watch median"
-    }
-   ]
-  },
-  {
-   "section": "chemistry",
-   "id": "nitrate",
-   "title": "Nitrate stays low",
-   "url": "chemistry--nitrate.html",
-   "key": false,
-   "headline": "Nitrate strips have read 2 mg/L at the creek on every visit.",
-   "status": "good",
-   "numbers": []
-  },
-  {
-   "section": "region",
-   "id": "local-map",
-   "title": "Map of sites around the creek",
-   "url": "region--local-map.html",
-   "key": false,
-   "headline": "1652 Clean Water Hub sites with surveys lie within 30 km of the chapter; the long-record ones cluster to the southwest, across the Potomac.",
-   "status": "info",
-   "numbers": []
-  },
-  {
-   "section": "region",
-   "id": "neighbour-trends",
-   "title": "Streams across the Potomac are mostly improving",
-   "url": "region--neighbour-trends.html",
-   "key": true,
-   "headline": "11 of 31 long-record sites within 30 km show improving scores, the opposite of Site 1's direction.",
-   "status": "good",
-   "numbers": [
-    {
-     "value": "11 of 31",
-     "label": "neighbour sites improving"
-    },
-    {
-     "value": "about 3",
-     "label": "expected by chance alone"
-    }
-   ]
-  },
-  {
-   "section": "region",
-   "id": "nearby-sites",
-   "title": "Sites nearby",
-   "url": "region--nearby-sites.html",
-   "key": false,
-   "headline": "25 other Hub sites within 10 km have usable surveys, mostly salt and nitrate readings.",
-   "status": "info",
-   "numbers": []
-  },
-  {
    "section": "national",
    "id": "map",
    "title": "Where volunteers monitor",
@@ -228,12 +30,16 @@
    "status": "info",
    "numbers": [
     {
-     "value": "12.8%",
-     "label": "of the chapter's watershed paved or roofed (2019)"
+     "value": "40%",
+     "label": "sensitive share where under 2% is paved"
     },
     {
-     "value": "28%",
-     "label": "of it forest"
+     "value": "22%",
+     "label": "where a quarter or more is paved"
+    },
+    {
+     "value": "7,326",
+     "label": "surveys"
     }
    ]
   },
@@ -493,6 +299,204 @@
    ]
   },
   {
+   "section": "watersheds",
+   "id": "watershed-findings",
+   "title": "How the findings for each watershed are worked out",
+   "url": "watersheds--watershed-findings.html",
+   "key": false,
+   "headline": "Pick any watershed on the Explore map to see what the data show there: 28,015 units have findings of their own, each a plain sentence with its numbers and numbered sources.",
+   "status": "info",
+   "numbers": [
+    {
+     "value": "28,015",
+     "label": "watersheds with findings"
+    },
+    {
+     "value": "271",
+     "label": "trend tests"
+    },
+    {
+     "value": "13",
+     "label": "driver models"
+    }
+   ]
+  },
+  {
+   "section": "chapter",
+   "id": "expected",
+   "title": "Compared with what its setting predicts",
+   "url": "chapter--expected.html",
+   "key": false,
+   "headline": "Site 1 finds fewer pollution-sensitive animals than its setting predicts, and the gap appears to be widening (p = 0.055, about 11 percentage points a decade).",
+   "status": "watch",
+   "numbers": [
+    {
+     "value": "11 pts",
+     "label": "per decade, widening gap at Site 1"
+    },
+    {
+     "value": "2 of 3",
+     "label": "latest Site 1 surveys below the expected range"
+    }
+   ]
+  },
+  {
+   "section": "chapter",
+   "id": "score-trend",
+   "title": "The score has held steady",
+   "url": "chapter--score-trend.html",
+   "key": false,
+   "headline": "Scores held near 16.5 before 2013 and 16.6 since; the overall score shows no trend.",
+   "status": "steady",
+   "numbers": [
+    {
+     "value": "16.5 \u2192 16.6",
+     "label": "mean SOS score, before and since 2013"
+    },
+    {
+     "value": "3.4",
+     "label": "points between the two sites on the same day"
+    }
+   ]
+  },
+  {
+   "section": "chapter",
+   "id": "species-mix",
+   "title": "The mix of animals is shifting",
+   "url": "chapter--species-mix.html",
+   "key": false,
+   "headline": "Between 2005\u20132009 and 2020\u20132024, damselflies and common net-spinning caddisflies became rarer while dobsonflies and aquatic worms became regulars.",
+   "status": "watch",
+   "numbers": [
+    {
+     "value": "65% \u2192 15%",
+     "label": "damselflies, share of surveys"
+    },
+    {
+     "value": "47% \u2192 92%",
+     "label": "aquatic worms, share of surveys"
+    }
+   ]
+  },
+  {
+   "section": "chapter",
+   "id": "trend-tests",
+   "title": "Trend tests",
+   "url": "chapter--trend-tests.html",
+   "key": false,
+   "headline": "At Site 1 the share of pollution-sensitive groups is declining (p = 0.042) while the total score shows no clear trend.",
+   "status": "concern",
+   "numbers": []
+  },
+  {
+   "section": "chapter",
+   "id": "score-parts",
+   "title": "What moves the score",
+   "url": "chapter--score-parts.html",
+   "key": false,
+   "headline": "Pollution-sensitive animals drive the swings: they add 2 to 18 points per survey.",
+   "status": "info",
+   "numbers": []
+  },
+  {
+   "section": "chapter",
+   "id": "season",
+   "title": "Season matters",
+   "url": "chapter--season.html",
+   "key": false,
+   "headline": "Spring surveys average 2.6 points more than summer ones, so trends must compare like seasons.",
+   "status": "info",
+   "numbers": []
+  },
+  {
+   "section": "chapter",
+   "id": "survey-forms",
+   "title": "The chapter changed survey forms in 2024",
+   "url": "chapter--survey-forms.html",
+   "key": false,
+   "headline": "Since 2024 the chapter has also used the Virginia form, which the Hub's own site page does not chart.",
+   "status": "info",
+   "numbers": []
+  },
+  {
+   "section": "chapter",
+   "id": "great-seneca",
+   "title": "Great Seneca Creek within its watersheds",
+   "url": "chapter--great-seneca.html",
+   "key": false,
+   "headline": "Great Seneca Creek's subwatershed finds 39% sensitive groups against 39% expected; its wider watershed, Seneca Creek, finds 39%.",
+   "status": "info",
+   "numbers": []
+  },
+  {
+   "section": "chapter",
+   "id": "road-salt",
+   "title": "Road salt reaches the creek every winter",
+   "url": "chapter--road-salt.html",
+   "key": false,
+   "headline": "Chloride in the creek climbs from about 85 mg/L in summer to winter peaks of 159, still below the EPA's 230.",
+   "status": "watch",
+   "numbers": [
+    {
+     "value": "159 mg/L",
+     "label": "highest winter chloride in the creek"
+    },
+    {
+     "value": "132 mg/L",
+     "label": "Maryland Salt Watch median"
+    }
+   ]
+  },
+  {
+   "section": "chapter",
+   "id": "nitrate",
+   "title": "Nitrate stays low",
+   "url": "chapter--nitrate.html",
+   "key": false,
+   "headline": "Nitrate strips have read 2 mg/L at the creek on every visit.",
+   "status": "good",
+   "numbers": []
+  },
+  {
+   "section": "chapter",
+   "id": "local-map",
+   "title": "Map of sites around the creek",
+   "url": "chapter--local-map.html",
+   "key": false,
+   "headline": "1652 Clean Water Hub sites with surveys lie within 30 km of the chapter; the long-record ones cluster to the southwest, across the Potomac.",
+   "status": "info",
+   "numbers": []
+  },
+  {
+   "section": "chapter",
+   "id": "neighbour-trends",
+   "title": "Streams near the creek are mostly improving",
+   "url": "chapter--neighbour-trends.html",
+   "key": false,
+   "headline": "11 of 31 long-record sites within 30 km show improving scores, the opposite of Site 1's direction.",
+   "status": "good",
+   "numbers": [
+    {
+     "value": "11 of 31",
+     "label": "neighbour sites improving"
+    },
+    {
+     "value": "about 3",
+     "label": "expected by chance alone"
+    }
+   ]
+  },
+  {
+   "section": "chapter",
+   "id": "nearby-sites",
+   "title": "Sites near the creek",
+   "url": "chapter--nearby-sites.html",
+   "key": false,
+   "headline": "25 other Hub sites within 10 km have usable surveys, mostly salt and nitrate readings.",
+   "status": "info",
+   "numbers": []
+  },
+  {
    "section": "data",
    "id": "data-quality",
    "title": "How clean the data is",
@@ -517,7 +521,7 @@
    "title": "Water temperature switches units",
    "url": "data--temperature-units.html",
    "key": false,
-   "headline": "The Hub stores no temperature unit; chapter readings switch from \u00b0C to \u00b0F in 2012, and 83 readings nationwide needed converting.",
+   "headline": "The Hub stores no temperature unit; at one long-running site pair (Great Seneca Creek) readings switch from \u00b0C to \u00b0F in 2012, and 83 readings nationwide needed converting.",
    "status": "info",
    "numbers": []
   },

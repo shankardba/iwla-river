@@ -55,9 +55,9 @@ def temperature_units(db):
                         "tip": f"{LABEL[r['site_id']]}, {r['date']}: entered {r['raw']:g}" + (f" → {r['c']:g} °C" if r["c"] is not None else "")}
                         for r in rows if color.get(r["rule"], "bad") == c]} for c in ("accent", "warn", "bad")]}
     return Page(refs=["cwh"], 
-        headline=f"The Hub stores no temperature unit; chapter readings switch from °C to °F in {first_f}, and {fmt(n.get('fahrenheit_converted', 0))} readings nationwide needed converting.",
+        headline=f"The Hub stores no temperature unit; at one long-running site pair (Great Seneca Creek) readings switch from °C to °F in {first_f}, and {fmt(n.get('fahrenheit_converted', 0))} readings nationwide needed converting.",
         status="info",
-        blocks=[chart(spec, "Water temperature as entered at the chapter sites."),
+        blocks=[chart(spec, "Water temperature as entered at the two Great Seneca Creek sites (case study), an example of the unit switch."),
                 text(f"Entries move from Celsius (under 30) to what can only be Fahrenheit (50 to 80) from {first_f}, sometimes on the "
                      f"same day at the two sites. Readings up to 32 are taken as °C, 41 and up as °F and converted, and 32 to 41 is "
                      f"left blank as unclear ({fmt(n.get('ambiguous', 0))} readings nationwide). Without this fix any temperature trend would be meaningless.")])

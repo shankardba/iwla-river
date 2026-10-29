@@ -6,16 +6,16 @@ from ..db import CHAPTER, LABEL, PROTO, fmt, mean, pct, pfmt, season, verdict_pi
 from ..diagrams import plates
 from ..registry import Page, chart, diagram, finding, links, pill, section, table, text
 
-section("chapter", "Great Seneca Creek",
-        "The Rockville Chapter's two monitoring sites on Great Seneca Creek in Germantown, Maryland, "
-        "surveyed since 2005: how stream health has moved, which animals are changing and how the creek "
-        "compares with what its setting predicts.", order=10)
+section("chapter", "Case study: Great Seneca Creek",
+        "One creek followed in depth: the IWLA Rockville Chapter's two monitoring sites on Great Seneca Creek in "
+        "Germantown, Maryland, surveyed since 2005. How stream health has moved, which animals are changing, road salt "
+        "in winter, how the creek compares with what its setting predicts, and how nearby streams are changing.", order=80)
 
 SITE_COLOR = {467: "accent", 468: "grey"}
 LEGEND_SITES = [{"name": "Site 1", "color": "accent"}, {"name": "Site 2", "color": "grey"}]
 
 
-@finding("chapter", "score-trend", "The score has held steady", order=10, key=True)
+@finding("chapter", "score-trend", "The score has held steady", order=10)
 def score_trend(db):
     sos = db.sos()
     if not sos:
@@ -56,7 +56,7 @@ def score_trend(db):
         ])
 
 
-@finding("chapter", "species-mix", "The mix of animals is shifting", order=20, key=True)
+@finding("chapter", "species-mix", "The mix of animals is shifting", order=20)
 def species_mix(db):
     rows = db.rows(f"""SELECT taxon, tolerance, period, sum(found)::int AS found, sum(surveys)::int AS surveys
                        FROM taxa_by_period WHERE site_id IN ({CHAPTER}) AND protocol = 'sos_bio'
@@ -143,7 +143,7 @@ def trend_tests(db):
                "turning points by a permutation test of the strongest mean shift (999 shuffles).")
 
 
-@finding("chapter", "expected", "Compared with what its setting predicts", order=5, key=True)
+@finding("chapter", "expected", "Compared with what its setting predicts", order=5)
 def expected(db):
     if not db.has("expected"):
         return None

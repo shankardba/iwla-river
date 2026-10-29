@@ -15,7 +15,7 @@ RES = Path(__file__).with_name("context_results.json")
 
 section("context", "In context",
         "The volunteer data checked against public measurements: agency laboratory chloride, professional bug surveys, "
-        "state lists of impaired waters, land cover, permits and census data.", order=45)
+        "state lists of impaired waters, land cover, permits and census data.", order=20)
 
 
 def res(key):

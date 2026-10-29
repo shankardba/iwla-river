@@ -21,7 +21,7 @@ from .db import DB, fmt
 from .diagrams import bugs, plates
 from .diagrams.kit import figure, place
 
-SHARE_VERSION = 1
+SHARE_VERSION = 2
 HERE = Path(__file__).resolve().parent
 ASSETS = HERE / "assets"
 CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
@@ -65,9 +65,9 @@ def card_html(db: DB) -> str:
       .sub b {{ color: var(--ink); font-weight: 600; }}
     </style></head><body><div class="card">
       <div class="txt">
-        <div class="eb">IWLA Rockville Chapter · Save Our Streams</div>
-        <h1>Great Seneca Creek Record</h1>
-        <div class="sub">Stream surveys since <b>{first}</b>, read against <b>{fmt(usable)}</b> nationwide</div>
+        <div class="eb">Independent analysis · Save Our Streams data</div>
+        <h1>Save Our Streams Record</h1>
+        <div class="sub"><b>{fmt(usable)}</b> volunteer stream samples nationwide, every result cited</div>
       </div>
       <div class="art">{art}</div>
     </div></body></html>"""
@@ -76,7 +76,7 @@ def card_html(db: DB) -> str:
 def icon_svg() -> str:
     """A mayfly nymph on the site's river blue: the animal the whole score leans on."""
     body = f'<rect width="100" height="100" fill="#1d6a86"/>' + place(bugs.mayfly("ic"), 50, 6, 0.86)
-    svg = figure("ic", 100, 100, "Great Seneca Creek Record", body)
+    svg = figure("ic", 100, 100, "Save Our Streams Record", body)
     # Icons do not follow the page theme: pin the palette to light values.
     return svg.replace('<svg class="dg"', '<svg xmlns="http://www.w3.org/2000/svg" class="dg" data-theme="light"', 1)
 

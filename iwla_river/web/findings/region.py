@@ -8,12 +8,10 @@ from ... import config as C
 from ..db import CHAPTER, fmt, pfmt, public_site, year
 from ..registry import Page, chart, finding, gmaps, links, maplink, section, table, text
 
-section("region", "Neighbouring streams",
-        f"Every Clean Water Hub site within {C.NEIGHBOUR_KM} km of the chapter with a long enough record, most of them "
-        "Fairfax County streams across the Potomac: are they changing the same way?", order=30)
+# Part of the Great Seneca Creek case study (section "chapter"): sites within C.NEIGHBOUR_KM km of the creek.
 
 
-@finding("region", "neighbour-trends", "Streams across the Potomac are mostly improving", order=10, key=True)
+@finding("chapter", "neighbour-trends", "Streams near the creek are mostly improving", order=70)
 def neighbour_trends(db):
     rows = [r for r in db.trends() if not r["is_chapter_site"] and r["measure"] == "score"
             and r["verdict"] != "too few repeat seasons"]
@@ -54,7 +52,7 @@ def neighbour_trends(db):
                 links([("expected", "the model-based test, which judges every site against its own setting")])])
 
 
-@finding("region", "nearby-sites", "Sites nearby", order=20)
+@finding("chapter", "nearby-sites", "Sites near the creek", order=72)
 def nearby_sites(db):
     rows = db.rows(f"""
         WITH c AS (SELECT lat, lon FROM sites WHERE site_id = 467), d AS (

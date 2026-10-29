@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>{% block title %}Great Seneca Creek Record{% endblock %}</title>
+<title>{% block title %}Save Our Streams Record{% endblock %}</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-{% set desc %}{% block description %}Investigate 20 years of Save Our Streams surveys on Great Seneca Creek, against 83,000 volunteer samples nationwide.{% endblock %}{% endset %}
+{% set desc %}{% block description %}An independent analysis of Save Our Streams volunteer stream data nationwide: trends, every watershed, and how volunteer surveys compare with professional data, with every result cited.{% endblock %}{% endset %}
 {% set ttl %}{{ self.title() }}{% endset %}
 <link rel="icon" href="assets/icon.svg?v={{ share_v }}" type="image/svg+xml">
 <link rel="icon" href="assets/favicon-32.png?v={{ share_v }}" sizes="32x32" type="image/png">
@@ -13,14 +13,14 @@
 <meta name="description" content="{{ desc | trim }}">
 <meta name="theme-color" content="#1d6a86">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="Great Seneca Creek Record">
+<meta property="og:site_name" content="Save Our Streams Record">
 <meta property="og:title" content="{{ ttl | trim }}">
 <meta property="og:description" content="{{ desc | trim }}">
 <meta property="og:url" content="{{ site_url }}{{ '' if page_name == 'index.html' else page_name }}">
 <meta property="og:image" content="{{ site_url }}assets/og-image.png?v={{ share_v }}">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Great Seneca Creek Record: a stream riffle with the animals volunteers count, IWLA Rockville Chapter, Save Our Streams">
+<meta property="og:image:alt" content="Save Our Streams Record: a stream riffle with the animals volunteers count; an independent analysis of Save Our Streams data">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="{{ ttl | trim }}">
 <meta name="twitter:description" content="{{ desc | trim }}">
@@ -37,16 +37,16 @@
 {% set story = sections | rejectattr("id", "in", ["data"]) | list %}
 <header class="topbar">
   <div class="topbar-in">
-    <a class="brand" href="index.html" aria-label="Great Seneca Creek Record, home">
+    <a class="brand" href="index.html" aria-label="Save Our Streams Record, home">
       <img src="assets/icon.svg?v={{ share_v }}" alt="" width="26" height="26">
-      <span class="brand-name">Great Seneca Creek Record</span>
+      <span class="brand-name">Save Our Streams Record</span>
     </a>
     <nav class="mainnav" aria-label="Main">
       <ul>
         <li><a class="nav-link" href="index.html" {% if here == "index.html" %}aria-current="page"{% endif %}>Explore</a></li>
         <li class="has-menu">
           <button class="nav-link" type="button" aria-expanded="false" aria-controls="menu-findings"
-            {% if here == "findings.html" or ((here.split("--")[0] ~ ".html") in (story | map(attribute="url") | list) and not here.startswith("chapter")) %}data-current{% endif %}>Findings<svg viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></button>
+            {% if here == "findings.html" or ((here.split("--")[0] ~ ".html") in (story | map(attribute="url") | list)) %}data-current{% endif %}>Findings<svg viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></button>
           <div class="menu mega" id="menu-findings" hidden>
             <a class="menu-all" href="findings.html">All findings <span class="meta">every result on one page</span></a>
             <div class="mega-cols">
@@ -59,7 +59,6 @@
             </div>
           </div>
         </li>
-        <li><a class="nav-link" href="chapter.html" {% if here.startswith("chapter") %}aria-current="page"{% endif %}>Great Seneca Creek</a></li>
         {% if data_sec %}
         <li class="has-menu">
           <button class="nav-link" type="button" aria-expanded="false" aria-controls="menu-data" {% if here.startswith("data") %}data-current{% endif %}>Data<svg viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></button>

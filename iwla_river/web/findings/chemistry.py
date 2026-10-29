@@ -5,11 +5,9 @@ from __future__ import annotations
 from ... import config as C
 from ..db import CHEM, fmt, mean, year
 from ..diagrams import plates
-from ..registry import Page, chart, diagram, finding, links, section, table, text
+from ..registry import Page, chart, diagram, finding, links, table, text
 
-section("chemistry", "Water chemistry",
-        "Chloride from road salt and nitrate from fertilizer and sewage, measured with Salt Watch and Nitrate Watch "
-        "strips at the chapter's creek and lake since 2024.", order=20)
+# Part of the Great Seneca Creek case study (section "chapter").
 
 CHEM_LABEL = C.CHAPTER_CHEM_SITES
 
@@ -19,7 +17,7 @@ def readings(db, parameter):
                        WHERE s.site_id IN ({CHEM}) AND c.parameter = '{parameter}' ORDER BY date""")
 
 
-@finding("chemistry", "road-salt", "Road salt reaches the creek every winter", order=10, key=True)
+@finding("chapter", "road-salt", "Road salt reaches the creek every winter", order=65)
 def road_salt(db):
     cl = readings(db, "chloride")
     if not cl:
@@ -59,7 +57,7 @@ def road_salt(db):
                 links([("expected", "the loss of sensitive animals at Site 1")])])
 
 
-@finding("chemistry", "nitrate", "Nitrate stays low", order=20)
+@finding("chapter", "nitrate", "Nitrate stays low", order=66)
 def nitrate(db):
     no3 = readings(db, "nitrate")
     if not no3:

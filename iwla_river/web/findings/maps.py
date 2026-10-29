@@ -81,18 +81,12 @@ def national_map(db):
         pts.append({"x": x, "y": y, "r": round(min(9, 1.6 + math.sqrt(n) * 0.45), 1),
                     "c": "c4" if c["bio"] else "c1", "ll": [la, lo],
                     "tip": f"{len(c['sites'])} sites: {c['bio']} bio, {c['chem']} chem"})
-    site = db.rows("SELECT lat, lon FROM sites WHERE site_id = 467")[0]
-    cx, cy = P(*albers(site["lat"], site["lon"]))
-    pts.append({"x": cx, "y": cy, "r": 6, "color": "bad", "opacity": 1, "ring": True, "href": gmaps(site["lat"], site["lon"]),
-                "tip": "Great Seneca Creek, the chapter's teaching site. Click for Google Maps."})
     states = db.rows("""SELECT state, count(DISTINCT site_id) AS sites FROM usable_surveys WHERE state IS NOT NULL
                         GROUP BY 1 ORDER BY sites DESC LIMIT 5""")
     n_sites = sum(len(c["sites"]) for c in cells.values())
     spec = {"type": "map", "title": f"{fmt(n_sites)} monitored sites in the lower 48 states",
-            "legend": [{"name": "Has biological surveys", "color": "c4"}, {"name": "Salt, nitrate or chemistry only", "color": "c1"},
-                       {"name": "Great Seneca Creek", "color": "bad"}],
+            "legend": [{"name": "Has biological surveys", "color": "c4"}, {"name": "Salt, nitrate or chemistry only", "color": "c1"}],
             "height": round(H), "points": pts, "opacity": 0.6, "paths": outline_paths(P),
-            "labels": [{"x": cx, "y": cy, "tx": cx - 50, "ty": cy + 70, "text": "Great Seneca Creek", "anchor": "end"}],
             "note": "Dot size: surveys in each quarter-degree cell. Alaska and Hawaii not shown. Outlines: US Census Bureau. Click a dot to open it in Google Maps."}
     return Page(refs=["cwh", "census-boundaries"], 
         headline=f"{fmt(n_sites)} sites across the lower 48 states have usable surveys; most are in {', '.join(s['state'] for s in states[:3])}.",
@@ -102,10 +96,10 @@ def national_map(db):
                 text("Biological surveys, which the expected-score model learns from, cluster in the mid-Atlantic and upper Midwest. "
                      "Salt Watch and Nitrate Watch kits spread monitoring much more widely. No map tiles are loaded: the dots are "
                      "placed by each site's own coordinates, and each opens in Google Maps."),
-                links([("local-map", "the sites around Great Seneca Creek"), ("model", "the model trained on these surveys")])])
+                links([("model", "the model trained on these surveys"), ("monitoring-gaps", "where high-need watersheds have no volunteer")])])
 
 
-@finding("region", "local-map", "Map of sites around the creek", order=5, key=False)
+@finding("chapter", "local-map", "Map of sites around the creek", order=68)
 def local_map(db):
     c = db.rows("SELECT lat, lon FROM sites WHERE site_id = 467")[0]
     lat0, lon0 = c["lat"], c["lon"]

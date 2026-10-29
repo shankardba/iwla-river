@@ -1,4 +1,4 @@
-"""Watershed findings: the zoomable explorer and the chapter's place in its nested watersheds."""
+"""Watershed findings: how the per-watershed findings work, and (for the case study) the creek in its nested watersheds."""
 
 from __future__ import annotations
 
@@ -7,8 +7,8 @@ from ..db import fmt, pct
 from ..registry import Page, finding, links, section, table, text
 
 section("watersheds", "Watersheds",
-        "How the chapter's creek compares with each larger watershed it sits inside. To zoom through every "
-        "watershed in the country, use Explore.", order=15)
+        "Findings for every watershed in the country, from regions down to small subwatersheds: pick one on the Explore "
+        "map to see what the data show there.", order=30)
 
 LEVEL = {2: "Region", 4: "Subregion", 6: "Basin", 8: "Subbasin", 10: "Watershed", 12: "Subwatershed"}
 
@@ -49,7 +49,7 @@ def explorer(db):  # retired: the Explore page (index.html) is the explorer now
                "median gap per season and year, shown only with at least 10 same-season comparisons.")
 
 
-@finding("watersheds", "great-seneca", "Great Seneca Creek within its watersheds", order=20, key=False)
+@finding("chapter", "great-seneca", "Great Seneca Creek within its watersheds", order=60)
 def great_seneca(db):
     huc = chapter_huc(db)
     if not huc:

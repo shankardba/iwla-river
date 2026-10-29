@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% import "_blocks.html" as ui with context %}
-{% block title %}Great Seneca Creek Record · Explore{% endblock %}
+{% block title %}Save Our Streams Record · Explore{% endblock %}
 {% block body_class %}is-app{% endblock %}
 {% block body %}
 {% if explorer_chapter is not none %}
@@ -55,8 +55,8 @@
     <div class="numbers">
       <div><b>{{ meta.usable | fmt }}</b><span>usable samples nationwide</span></div>
       <div><b>{{ meta.sites | fmt }}</b><span>sites with samples</span></div>
-      <div><b>{{ meta.chapter_surveys }}</b><span>surveys at the chapter's two sites</span></div>
-      <div><b>{{ meta.first_year }}–{{ meta.last_year }}</b><span>years of the chapter's record</span></div>
+      <div><b>{{ meta.wsf_units | fmt }}</b><span>watersheds with findings of their own</span></div>
+      <div><b>{{ refs | length }}</b><span>cited sources</span></div>
     </div>
   </section>
 </div>

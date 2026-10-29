@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 {% import "_blocks.html" as ui with context %}
-{% block title %}Findings · Great Seneca Creek Record{% endblock %}
-{% block description %}Every result from the Save Our Streams data, from Great Seneca Creek to the national picture.{% endblock %}
+{% block title %}Findings · Save Our Streams Record{% endblock %}
+{% block description %}Every result from the Save Our Streams data: national patterns, checks against public data, every watershed, and one creek as a case study.{% endblock %}
 {% block main %}
 <header class="hero">
   <div class="eyebrow">Findings</div>
   <h1>What the data shows</h1>
-  <p class="lede">{{ meta.chapter_surveys }} stream surveys at the chapter's two sites, read against {{ meta.usable | fmt }} volunteer samples nationwide. Each result has its own page with the evidence behind it.</p>
+  <p class="lede">{{ meta.usable | fmt }} volunteer samples nationwide, checked against public USGS, EPA, state and Census data. Each result has its own page with the evidence, the method and every source behind it.</p>
 </header>
 
 <section class="block">

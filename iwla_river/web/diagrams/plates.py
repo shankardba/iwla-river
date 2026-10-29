@@ -206,8 +206,8 @@ def pts_(points):
 
 
 def watershed(p, bins, ctx):
-    """bins: [{label, mean}] national sensitive share by paved band; ctx: chapter watershed land cover."""
-    W, H = 760, 420
+    """bins: [{label, mean}] national sensitive share by paved band; ctx: one watershed's land cover as a bar, or None."""
+    W, H = 760, 420 if ctx else 356
     s = text(0, 18, "Two watersheds after the same storm", "dg-big")
     s += text(180, 36, "Forested", "dg-name", "middle") + text(580, 36, "Paved", "dg-name", "middle")
     s += _panel(p, 0, "forest") + _panel(p, 400, "paved")
@@ -216,7 +216,9 @@ def watershed(p, bins, ctx):
     s += text(180, 340, f"{round(100 * lo['mean'])}% of the groups found", "dg-name", "middle")
     s += text(580, 322, f"Watersheds {hi['label']} paved: sensitive animals are", "dg-sub", "middle")
     s += text(580, 340, f"{round(100 * hi['mean'])}% of the groups found", "dg-name", "middle")
-    # Great Seneca's land cover as a bar
+    if not ctx:
+        return figure(p, W, H, "Forested and paved watersheds after rain", s, flow=True)
+    # one watershed's land cover as a bar
     dev, forest = ctx.get("ws_urban_pct") or 0, ctx.get("ws_forest_pct") or 0
     farm = (ctx.get("ws_crop_pct") or 0) + (ctx.get("ws_hay_pct") or 0)
     other = max(0, 100 - dev - forest - farm)
