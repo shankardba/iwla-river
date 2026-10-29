@@ -1,4 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" class="dg" data-theme="light" viewBox="0 0 100 100" role="img" aria-label="Great Seneca Creek Record"><style>svg {
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" data-theme="light" viewBox="0 0 100 100" role="img" aria-label="Save Our Streams Record"><style>svg {
+  --heat: #d9480f; --nodata: #b8c2c3;
+  --r1: #f3d9a4; --r2: #eab46a; --r3: #df8a3e; --r4: #c95b2b; --r5: #9c2f22;
+  --s1: #b9dbe7; --s2: #7fb8d0; --s3: #3f8fb0; --s4: #1d6a86;
   --dg-line: #3b3a33; --dg-flow: #2a7fa6; --dg-nts: #b45309; --dg-sky: #e6f1f5;
   --dg-water: #9fd0e4; --dg-water-deep: #4a90b0; --dg-stone: #a7a294; --dg-stone-dark: #77736a; --dg-sand: #d9c9a3;
   --dg-soil: #9a7b55; --dg-leaf: #6fa35a; --dg-leaf-dark: #3f7a3a; --dg-bark: #7a5a3c; --dg-grass: #8dbb63;
