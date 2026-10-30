@@ -170,9 +170,11 @@ def _panel(p, x0, kind):
     """One half: a slope down to a stream channel at its right edge. Ground surface y from 150 (left) to 210."""
     w = 360
     gy = lambda x: 150 + (x - x0) / w * 52
-    s = f'<rect x="{x0}" y="40" width="{w}" height="170" fill="url(#{p}-sky)"/>'
-    ground = [(x0, 150), (x0 + w - 70, gy(x0 + w - 70)), (x0 + w - 50, 222), (x0 + w - 20, 222), (x0 + w, 205), (x0 + w, 300), (x0, 300)]
-    s += shape(f"M{pts_(ground)}Z", p, "soil", sw=0.8)
+    cid = f"{p}-clip{x0}"
+    s = f'<clipPath id="{cid}"><rect x="{x0}" y="40" width="{w}" height="270" rx="8"/></clipPath><g clip-path="url(#{cid})">'
+    s += f'<rect x="{x0}" y="40" width="{w}" height="170" fill="url(#{p}-sky)"/>'
+    ground = [(x0, 150), (x0 + w - 70, gy(x0 + w - 70)), (x0 + w - 50, 222), (x0 + w - 20, 222), (x0 + w, 205), (x0 + w, 312), (x0, 312)]
+    s += shape(f"M{pts_(ground)}Z", p, "soil", sw=0)
     s += shape(f"M{n(x0 + w - 52)} 218 Q{n(x0 + w - 35)} 228 {n(x0 + w - 18)} 218Z", p, "water", sw=0)
     # clouds and rain
     s += shape(smooth([(x0 + 40, 70), (x0 + 70, 52), (x0 + 110, 56), (x0 + 140, 50), (x0 + 175, 66), (x0 + 150, 80), (x0 + 60, 82)]), p, "snow", sw=0.6)
@@ -186,7 +188,8 @@ def _panel(p, x0, kind):
             gx = x0 + 70 + i * 40
             s += f'<path class="flow" d="M{n(gx)} {n(gy(gx) + 8)} L{n(gx + 4)} {n(gy(gx) + 40)}" style="stroke:var(--dg-flow)" stroke-width="1.6" marker-end="url(#{p}-arrow)"/>'
         s += f'<path class="flow" d="M{x0 + 70} 252 Q{x0 + 200} 272 {x0 + w - 40} 232" fill="none" style="stroke:var(--dg-flow)" stroke-width="1.8" marker-end="url(#{p}-arrow)"/>'
-        s += label((x0 + 150, gy(x0 + 150) + 30), (x0 + 24, 284), "Rain soaks in", "and seeps slowly to the stream")
+        s += f'<rect x="{x0 + 12}" y="258" width="236" height="44" rx="6" style="fill:var(--surface);opacity:.82"/>'
+        s += label((x0 + 150, gy(x0 + 150) + 30), (x0 + 20, 272), "Rain soaks in", "and seeps slowly to the stream")
     else:
         s += shape(f"M{pts_([(x0, 148), (x0 + w - 70, gy(x0 + w - 70) - 2), (x0 + w - 70, gy(x0 + w - 70) + 5), (x0, 155)])}Z", p, "road", sw=0)
         s += "".join(_house(p, x0 + 14 + i * 62, gy(x0 + 14 + i * 62) - 2, 34) for i in range(4))
@@ -197,8 +200,10 @@ def _panel(p, x0, kind):
             rx = x0 + 40 + i * 52
             s += f'<path class="flow" d="M{n(rx)} {n(gy(rx) - 5)} L{n(rx + 40)} {n(gy(rx + 40) - 5)}" style="stroke:var(--dg-flow)" stroke-width="2.2" marker-end="url(#{p}-arrow)"/>'
         s += f'<path class="flow" d="M{n(dx)} {n(gy(dx) + 8)} L{n(dx)} 246 L{n(x0 + w - 46)} 234" fill="none" style="stroke:var(--dg-flow)" stroke-width="2.2" marker-end="url(#{p}-arrow)"/>'
-        s += label((dx, gy(dx)), (x0 + 24, 284), "Rain runs off into storm drains", "and reaches the stream in minutes")
-    return s
+        s += f'<rect x="{x0 + 12}" y="258" width="236" height="44" rx="6" style="fill:var(--surface);opacity:.82"/>'
+        s += label((dx, gy(dx)), (x0 + 20, 272), "Rain runs off into storm drains", "and reaches the stream in minutes")
+    # one frame round the whole panel, drawn last so nothing crosses it
+    return s + f'</g><rect x="{x0}" y="40" width="{w}" height="270" rx="8" style="fill:none;stroke:var(--rule);stroke-width:1.2"/>'
 
 
 def pts_(points):
@@ -207,28 +212,28 @@ def pts_(points):
 
 def watershed(p, bins, ctx):
     """bins: [{label, mean}] national sensitive share by paved band; ctx: one watershed's land cover as a bar, or None."""
-    W, H = 760, 420 if ctx else 356
+    W, H = 760, 436 if ctx else 372
     s = text(0, 18, "Two watersheds after the same storm", "dg-big")
     s += text(180, 36, "Forested", "dg-name", "middle") + text(580, 36, "Paved", "dg-name", "middle")
     s += _panel(p, 0, "forest") + _panel(p, 400, "paved")
     lo, hi = bins[0], bins[-1]
-    s += text(180, 322, f"Watersheds {lo['label']} paved: sensitive animals are", "dg-sub", "middle")
-    s += text(180, 340, f"{round(100 * lo['mean'])}% of the groups found", "dg-name", "middle")
-    s += text(580, 322, f"Watersheds {hi['label']} paved: sensitive animals are", "dg-sub", "middle")
-    s += text(580, 340, f"{round(100 * hi['mean'])}% of the groups found", "dg-name", "middle")
+    s += text(180, 336, f"Watersheds {lo['label']} paved: sensitive animals are", "dg-sub", "middle")
+    s += text(180, 354, f"{round(100 * lo['mean'])}% of the groups found", "dg-name", "middle")
+    s += text(580, 336, f"Watersheds {hi['label']} paved: sensitive animals are", "dg-sub", "middle")
+    s += text(580, 354, f"{round(100 * hi['mean'])}% of the groups found", "dg-name", "middle")
     if not ctx:
         return figure(p, W, H, "Forested and paved watersheds after rain", s, flow=True)
     # one watershed's land cover as a bar
     dev, forest = ctx.get("ws_urban_pct") or 0, ctx.get("ws_forest_pct") or 0
     farm = (ctx.get("ws_crop_pct") or 0) + (ctx.get("ws_hay_pct") or 0)
     other = max(0, 100 - dev - forest - farm)
-    s += text(0, 372, f"Above the chapter's sites: {ctx.get('ws_impervious_pct', 0):.1f}% paved or roofed", "dg-name")
+    s += text(0, 388, f"Above the chapter's sites: {ctx.get('ws_impervious_pct', 0):.1f}% paved or roofed", "dg-name")
     x = 0
     for v, nm, col in ((dev, "developed", "var(--dg-roof)"), (forest, "forest", "var(--dg-leaf)"), (farm, "farm and hay", "var(--dg-grass)"), (other, "water, wetland, other", "var(--dg-water)")):
         w = 760 * v / 100
-        s += f'<rect x="{n(x)}" y="382" width="{n(w)}" height="16" style="fill:{col}"/>'
+        s += f'<rect x="{n(x)}" y="398" width="{n(w)}" height="16" style="fill:{col}"/>'
         if w > 70:
-            s += text(x + 6, 413, f"{nm} {v:.0f}%", "dg-sub")
+            s += text(x + 6, 429, f"{nm} {v:.0f}%", "dg-sub")
         x += w
     return figure(p, W, H, "Forested and paved watersheds after rain", s, flow=True)
 
