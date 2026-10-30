@@ -398,3 +398,9 @@ ol.next { margin: 0; padding-left: 22px; display: flex; flex-direction: column; 
 .ex-states a { color: var(--accent); }
 .ex-area.ex-hb path { stroke: var(--muted); stroke-width: 1; stroke-opacity: .8; }
 .ex-area.ex-hb:hover path, .ex-area.ex-hb.hl path { stroke: var(--ink); stroke-width: 2; }
+/* River table: fit the panel instead of scrolling sideways; plain headers keep their padding. */
+.ex-rivlist { width: 100%; }
+.ex-rivlist th { padding: 8px; white-space: nowrap; }
+.ex-rivlist td { white-space: normal; vertical-align: top; }
+.ex-rivlist td:first-child { min-width: 0; }
+.ex-rivlist td:first-child .ex-card-s { display: block; }

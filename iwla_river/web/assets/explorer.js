@@ -165,6 +165,19 @@
     return out.filter(r => r.L >= min || r.n === hiRiver).sort((a, b) => b.here - a.here);
   }
 
+  // The smallest watershed that holds nearly all of a river's length inside `code` (at least one level down when possible).
+  // r.u gives km by unit: regions to basins for major rivers, HUC10 and HUC12 for subbasin rivers.
+  function riverHome(r, code) {
+    let c = code, base = code ? (r.u[code] ?? r.here) : r.L;
+    for (;;) {
+      const kids = Object.entries(r.u).filter(([k]) => k.length === c.length + 2 && k.startsWith(c));
+      if (!kids.length) return c;
+      const [k, v] = kids.reduce((m, x) => x[1] > m[1] ? x : m);
+      if (!W8[k]) return c;                             // no samples in that unit: stay a level up
+      if (c !== code && v < 0.85 * base) return c;
+      c = k; base = v;
+    }
+  }
   const shape = c => !c ? null : c.length === 2 ? (GTOP || {})[c] : c.length === 4 ? (GREG[c.slice(0, 2)] || {})[c] : (GSUB[c.slice(0, 4)] || {})[c];
 
   function mapSvg(code) {
@@ -660,7 +673,12 @@
     const sb = e.target.closest("[data-st]"); if (sb) { e.preventDefault(); view = "s"; st = sb.dataset.st; render(true); return; }
     const so = e.target.closest("[data-sort]"); if (so) { const key = so.dataset.sort; sortDir = sortKey === key ? -sortDir : key === "n" ? 1 : -1; sortKey = key; render(false); return; }
     if (e.target.closest(".maplink")) return;
-    const rv = e.target.closest("[data-river]"); if (rv) { e.preventDefault(); hiRiver = hiRiver === rv.dataset.river ? null : rv.dataset.river; const top = $(".ex-panel").scrollTop; render(false).then(() => { $(".ex-panel").scrollTop = top; }); return; }
+    const rv = e.target.closest("[data-river]"); if (rv) {
+      e.preventDefault();
+      const name = rv.dataset.river, r = riversIn(cur).find(x => x.n === name), to = r ? riverHome(r, cur) : cur;
+      if (to !== cur) { hiRiver = name; site = null; cur = to; render(true); return; }   // zoom to the river's watershed, traced
+      hiRiver = hiRiver === name ? null : name; const top = $(".ex-panel").scrollTop; render(false).then(() => { $(".ex-panel").scrollTop = top; }); return;
+    }
     const siteEl = e.target.closest("[data-site]"); if (siteEl) { e.preventDefault(); openSite(siteEl.dataset.site, cur); return; }
     const g = e.target.closest("[data-go]"); if (g) { e.preventDefault(); go(g.dataset.go); }
   });
