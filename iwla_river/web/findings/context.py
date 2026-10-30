@@ -363,3 +363,140 @@ def storm_timing(db):
         method=f"Flow percentile of the nearest gauge in the same HUC12 (else HUC10), from USGS daily values. Scores standardised "
                f"within each form (SOS, Virginia SOS). Site and year means removed; least squares with standard errors clustered "
                f"by site; sites with both storm and calm surveys. {inputs()}. Code: iwla_river/context.py.")
+
+
+def _scope(states):
+    named = [f"{s} {round(100 * share)}%" for s, _, share in states if s != "unknown"][:3]
+    return ", ".join(named)
+
+
+def _q(v):
+    """q-values near the 0.05 cut-off get three decimals so a borderline result is not shown as passing."""
+    return f"q = {v:.3f}" if 0.03 < v < 0.07 else f"q = {v:.2g}"
+
+
+@finding("context", "site-visits", "Three surveys capture most of what a site is", order=80, key=True)
+def site_visits(db):
+    a = res("site_reliability")
+    if not a:
+        return None
+    rel = a["reliability"]
+    spec = {"type": "bars", "title": "How well the average of a site's surveys predicts its long-run average",
+            "y": {"min": 0, "max": 1, "ticks": [0, 0.25, 0.5, 0.75, 1], "fmt": "int"}, "xLabel": "surveys averaged",
+            "height": 280, "cats": [{"label": k, "sub": f"{v[1]:.2f}–{v[2]:.2f}", "value": v[0], "valueLabel": f"{v[0]:.2f}",
+                                     "color": "accent", "tip": f"{k} survey{'s' if k != '1' else ''}: reliability {v[0]:.2f} (95% CI {v[1]:.2f}–{v[2]:.2f})"}
+                                    for k, v in rel.items()]}
+    return Page(refs=["cwh", "sos", "laird-ware1982", "statsmodels", "shrout-fleiss1979", "spearman1910", "brown1910", "efron1979"],
+        headline=f"{round(100 * a['icc'])}% of the variation in a bug survey's share of sensitive animals is the site itself, "
+                 f"so the average of {a['visits_for_0_8']} surveys predicts a site's long-run average with reliability "
+                 f"{rel['3'][0]:.2f}; past about six surveys, more visits add little.",
+        status="info",
+        numbers=[(f"{a['icc']:.2f}", f"share of variation between sites (95% CI {a['icc_lo']:.2f} to {a['icc_hi']:.2f})"),
+                 (f"{rel['3'][0]:.2f}", "reliability of a 3-survey average"),
+                 (fmt(a["sites_with_1_visit"]), f"of {fmt(a['sites'])} sites surveyed only once")],
+        blocks=[chart(spec, "Reliability: the correlation expected between the average of that many surveys and the site's "
+                            "true long-run average. Labels under the bars: 95% intervals from resampling whole sites."),
+                text(f"A linear mixed model gives every site its own baseline and separates two kinds of variation: between "
+                     f"sites (one stream is simply richer than another) and from one survey to the next at the same site "
+                     f"(season, weather, which riffle was kicked, who sorted the net). Between sites is "
+                     f"{round(100 * a['icc'])}% of the total once the season is allowed for.",
+                     f"For running a program, that means a single survey already says a fair amount about a site "
+                     f"(reliability {rel['1'][0]:.2f}), {a['visits_for_0_8']} surveys reach 0.8 and {a['visits_for_0_9']} reach 0.9. "
+                     f"Half the sites here have {a['median_visits_per_site']:.0f} surveys or fewer, and {fmt(a['sites_with_1_visit'])} "
+                     f"have one. Bringing a once-surveyed site up to three adds more than taking a well-surveyed site from ten to twenty. "
+                     f"Detecting change over time is a different question that needs more visits; see the trend findings."),
+                text(f"The surveys are the {fmt(a['surveys'])} bug surveys with a sensitive-animal share, at {fmt(a['sites'])} sites "
+                     f"({_scope(a['states'])}). Most come from Virginia, which runs the largest volunteer bug program.")],
+        method=f"Linear mixed model, sensitive share ~ season, random intercept per site, fitted by REML (statsmodels). "
+               f"Intraclass correlation = between-site variance / total. Reliability of a k-survey average by the Spearman–Brown "
+               f"formula. 95% intervals from {a['boot_rounds']} bootstrap resamples of whole sites. {inputs()}. "
+               f"Code: iwla_river/survey_models.py.")
+
+
+@finding("context", "maps-vs-local", "Maps predict about half of why sites differ; the rest is local", order=82, key=True)
+def maps_vs_local(db):
+    b = res("mapped_vs_local")
+    if not b:
+        return None
+    rows = [[lab, f"{x['r2']:.2f} ({x['r2_lo']:.2f}–{x['r2_hi']:.2f})", f"{x['site_r2']:.2f} ({x['site_r2_lo']:.2f}–{x['site_r2_hi']:.2f})"]
+            for lab, x in (("All 20 inputs: land, pollution, flow, weather, season, state", b["all"]),
+                           ("Land and pollution only", b["land_only"]), ("Share paved alone", b["paved_only"]),
+                           ("Road density alone", b["road_only"]))]
+    al = b["all"]
+    return Page(refs=["cwh", "sos", "streamcat", "annual-nlcd", "echo", "attains", "usmin", "nwis", "openmeteo", "era5",
+                      "lightgbm", "sklearn", "spearman"],
+        headline=f"Mapped land, pollution, flow and weather data predict {round(100 * al['site_r2'])}% of the differences between "
+                 f"sites' average share of sensitive animals at sites the model never saw; most of the rest is local, and only a "
+                 f"survey finds it.",
+        status="info",
+        numbers=[(f"{al['site_r2']:.2f}", "R² for site averages at unseen sites"), (f"{al['r2']:.2f}", "R² for single surveys"),
+                 (f"{b['paved_only']['site_r2']:.2f}", "share paved alone, site averages")],
+        blocks=[table([("Inputs",), ("Single surveys, R² (range)", 1), ("Site averages, R² (range)", 1)], rows,
+                      f"R² on held-out sites: every survey of a site is held out together, so the model is always predicting "
+                      f"places it has not seen. Range across {b['repeats']} repeats of {b['folds']}-fold cross-validation. Site "
+                      f"averages use the {fmt(b['sites_3_plus'])} sites with 3 or more surveys."),
+                text("Most of what the maps predict comes from land and pollution; flow, recent rain, heat and season add "
+                     "little. Paving alone gets most of the way. Road density alone does less well, and the two largely measure "
+                     f"the same development (rank correlation {b['road_paved_rho']:.2f}), so neither should be read as the cause.",
+                     "The half the maps miss is what makes two streams in similar watersheds different: shade and banks, "
+                     "a culvert, a spring, a recent spill. That part can only be found by sampling, and it is where volunteer "
+                     "surveys add information that no national dataset has. A smaller part of what is missed is plain survey-to-survey "
+                     "noise: even a perfect map could not predict an average of only a few surveys exactly "
+                     "(see how many surveys it takes to know a site).")],
+        method=f"LightGBM gradient-boosted trees (300 trees) predicting each survey's sensitive share from {b['inputs']} inputs "
+               f"(StreamCat road density, septic, fertiliser and manure; Annual NLCD paving; ECHO permits; ATTAINS impairments; "
+               f"USMIN mines; USGS gauge flow percentile; Open-Meteo rain and heat; season; state). Cross-validation grouped by "
+               f"site (scikit-learn GroupKFold), {b['repeats']} shuffled repeats. Spearman rank correlation for road density "
+               f"vs paving. {fmt(b['surveys'])} surveys at {fmt(b['sites'])} sites. {inputs()}. Code: iwla_river/survey_models.py.")
+
+
+@finding("context", "watershed-types", "Urban watersheds stand apart; livestock watersheds score like low-pressure ones", order=84, key=True)
+def watershed_types(db):
+    w = res("watershed_types")
+    if not w:
+        return None
+    T = {t["name"]: t for t in w["types"]}
+    order = [n for n in ("low-pressure", "livestock", "mining", "cropland", "urban") if n in T] + [n for n in T if n not in
+             ("low-pressure", "livestock", "mining", "cropland", "urban")]
+    q = {frozenset((a, b)): qq for a, b, _, qq in w["pairs"]}
+    lp = "low-pressure"
+    pr = lambda t: t["profile"]
+    rows = [[n.capitalize(), fmt(T[n]["watersheds"]), f"{pr(T[n])['impervious_at_survey']:.0f}%", f"{pr(T[n])['npdes_permits']:.0f}",
+             f"{pr(T[n])['fertilizer_upstream']:.0f}", f"{pr(T[n])['manure_upstream']:.0f}", f"{pr(T[n])['mine_features']:.0f}",
+             f"{round(100 * T[n]['share_median'])}%", "—" if n == lp else _q(q[frozenset((n, lp))]),
+             f"{T[n]['stability']:.2f}", ", ".join(s for s, _ in T[n]["states"] if s != "unknown")] for n in order]
+    u, lv, cr = T.get("urban"), T.get("livestock"), T.get("cropland")
+    return Page(refs=["cwh", "sos", "wbd", "streamcat", "annual-nlcd", "echo", "attains", "usmin", "lloyd1982", "rousseeuw1987",
+                      "hubert-arabie1985", "hennig2007", "sklearn", "kruskal", "mann-whitney", "bh1995"],
+        headline=f"Grouped by their pressures alone, {fmt(w['watersheds'])} small watersheds fall into {w['k']} stable types: urban "
+                 f"watersheds have the fewest sensitive animals ({round(100 * u['share_median'])}% vs "
+                 f"{round(100 * T[lp]['share_median'])}% in low-pressure ones), while livestock watersheds are no different from "
+                 f"low-pressure ones.",
+        status="concern",
+        numbers=[(f"{round(100 * u['share_median'])}%", "sensitive share, urban watersheds"),
+                 (f"{round(100 * T[lp]['share_median'])}%", "low-pressure watersheds"),
+                 (f"{round(100 * lv['share_median'])}%", "livestock watersheds")],
+        blocks=[table([("Type",), ("HUC12s", 1), ("Paved", 1), ("Permits", 1), ("Fertiliser", 1), ("Manure", 1), ("Mine features", 1),
+                       ("Sensitive share", 1), ("vs low-pressure", 1), ("Stability", 1), ("Main states",)], rows,
+                      "Medians per type. Fertiliser and manure: StreamCat kg N per hectare per year upstream. Stability: average "
+                      "Jaccard overlap when the watersheds are re-clustered from random 80% subsets (above 0.75 is dependable). "
+                      "q: Benjamini–Hochberg across all pairs of types."),
+                text(f"The types come from pressures only: paving, road density, discharge permits, mine features, impaired "
+                     f"waters, septic systems, fertiliser and manure. The bug results were not used to form them, so comparing "
+                     f"their streams afterwards is a fair test. They differ (Kruskal–Wallis H = {w['kruskal_h']}, {p_(w['kruskal_p'])}).",
+                     f"Urban watersheds ({pr(u)['impervious_at_survey']:.0f}% paved, {pr(u)['npdes_permits']:.0f} permits) have the "
+                     f"lowest share. Livestock watersheds, with heavy manure inputs but little paving, score as well as low-pressure "
+                     f"ones (q = {q[frozenset(('livestock', lp))]:.2f}). That is a result about these {fmt(lv['watersheds'])} mostly "
+                     f"Virginia watersheds, not a finding that manure does no harm: StreamCat's manure figure is a county-based estimate.",
+                     (f"Mining watersheds ({fmt(T['mining']['watersheds'])}, with many mapped mine features and permits) sit right at "
+                      f"the line against low-pressure ones ({_q(q[frozenset(('mining', lp))])}) and are the least stable type "
+                      f"({T['mining']['stability']:.2f}); treat them as tentative." if "mining" in T else ""),
+                     f"Cropland watersheds are lower too, but all {fmt(cr['watersheds'])} are in "
+                     f"{', '.join(s for s, _ in cr['states'])}, where stream animals differ from the East; region and farming "
+                     f"cannot be told apart here." if cr else ""),
+                links([("development-salt", "paving and winter salt"), ("maps-vs-local", "how much maps predict at all")])],
+        method=f"HUC12 medians of 8 pressures for watersheds with {w['min_surveys']} or more bug surveys, scaled by median and "
+               f"interquartile range. k-means (scikit-learn) with k chosen by silhouette (k = {w['k']}). Stability from "
+               f"{w['rounds']} re-clusterings of random 80% subsets (mean adjusted Rand index {w['ari_mean']:.2f}; Jaccard per type). "
+               f"Sensitive share compared by Kruskal–Wallis, then Mann–Whitney U for each pair with BH q-values. {inputs()}. "
+               f"Code: iwla_river/survey_models.py.")

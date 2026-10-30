@@ -299,6 +299,75 @@
    ]
   },
   {
+   "section": "context",
+   "id": "site-visits",
+   "title": "Three surveys capture most of what a site is",
+   "url": "context--site-visits.html",
+   "key": true,
+   "headline": "64% of the variation in a bug survey's share of sensitive animals is the site itself, so the average of 3 surveys predicts a site's long-run average with reliability 0.84; past about six surveys, more visits add little.",
+   "status": "info",
+   "numbers": [
+    {
+     "value": "0.64",
+     "label": "share of variation between sites (95% CI 0.61 to 0.68)"
+    },
+    {
+     "value": "0.84",
+     "label": "reliability of a 3-survey average"
+    },
+    {
+     "value": "468",
+     "label": "of 1,162 sites surveyed only once"
+    }
+   ]
+  },
+  {
+   "section": "context",
+   "id": "maps-vs-local",
+   "title": "Maps predict about half of why sites differ; the rest is local",
+   "url": "context--maps-vs-local.html",
+   "key": true,
+   "headline": "Mapped land, pollution, flow and weather data predict 46% of the differences between sites' average share of sensitive animals at sites the model never saw; most of the rest is local, and only a survey finds it.",
+   "status": "info",
+   "numbers": [
+    {
+     "value": "0.46",
+     "label": "R\u00b2 for site averages at unseen sites"
+    },
+    {
+     "value": "0.36",
+     "label": "R\u00b2 for single surveys"
+    },
+    {
+     "value": "0.41",
+     "label": "share paved alone, site averages"
+    }
+   ]
+  },
+  {
+   "section": "context",
+   "id": "watershed-types",
+   "title": "Urban watersheds stand apart; livestock watersheds score like low-pressure ones",
+   "url": "context--watershed-types.html",
+   "key": true,
+   "headline": "Grouped by their pressures alone, 286 small watersheds fall into 5 stable types: urban watersheds have the fewest sensitive animals (27% vs 40% in low-pressure ones), while livestock watersheds are no different from low-pressure ones.",
+   "status": "concern",
+   "numbers": [
+    {
+     "value": "27%",
+     "label": "sensitive share, urban watersheds"
+    },
+    {
+     "value": "40%",
+     "label": "low-pressure watersheds"
+    },
+    {
+     "value": "42%",
+     "label": "livestock watersheds"
+    }
+   ]
+  },
+  {
    "section": "watersheds",
    "id": "watershed-findings",
    "title": "How the findings for each watershed are worked out",
@@ -541,7 +610,7 @@
    "title": "References",
    "url": "data--references.html",
    "key": false,
-   "headline": "Every number on this site traces to 27 data sources, 21 published methods and 8 studies that explain what the readings mean.",
+   "headline": "Every number on this site traces to 27 data sources, 30 published methods and 8 studies that explain what the readings mean.",
    "status": "info",
    "numbers": []
   },

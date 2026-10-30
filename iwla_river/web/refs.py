@@ -172,6 +172,34 @@ REFS: dict[str, dict] = {
                          full="Mann, H.B. and Whitney, D.R. (1947). On a test of whether one of two random variables is "
                               "stochastically larger than the other. Annals of Mathematical Statistics 18(1): 50–60.",
                          doi="10.1214/aoms/1177730491"),
+    "laird-ware1982": dict(kind="method", short="Laird and Ware 1982 (mixed models)",
+                           full="Laird, N.M. and Ware, J.H. (1982). Random-effects models for longitudinal data. Biometrics "
+                                "38(4): 963–974.", doi="10.2307/2529876"),
+    "statsmodels": dict(kind="method", short="Seabold and Perktold 2010 (statsmodels)",
+                        full="Seabold, S. and Perktold, J. (2010). Statsmodels: econometric and statistical modeling with Python. "
+                             "Proceedings of the 9th Python in Science Conference: 92–96.", doi="10.25080/Majora-92bf1922-011"),
+    "shrout-fleiss1979": dict(kind="method", short="Shrout and Fleiss 1979 (intraclass correlation)",
+                              full="Shrout, P.E. and Fleiss, J.L. (1979). Intraclass correlations: uses in assessing rater "
+                                   "reliability. Psychological Bulletin 86(2): 420–428.", doi="10.1037/0033-2909.86.2.420"),
+    "spearman1910": dict(kind="method", short="Spearman 1910 (Spearman–Brown)",
+                         full="Spearman, C. (1910). Correlation calculated from faulty data. British Journal of Psychology 3(3): "
+                              "271–295.", doi="10.1111/j.2044-8295.1910.tb00206.x"),
+    "brown1910": dict(kind="method", short="Brown 1910 (Spearman–Brown)",
+                      full="Brown, W. (1910). Some experimental results in the correlation of mental abilities. British Journal "
+                           "of Psychology 3(3): 296–322.", doi="10.1111/j.2044-8295.1910.tb00207.x"),
+    "lloyd1982": dict(kind="method", short="Lloyd 1982 (k-means)",
+                      full="Lloyd, S.P. (1982). Least squares quantization in PCM. IEEE Transactions on Information Theory "
+                           "28(2): 129–137.", doi="10.1109/TIT.1982.1056489"),
+    "rousseeuw1987": dict(kind="method", short="Rousseeuw 1987 (silhouette)",
+                          full="Rousseeuw, P.J. (1987). Silhouettes: a graphical aid to the interpretation and validation of "
+                               "cluster analysis. Journal of Computational and Applied Mathematics 20: 53–65.",
+                          doi="10.1016/0377-0427(87)90125-7"),
+    "hubert-arabie1985": dict(kind="method", short="Hubert and Arabie 1985 (adjusted Rand index)",
+                              full="Hubert, L. and Arabie, P. (1985). Comparing partitions. Journal of Classification 2(1): "
+                                   "193–218.", doi="10.1007/BF01908075"),
+    "hennig2007": dict(kind="method", short="Hennig 2007 (cluster stability)",
+                       full="Hennig, C. (2007). Cluster-wise assessment of cluster stability. Computational Statistics and Data "
+                            "Analysis 52(1): 258–271.", doi="10.1016/j.csda.2006.11.025"),
     "kruskal": dict(kind="method", short="Kruskal and Wallis 1952",
                     full="Kruskal, W.H. and Wallis, W.A. (1952). Use of ranks in one-criterion variance analysis. Journal of the "
                          "American Statistical Association 47(260): 583–621.", doi="10.1080/01621459.1952.10483441"),

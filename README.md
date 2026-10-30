@@ -92,6 +92,8 @@ downstream, marks each source, lists them in the panel, finds them in search, an
 
 `python -m iwla_river.context` recomputes the "In context" findings (volunteer data checked against USGS, EPA, state and Census data) from `data/river.duckdb` and DataLab's joined `streams` dataset (`DATALAB_STREAMS`), and writes the aggregate results to `iwla_river/web/findings/context_results.json`, which is committed so the site rebuilds without DataLab. Every finding cites its sources from `iwla_river/web/refs.py` (DOIs checked against Crossref/DataCite); the build fails on an unknown key.
 
+`~/datalab/.venv/bin/python -m iwla_river.survey_models` (needs statsmodels and lightgbm) adds three program-design results to the same file: how many surveys it takes to know a site (mixed model, Spearman–Brown), how much of the difference between sites mapped data predicts at unseen sites (LightGBM, grouped cross-validation), and watershed types by pressure (k-means with stability checks). Run it after `iwla_river.context`.
+
 `python -m iwla_river.site` builds the site into `docs/`, served by GitHub Pages at https://shankardba.github.io/iwla-river/. It is organised as a tool, with a top menu (a full-screen sheet on phones):
 
 | Menu | Page | What it is |

@@ -412,5 +412,368 @@
   "restoration_events": 4839,
   "epa319_projects": 19048,
   "gap_watersheds": 22697
+ },
+ "site_reliability": {
+  "surveys": 7332,
+  "sites": 1162,
+  "states": [
+   [
+    "VA",
+    6105,
+    0.833
+   ],
+   [
+    "unknown",
+    326,
+    0.044
+   ],
+   [
+    "MD",
+    313,
+    0.043
+   ],
+   [
+    "NY",
+    185,
+    0.025
+   ],
+   [
+    "MN",
+    142,
+    0.019
+   ]
+  ],
+  "between_var": 0.0119,
+  "within_var": 0.0066,
+  "icc": 0.643,
+  "icc_lo": 0.607,
+  "icc_hi": 0.679,
+  "boot_rounds": 200,
+  "reliability": {
+   "1": [
+    0.643,
+    0.607,
+    0.679
+   ],
+   "2": [
+    0.783,
+    0.756,
+    0.809
+   ],
+   "3": [
+    0.844,
+    0.823,
+    0.864
+   ],
+   "4": [
+    0.878,
+    0.861,
+    0.894
+   ],
+   "6": [
+    0.915,
+    0.903,
+    0.927
+   ],
+   "10": [
+    0.947,
+    0.939,
+    0.955
+   ]
+  },
+  "visits_for_0_8": 3,
+  "visits_for_0_9": 5,
+  "median_visits_per_site": 2.0,
+  "sites_with_1_visit": 468,
+  "sites_with_3_plus": 554
+ },
+ "mapped_vs_local": {
+  "surveys": 7332,
+  "sites": 1162,
+  "sites_3_plus": 554,
+  "inputs": 20,
+  "all": {
+   "r2": 0.36,
+   "r2_lo": 0.348,
+   "r2_hi": 0.364,
+   "site_r2": 0.456,
+   "site_r2_lo": 0.402,
+   "site_r2_hi": 0.475
+  },
+  "land_only": {
+   "r2": 0.356,
+   "r2_lo": 0.344,
+   "r2_hi": 0.362,
+   "site_r2": 0.433,
+   "site_r2_lo": 0.389,
+   "site_r2_hi": 0.454
+  },
+  "road_only": {
+   "r2": 0.268,
+   "r2_lo": 0.255,
+   "r2_hi": 0.289,
+   "site_r2": 0.291,
+   "site_r2_lo": 0.266,
+   "site_r2_hi": 0.328
+  },
+  "paved_only": {
+   "r2": 0.316,
+   "r2_lo": 0.301,
+   "r2_hi": 0.327,
+   "site_r2": 0.413,
+   "site_r2_lo": 0.39,
+   "site_r2_hi": 0.429
+  },
+  "road_paved_rho": 0.815,
+  "repeats": 5,
+  "folds": 5
+ },
+ "watershed_types": {
+  "watersheds": 286,
+  "min_surveys": 3,
+  "k": 5,
+  "silhouette": {
+   "2": 0.398,
+   "3": 0.384,
+   "4": 0.422,
+   "5": 0.427,
+   "6": 0.39,
+   "7": 0.278,
+   "8": 0.274,
+   "9": 0.265
+  },
+  "ari_mean": 0.942,
+  "rounds": 30,
+  "types": [
+   {
+    "name": "cropland",
+    "watersheds": 30,
+    "sites": 58,
+    "surveys": 226,
+    "share_median": 0.333,
+    "stability": 0.991,
+    "states": [
+     [
+      "IA",
+      12
+     ],
+     [
+      "MN",
+      10
+     ],
+     [
+      "IN",
+      3
+     ]
+    ],
+    "top_state_share": 0.4,
+    "profile": {
+     "impervious_at_survey": 3.24,
+     "road_density": 1.88,
+     "npdes_permits": 3.5,
+     "mine_features": 4.0,
+     "impaired_waters": 1.0,
+     "septic_upstream": 3.23,
+     "fertilizer_upstream": 54.38,
+     "manure_upstream": 3.86
+    }
+   },
+   {
+    "name": "mining",
+    "watersheds": 21,
+    "sites": 57,
+    "surveys": 250,
+    "share_median": 0.348,
+    "stability": 0.812,
+    "states": [
+     [
+      "VA",
+      11
+     ],
+     [
+      "NY",
+      5
+     ],
+     [
+      "SD",
+      2
+     ]
+    ],
+    "top_state_share": 0.524,
+    "profile": {
+     "impervious_at_survey": 4.98,
+     "road_density": 1.96,
+     "npdes_permits": 22.0,
+     "mine_features": 16.0,
+     "impaired_waters": 3.0,
+     "septic_upstream": 9.02,
+     "fertilizer_upstream": 2.82,
+     "manure_upstream": 0.74
+    }
+   },
+   {
+    "name": "low-pressure",
+    "watersheds": 161,
+    "sites": 437,
+    "surveys": 3363,
+    "share_median": 0.4,
+    "stability": 0.97,
+    "states": [
+     [
+      "VA",
+      143
+     ],
+     [
+      "unknown",
+      7
+     ],
+     [
+      "MD",
+      5
+     ]
+    ],
+    "top_state_share": 0.888,
+    "profile": {
+     "impervious_at_survey": 1.0,
+     "road_density": 2.51,
+     "npdes_permits": 5.0,
+     "mine_features": 0.0,
+     "impaired_waters": 4.0,
+     "septic_upstream": 6.79,
+     "fertilizer_upstream": 3.74,
+     "manure_upstream": 0.99
+    }
+   },
+   {
+    "name": "urban",
+    "watersheds": 49,
+    "sites": 328,
+    "surveys": 2920,
+    "share_median": 0.273,
+    "stability": 0.907,
+    "states": [
+     [
+      "VA",
+      34
+     ],
+     [
+      "MD",
+      8
+     ],
+     [
+      "NY",
+      2
+     ]
+    ],
+    "top_state_share": 0.694,
+    "profile": {
+     "impervious_at_survey": 21.89,
+     "road_density": 8.52,
+     "npdes_permits": 61.0,
+     "mine_features": 3.0,
+     "impaired_waters": 7.0,
+     "septic_upstream": 13.31,
+     "fertilizer_upstream": 0.91,
+     "manure_upstream": 0.02
+    }
+   },
+   {
+    "name": "livestock",
+    "watersheds": 25,
+    "sites": 77,
+    "surveys": 331,
+    "share_median": 0.417,
+    "stability": 0.986,
+    "states": [
+     [
+      "VA",
+      20
+     ],
+     [
+      "NY",
+      3
+     ],
+     [
+      "MD",
+      1
+     ]
+    ],
+    "top_state_share": 0.8,
+    "profile": {
+     "impervious_at_survey": 1.89,
+     "road_density": 1.96,
+     "npdes_permits": 9.0,
+     "mine_features": 1.0,
+     "impaired_waters": 2.0,
+     "septic_upstream": 5.95,
+     "fertilizer_upstream": 8.59,
+     "manure_upstream": 30.34
+    }
+   }
+  ],
+  "kruskal_h": 73.5,
+  "kruskal_p": 4.2e-15,
+  "pairs": [
+   [
+    "cropland",
+    "mining",
+    0.8029,
+    0.8029
+   ],
+   [
+    "cropland",
+    "low-pressure",
+    0.0005536,
+    0.001845
+   ],
+   [
+    "cropland",
+    "urban",
+    0.001029,
+    0.002573
+   ],
+   [
+    "cropland",
+    "livestock",
+    0.001404,
+    0.002808
+   ],
+   [
+    "mining",
+    "low-pressure",
+    0.03993,
+    0.04992
+   ],
+   [
+    "mining",
+    "urban",
+    0.004122,
+    0.00687
+   ],
+   [
+    "mining",
+    "livestock",
+    0.03113,
+    0.04447
+   ],
+   [
+    "low-pressure",
+    "urban",
+    2.605e-15,
+    2.605e-14
+   ],
+   [
+    "low-pressure",
+    "livestock",
+    0.3323,
+    0.3692
+   ],
+   [
+    "urban",
+    "livestock",
+    1.107e-08,
+    5.535e-08
+   ]
+  ]
  }
 }
