@@ -404,8 +404,7 @@ def build(db_path=C.DB_PATH, out: Path = OUT, body_out: Path = BODY_OUT) -> Path
     pages["findings.html"] = render("findings.html", "findings.html", key=key)
     from .diagrams import about as about_dg
     pages["about.html"] = render("about.html", "about.html", datasets=ABOUT_DATASETS,
-                                 joins_svg=about_dg.joins(meta["sites"], meta["usable"]),
-                                 pipeline_svg=about_dg.pipeline(meta["wsf_units"]))
+                                 joins_svg=about_dg.joins(meta["sites"], meta["usable"]))
     for s in sections:
         pages[s["url"]] = render("section.html", s["url"], section=s)
         for n, i in enumerate(s["findings"]):

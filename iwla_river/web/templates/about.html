@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block title %}About · Save Our Streams Record{% endblock %}
-{% block description %}What this record is, which public datasets are joined to the Save Our Streams data and how, and how each finding is tested and cited.{% endblock %}
+{% block description %}What this record is and which public datasets are joined to the Save Our Streams data, and how.{% endblock %}
 {% block main %}
 <header class="hero">
   <div class="eyebrow">About</div>
@@ -22,47 +22,5 @@
     </tbody>
   </table></div>
   <p class="meta">Survey snapshot {{ meta.snapshot }}. Full citations with DOIs: <a href="data--references.html">References</a>.</p>
-</section>
-
-<section class="block">
-  <h2>How each finding is made</h2>
-  <p>Each question gets the test that fits it, chosen before the result is known, and every result reports its effect size, its uncertainty and its q-value. Results that come out null are kept and shown.</p>
-  <figure class="diagram">{{ pipeline_svg | safe }}<figcaption>The same pipeline runs for the national findings and for each watershed's own findings in Explore.</figcaption></figure>
-</section>
-
-<section class="block">
-  <h2>Safeguards</h2>
-  <ul>
-    <li><b>Repeat visits.</b> Sites are surveyed many times. Intervals come from a cluster bootstrap that resamples whole sites or watersheds, and regressions use cluster-robust errors, so one busy site cannot pass for many.</li>
-    <li><b>Many tests.</b> Trends are tested at hundreds of sites and thousands of watersheds. Each family of tests is corrected with Benjamini–Hochberg q-values, and only those under 0.05 are called a trend.</li>
-    <li><b>Models scored fairly.</b> The driver models are scored on sites they never saw (five repeats of five-fold cross-validation grouped by site), and their range across repeats is reported.</li>
-    <li><b>Policy effects.</b> Before-and-after comparisons near restoration projects are run again on a placebo date. When the placebo shift is as large as the real one, as it is here, the finding says no benefit is detectable.</li>
-    <li><b>Volunteer data checked against professionals.</b> Volunteer chloride is compared with agency lab results, and volunteer bug scores with professional surveys at the same places. See <a href="context--chloride-check.html">the chloride check</a> and <a href="context--volunteers-vs-professionals.html">volunteers vs professionals</a>.</li>
-  </ul>
-</section>
-
-<section class="block">
-  <h2>Limits</h2>
-  <ul>
-    <li>Volunteer sites are chosen by volunteers, not at random, so national figures describe the monitored streams, not all streams. <a href="context--monitoring-gaps.html">Monitoring gaps</a> shows where coverage is thin.</li>
-    <li>A watershed join matches the same HUC12, not always the same reach; associations at watershed level do not prove what happens at a single site.</li>
-    <li>Associations are not causes. Where a finding says "linked with", that is all it claims.</li>
-    <li>Test-strip chemistry is less precise than lab chemistry; how much less is measured in the chloride check, not assumed.</li>
-  </ul>
-</section>
-
-<section class="block">
-  <h2>Reproduce it</h2>
-  <p>The code is public at <a href="https://github.com/shankardba/iwla-river">github.com/shankardba/iwla-river</a>. Every finding page lists its sources, and the site build stops if a finding cites a source that is not in <a href="data--references.html">References</a>. <a href="data--methods.html">Sources and methods</a> describes the cleaning rules and the score.</p>
-</section>
-
-<section class="block">
-  <h2>Privacy</h2>
-  <p>Personal details are removed when the data is downloaded and never shown. Many salt and nitrate kits test home taps, so those sites carry no names and their locations are rounded to about 1 km.</p>
-</section>
-
-<section class="block">
-  <h2>Using Explore</h2>
-  <p><a href="index.html">Explore</a> maps every sample. Browse by watershed, from region down to subwatershed, or by state, where each state's subbasins are drawn inside it. Each watershed shows its own cited findings; press <kbd>/</kbd> to search. <a href="findings.html">Findings</a> collects the national results, and <a href="chapter.html">Case study: Great Seneca Creek</a> follows one creek in depth.</p>
 </section>
 {% endblock %}
