@@ -675,7 +675,13 @@
     if (e.target.closest(".maplink")) return;
     const rv = e.target.closest("[data-river]"); if (rv) {
       e.preventDefault();
-      const name = rv.dataset.river, r = riversIn(cur).find(x => x.n === name), to = r ? riverHome(r, cur) : cur;
+      const name = rv.dataset.river;
+      // On the map a river crosses areas: a click opens the area under the pointer, keeping the river traced.
+      if (rv.closest("svg")) {
+        const area = document.elementsFromPoint(e.clientX, e.clientY).map(el => el.closest(".ex-area[data-go]")).find(Boolean);
+        if (area) { hiRiver = name; if (area.dataset.viewTo) view = "w"; go(area.dataset.go); return; }
+      }
+      const r = riversIn(cur).find(x => x.n === name), to = r ? riverHome(r, cur) : cur;
       if (to !== cur) { hiRiver = name; site = null; cur = to; render(true); return; }   // zoom to the river's watershed, traced
       hiRiver = hiRiver === name ? null : name; const top = $(".ex-panel").scrollTop; render(false).then(() => { $(".ex-panel").scrollTop = top; }); return;
     }
