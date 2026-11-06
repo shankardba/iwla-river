@@ -94,7 +94,7 @@ downstream, marks each source, lists them in the panel, finds them in search, an
 
 `~/datalab/.venv/bin/python -m iwla_river.survey_models` (needs statsmodels and lightgbm) adds three program-design results to the same file: how many surveys it takes to know a site (mixed model, Spearman–Brown), how much of the difference between sites mapped data predicts at unseen sites (LightGBM, grouped cross-validation), and watershed types by pressure (k-means with stability checks). Run it after `iwla_river.context`.
 
-`~/datalab/.venv/bin/python -m iwla_river.salt_bugs` (needs statsmodels) adds `salt_bugs`: volunteer chloride against volunteer bug surveys at the same site (overall score, sensitive, EPT and tolerant shares, each animal group), with paving, season and state held equal, plus change points, winter-to-spring pairs and EPA NRSA as a check. Set `DATALAB_STREAMS` to the streams dataset on the OricoArray.
+`~/datalab/.venv/bin/python -m iwla_river.salt_bugs` (needs statsmodels) adds `salt_bugs`: volunteer chloride against volunteer bug surveys at the same site (overall score, sensitive, EPT and tolerant shares, each animal group), with paving, season and state held equal, plus change points, winter-to-spring pairs and EPA NRSA as a check. Set `DATALAB_STREAMS` to the path of the streams dataset.
 
 `~/datalab/.venv/bin/python -m iwla_river.chloride_sources` adds `chloride_sources`: winter vs summer chloride at each site, what upstream (paving, roads, septic, wastewater, permits, population) tracks it, chloride on low- vs high-water days at the same site, and how much of paving's link to the bugs runs through chloride (bootstrap over sites).
 

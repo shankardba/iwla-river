@@ -12,7 +12,7 @@
 Stream and river sites only (pipes, ponds, lakes and drinking-water samples left out). Zeros and readings over
 20,000 mg/L dropped. Writes aggregates only, under "chloride_sources" in iwla_river/web/findings/context_results.json.
 
-    DATALAB_STREAMS=/Volumes/OricoArray/DataLab/datasets/streams/data.duckdb ~/datalab/.venv/bin/python -m iwla_river.chloride_sources
+    DATALAB_STREAMS=<streams dataset> ~/datalab/.venv/bin/python -m iwla_river.chloride_sources
 """
 
 from __future__ import annotations
