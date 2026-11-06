@@ -19,6 +19,7 @@ import argparse
 import gzip
 import json
 import math
+import os
 import time
 import urllib.request
 from collections import defaultdict
@@ -31,7 +32,7 @@ from pmtiles.reader import Reader
 from . import config as C
 from .enrich import _inside
 
-MAPS = Path("/Volumes/OricoArray/Daemon/library/maps/pmtiles")
+MAPS = Path(os.environ.get("MAPS_LIBRARY", Path.home() / "maps")) / "pmtiles"
 OUT = C.DATA / "cache" / "rivers_osm"
 CACHE = C.DATA / "cache"
 KINDS = {"river", "stream", "canal"}

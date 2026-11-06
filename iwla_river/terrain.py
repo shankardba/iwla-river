@@ -27,7 +27,7 @@ import numpy as np
 from . import config as C
 
 URL = "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png"
-LIBRARY = Path("/Volumes/OricoArray/Daemon/library/maps")
+LIBRARY = Path(os.environ.get("MAPS_LIBRARY", Path.home() / "maps"))  # folder holding pmtiles/
 PMTILES = LIBRARY / "pmtiles"
 DOCS = C.ROOT / "docs" / "data"
 OUT = DOCS / "terrain"

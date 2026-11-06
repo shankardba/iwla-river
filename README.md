@@ -80,8 +80,8 @@ Targets: share of animal groups found that are pollution-sensitive (comparable a
 ## Rivers
 
 `python -m iwla_river.rivers_osm` names the rivers in every subbasin with biological surveys and finds where each one starts
-and ends. It reads the OpenStreetMap vector maps (Protomaps `.pmtiles`) that NOMAD keeps on the M4 mini
-(`/Volumes/OricoArray/Daemon/library/maps/pmtiles`), joins each river's pieces, follows it past the subbasin edge to its
+and ends. It reads the OpenStreetMap vector maps (Protomaps `.pmtiles`) in a local maps library
+(`$MAPS_LIBRARY/pmtiles`, default `~/maps/pmtiles`), joins each river's pieces, follows it past the subbasin edge to its
 source and mouth, gets those two elevations from Open-Meteo, and notes what it flows into and which two rivers form it.
 Output: `data/cache/rivers_osm/<huc8>.json`; the site packs these into `docs/data/rivers/<huc4>.json`. It is resumable;
 subbasins whose state map is not downloaded yet are skipped until it is. Explore draws the rivers with water moving
