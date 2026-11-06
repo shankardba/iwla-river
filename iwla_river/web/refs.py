@@ -245,6 +245,18 @@ REFS: dict[str, dict] = {
                       full="Corsi, S.R., Graczyk, D.J., Geis, S.W., Booth, N.L. and Richards, K.D. (2010). A fresh look at road "
                            "salt: aquatic toxicity and water-quality impacts on local, regional, and national scales. "
                            "Environmental Science & Technology 44(19): 7376–7382.", doi="10.1021/es101333u"),
+    "canedo-arguelles2013": dict(kind="science", short="Cañedo-Argüelles et al. 2013",
+                                 full="Cañedo-Argüelles, M., Kefford, B.J., Piscart, C. et al. (2013). Salinisation of rivers: an "
+                                      "urgent ecological issue. Environmental Pollution 173: 157–167.",
+                                 doi="10.1016/j.envpol.2012.10.011"),
+    "hintz-relyea2019": dict(kind="science", short="Hintz and Relyea 2019",
+                             full="Hintz, W.D. and Relyea, R.A. (2019). A review of the species, community, and ecosystem impacts "
+                                  "of road salt salinisation in fresh waters. Freshwater Biology 64(6): 1081–1097.",
+                             doi="10.1111/fwb.13286"),
+    "king-richardson2003": dict(kind="method", short="King and Richardson 2003",
+                                full="King, R.S. and Richardson, C.J. (2003). Integrating bioassessment and ecological risk "
+                                     "assessment: an approach to developing numerical water-quality criteria. Environmental "
+                                     "Management 31(6): 795–809.", doi="10.1007/s00267-002-0036-4"),
     "bernhardt2005": dict(kind="science", short="Bernhardt et al. 2005",
                           full="Bernhardt, E.S. et al. (2005). Synthesizing U.S. river restoration efforts. Science 308(5722): "
                                "636–637.", doi="10.1126/science.1109769"),

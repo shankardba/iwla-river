@@ -135,7 +135,10 @@ def development_salt(db):
                      f"saltier than usual is followed by a slightly lower spring score, but not reliably "
                      f"({d['within_watersheds']} watersheds with two or more years, {p_(d['within_salt_p'])}).",
                      "This does not clear road salt. Salt is one of the ways paving harms streams, and spring bug surveys may miss "
-                     "short winter spikes. It does mean the volunteer data cannot yet show a salt effect separate from development.")],
+                     "short winter spikes. At this watershed scale, with salt averaged across a whole watershed, the data cannot "
+                     "show a salt effect separate from development. At the scale of single sites, where volunteers measured "
+                     "chloride beside their bug surveys, a separate link does show in the mix of animals."),
+                links([("chloride-bugs", "chloride and bugs at the same site"), ("development-trend", "how paving has grown")])],
         method=f"Between watersheds: least squares on watershed means with heteroskedasticity-robust (HC1) standard errors. "
                f"Within: watershed and year effects removed by two-way demeaning, standard errors clustered by watershed. "
                f"Paving interpolated between the 5-yearly Annual NLCD maps. {inputs()}. Code: iwla_river/context.py.")
@@ -500,3 +503,125 @@ def watershed_types(db):
                f"{w['rounds']} re-clusterings of random 80% subsets (mean adjusted Rand index {w['ari_mean']:.2f}; Jaccard per type). "
                f"Sensitive share compared by Kruskal–Wallis, then Mann–Whitney U for each pair with BH q-values. {inputs()}. "
                f"Code: iwla_river/survey_models.py.")
+
+
+@finding("context", "chloride-bugs", "Saltier streams hold fewer sensitive animals, well below EPA's chloride limit", order=32, key=True)
+def chloride_bugs(db):
+    s = res("salt_bugs")
+    if not s:
+        return None
+    P, S7, B = s["pairs"], s["score_7d"], s["bands_7d"]
+    rows_b = [x for x in B["rows"] if x["surveys"]]
+    lo_b, mid_b = rows_b[0], next(x for x in rows_b if x["band"] == "100-230")
+    tv, ts = s["threshold_score"]["va_rocky"], s["threshold_score"]["sos_bio"]
+    band = lambda b: b.replace("-", "–") + " mg/L"
+    spec = {"type": "bars", "title": "Sensitive groups found, by the chloride volunteers measured that week",
+            "y": {"min": 0, "max": 50, "ticks": [0, 10, 20, 30, 40, 50], "fmt": "int"}, "xLabel": "chloride (mg/L)", "height": 280,
+            "cats": [{"label": x["band"].replace("-", "–"), "sub": f"{fmt(x['surveys'])} surveys · {fmt(x['sites'])} sites",
+                      "value": round(100 * x["sensitive_share"]), "valueLabel": f"{round(100 * x['sensitive_share'])}%",
+                      "color": "accent" if x["band"] != "230-860" else "grey",
+                      "tip": f"{band(x['band'])}: median {round(100 * x['sensitive_share'])}% of groups found were sensitive; "
+                             f"{x['pct_ept']:.0f}% of animals were mayflies, stoneflies or caddisflies; median paving {x['paved']:.0f}%"}
+                     for x in rows_b]}
+    lab = {"score_pct": "SOS score (% of the form's maximum)", "sensitive_share": "Share of groups that are sensitive (points)",
+           "pct_ept": "% mayflies, stoneflies, caddisflies", "pct_tolerant": "% tolerant animals"}
+    k = lambda y, v: (100 if y == "sensitive_share" else 1) * v
+    st = s["sites"]
+    rows_o = [[lab[y], f"{S7[y]['spearman']:+.2f}",
+               f"{k(y, S7[y]['controlled']['coef']):+.1f} ({k(y, S7[y]['controlled']['lo']):+.1f} to {k(y, S7[y]['controlled']['hi']):+.1f}), {p_(S7[y]['controlled']['p'])}",
+               f"{k(y, S7[y]['within_site']['coef']):+.1f}, {p_(S7[y]['within_site']['p'])}",
+               f"{k(y, st[y]['coef']):+.1f}, {p_(st[y]['p'])}"] for y in lab]
+    rows_f = [[band(x["band"]), fmt(x["surveys"]), f"{x['va_score']:.1f}" if x["va_n"] >= 5 else "—", f"{x['sos_score']:.0f}" if x["sos_n"] >= 5 else "—",
+               f"{x['pct_ept']:.0f}%", f"{x['pct_tolerant']:.0f}%", f"{x['paved']:.0f}%"] for x in rows_b]
+    form = {"va_rocky": "Virginia", "sos_bio": "SOS"}
+    tx = [(f, t) for f, key in (("va_rocky", "taxa_va_30d"), ("sos_bio", "taxa_sos_30d")) for t in s[key]]
+    hit = [(f, t) for f, t in tx if min(t["share_q"], t["present_q"]) < 0.1]
+    hit.sort(key=lambda ft: min(ft[1]["share_q"], ft[1]["present_q"]))
+    rows_t = [[form[f], t["taxon"], t["tolerance"].replace("_", " "), f"{fmt(t['found'])} of {fmt(t['surveys'])}",
+               f"{t['share_per_10x']:+.1f} points ({t['share_lo']:+.1f} to {t['share_hi']:+.1f}), {_q(t['share_q'])}",
+               f"{round(100 * t['found_at_25'])}% → {round(100 * t['found_at_100'])}%, {_q(t['present_q'])}"] for f, t in hit]
+    ntx = len(tx)
+    w, pro = s["winter"], s["professional"]
+    pb = {x["band"]: x for x in pro["bands"]}
+    return Page(refs=["cwh", "sos", "annual-nlcd", "wbd", "nrsa", "epa-chloride", "corsi2010", "kaushal2018", "canedo-arguelles2013",
+                      "hintz-relyea2019", "king-richardson2003", "cameron-miller2015", "white1980", "statsmodels", "spearman",
+                      "kruskal", "bh1995", "efron1979"],
+        headline=f"Where volunteers measured chloride within a week of a bug survey ({fmt(P['within_7d'])} surveys at "
+                 f"{fmt(P['sites_7d'])} sites), saltier streams have fewer pollution-sensitive animals and more tolerant ones, with "
+                 f"paving, season and state held equal; scores start to fall around {tv['change_point_mg_l']:.0f}–"
+                 f"{ts['change_point_mg_l']:.0f} mg/L, far below EPA's chronic limit of 230.",
+        status="concern",
+        numbers=[(f"{round(100 * lo_b['sensitive_share'])}%", f"of groups found are sensitive, chloride under 25 mg/L"),
+                 (f"{round(100 * mid_b['sensitive_share'])}%", "at 100–230 mg/L"),
+                 (f"{tv['change_point_mg_l']:.0f} mg/L", "where Virginia SOS scores drop")],
+        blocks=[chart(spec, f"Median share of the animal groups found that are pollution-sensitive, for bug surveys with a volunteer "
+                            f"chloride reading at the same site within 7 days. The grey bar rests on {fmt(rows_b[-1]['sites'])} sites "
+                            f"only. No paired survey had chloride above 860 mg/L. Kruskal–Wallis across bands: H = {B['kruskal_h']}, "
+                            f"{p_(B['kruskal_p'])}."),
+                text(f"The Save Our Streams program asked whether chloride is linked to the bugs volunteers find: both the overall "
+                     f"stream score and each kind of animal. Both sides here are volunteer data. Every bug survey is paired with "
+                     f"chloride that volunteers measured at the same site, with an SOS chemistry kit ({round(100 * P['kit_share_7d'])}% "
+                     f"of pairs) or a Salt Watch strip, within 7 days. That gives {fmt(P['within_7d'])} surveys at "
+                     f"{fmt(P['sites_7d'])} sites, mostly in " + ", ".join(list(P["states_7d"])[:5]) + f"; median chloride "
+                     f"{P['median_cl_7d']:.0f} mg/L. Both survey forms are used: the Virginia SOS form (scored 0–12) and the "
+                     f"original SOS form (0–44), so scores are put on one scale as a percent of each form's maximum.",
+                     f"Salt and pavement travel together (rank correlation {P['paved_cl_rho']:.2f} here), so every comparison "
+                     f"below holds the paved share of the watershed, the season, the state and the survey form equal. The paved "
+                     f"share comes from the national land cover maps; it is the only outside data used, and only as a control."),
+                table([("Measure",), ("Rank correlation", 1), ("Per tenfold more chloride, paving held equal (95% CI)", 1),
+                       ("Same site, saltier weeks", 1), ("Site's typical chloride", 1)], rows_o,
+                      f"Change per tenfold rise in chloride (for example 20 to 200 mg/L). Same site: each site compared with itself "
+                      f"in saltier and fresher weeks. Site's typical chloride: median of all its readings (sites with 3 or more) "
+                      f"against its average bug results, {fmt(st['sites'])} sites."),
+                text(f"The mix of animals tracks chloride most clearly: fewer sensitive groups, fewer mayflies, stoneflies and "
+                     f"caddisflies, more tolerant animals. The overall score moves the same way but less sharply, since it blends "
+                     f"several measures: on the Virginia form it drops {abs(s['score_by_form_30d']['va_rocky']['coef']):.1f} points "
+                     f"per tenfold chloride ({p_(s['score_by_form_30d']['va_rocky']['p'])}), on the original form "
+                     f"{abs(s['score_by_form_30d']['sos_bio']['coef']):.1f} points ({p_(s['score_by_form_30d']['sos_bio']['p'])}).",
+                     f"Within the same site, a saltier week does not come with different bugs. That is what one would expect if "
+                     f"the animals reflect the salt a stream carries over months and years rather than on the day: comparing sites "
+                     f"by their typical chloride gives the clearest link of all for sensitive groups."),
+                table([("Chloride",), ("Surveys", 1), ("Virginia score (0–12)", 1), ("SOS score (0–44)", 1), ("EPT share", 1),
+                       ("Tolerant share", 1), ("Paved", 1)], rows_f,
+                      "Medians. EPT: mayflies, stoneflies and caddisflies as a share of all animals counted. — : fewer than 5 surveys."),
+                text(f"Where the drop happens: a change-point search, which finds the chloride level that best splits high scores "
+                     f"from low, puts it at {tv['change_point_mg_l']:.0f} mg/L for the Virginia form (90% interval "
+                     f"{tv['lo90']:.0f}–{tv['hi90']:.0f}; mean score {tv['mean_below']:.1f} below, {tv['mean_above']:.1f} above) and "
+                     f"{ts['change_point_mg_l']:.0f} mg/L for the original form ({ts['lo90']:.0f}–{ts['hi90']:.0f}; "
+                     f"{ts['mean_below']:.0f} vs {ts['mean_above']:.0f}). Both are far below EPA's chronic criterion of 230 mg/L, "
+                     f"which was set from laboratory toxicity tests on single species. Reviews of field studies find that stream "
+                     f"communities can change at chloride levels below such criteria."),
+                table([("Form",), ("Animal group",), ("Tolerance",), ("Found in", 1), ("Share of animals, per tenfold chloride", 1),
+                       ("Chance of finding it, 25 → 100 mg/L", 1)], rows_t,
+                      f"Groups with q below 0.1 on either test, out of {ntx} tested across both forms. Paving and season held equal; "
+                      f"surveys with a chloride reading within 30 days. q: Benjamini–Hochberg within each form and test."),
+                text("Stoneflies show the strongest link: on the Virginia form they are found in about half of surveys at 25 mg/L "
+                     "and far less often at 100. Common net-spinning caddisflies make up a smaller share of the catch as chloride "
+                     "rises, while midges and flatworms make up more. On the original form, most caddisflies are found less often "
+                     "and sowbugs make up more. Mayflies fall with chloride in the raw numbers, but that mostly goes once paving is "
+                     "held equal. The other groups show no clear link either way."),
+                text(f"Two more checks point the same way. Winter chloride at a site (December to March) against its spring bug "
+                     f"survey: {w['surveys']} surveys at {w['sites']} sites, sensitive share "
+                     f"{100 * w['sensitive_share']['controlled']['coef']:+.1f} points per tenfold, {p_(w['sensitive_share']['controlled']['p'])}, "
+                     f"in the same direction but short of a clear result. And EPA's national river survey, where professionals "
+                     f"measured chloride and bugs on the same visit ({fmt(pro['visits'])} visits): {round(100 * pb['under 25']['good_share'])}% "
+                     f"of streams under 25 mg/L were in good condition, against {round(100 * pb['over 860']['good_share'])}% above "
+                     f"860 mg/L (rank correlation {pro['spearman']:+.2f})."),
+                text(f"Limits. Paving is held equal in every comparison, but salt and paving rise together, so the two cannot be "
+                     f"fully separated: some of what is shown here may be other harms that come with development. Very salty "
+                     f"samples are few ({fmt(rows_b[-1]['surveys'])} surveys at {fmt(rows_b[-1]['sites'])} sites above 230 mg/L). "
+                     f"Salt Watch strips read in steps, and zero readings are left out as likely blanks.",
+                     f"What would strengthen this most: only {round(100 * P['share_7d'])}% of bug surveys "
+                     f"({fmt(P['within_7d'])} of {fmt(P['bug_surveys'])}) have a chloride reading at the same site within a week. "
+                     f"A chloride test at every bug survey, and at the same sites through the winter, would turn this into a much "
+                     f"sharper answer."),
+                links([("development-salt", "paving and winter salt at watershed scale"), ("chloride-check", "how well volunteer chloride matches lab chloride"),
+                       ("chloride-sites", "where chloride is rising"), ("site-visits", "how many surveys it takes to know a site")])],
+        method=f"Pairs: each Virginia SOS rocky-bottom or original SOS bug survey with the median of volunteer chloride readings "
+               f"(SOS Chemical, Salt Watch; zeros and readings over 20,000 mg/L dropped) at the same site within 7 days (30 days "
+               f"for change points and animal groups). Least squares of each measure on log10 chloride with paved share, season, "
+               f"state and form, standard errors clustered by site. Same site: site and season means removed. Site's typical "
+               f"chloride: weighted least squares on site means with HC3 errors. Change points: nonparametric deviance reduction, "
+               f"90% interval from {tv['boots']} bootstrap resamples of whole sites. Animal groups: share of animals counted by "
+               f"least squares, presence by logistic regression, both with paving and season, clustered by site; q-values by "
+               f"Benjamini–Hochberg. {inputs()}. Code: iwla_river/salt_bugs.py.")

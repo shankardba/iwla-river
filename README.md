@@ -94,6 +94,8 @@ downstream, marks each source, lists them in the panel, finds them in search, an
 
 `~/datalab/.venv/bin/python -m iwla_river.survey_models` (needs statsmodels and lightgbm) adds three program-design results to the same file: how many surveys it takes to know a site (mixed model, Spearman–Brown), how much of the difference between sites mapped data predicts at unseen sites (LightGBM, grouped cross-validation), and watershed types by pressure (k-means with stability checks). Run it after `iwla_river.context`.
 
+`~/datalab/.venv/bin/python -m iwla_river.salt_bugs` (needs statsmodels) adds `salt_bugs`: volunteer chloride against volunteer bug surveys at the same site (overall score, sensitive, EPT and tolerant shares, each animal group), with paving, season and state held equal, plus change points, winter-to-spring pairs and EPA NRSA as a check. Set `DATALAB_STREAMS` to the streams dataset on the OricoArray.
+
 `python -m iwla_river.site` builds the site into `docs/`, served by GitHub Pages at https://shankardba.github.io/iwla-river/. It is organised as a tool, with a top menu (a full-screen sheet on phones):
 
 | Menu | Page | What it is |

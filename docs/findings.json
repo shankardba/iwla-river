@@ -166,6 +166,29 @@
   },
   {
    "section": "context",
+   "id": "chloride-bugs",
+   "title": "Saltier streams hold fewer sensitive animals, well below EPA's chloride limit",
+   "url": "context--chloride-bugs.html",
+   "key": true,
+   "headline": "Where volunteers measured chloride within a week of a bug survey (644 surveys at 236 sites), saltier streams have fewer pollution-sensitive animals and more tolerant ones, with paving, season and state held equal; scores start to fall around 47\u201360 mg/L, far below EPA's chronic limit of 230.",
+   "status": "concern",
+   "numbers": [
+    {
+     "value": "40%",
+     "label": "of groups found are sensitive, chloride under 25 mg/L"
+    },
+    {
+     "value": "25%",
+     "label": "at 100\u2013230 mg/L"
+    },
+    {
+     "value": "47 mg/L",
+     "label": "where Virginia SOS scores drop"
+    }
+   ]
+  },
+  {
+   "section": "context",
    "id": "development-trend",
    "title": "Paving keeps spreading, fastest where volunteers work",
    "url": "context--development-trend.html",
@@ -610,7 +633,7 @@
    "title": "References",
    "url": "data--references.html",
    "key": false,
-   "headline": "Every number on this site traces to 27 data sources, 30 published methods and 8 studies that explain what the readings mean.",
+   "headline": "Every number on this site traces to 27 data sources, 31 published methods and 10 studies that explain what the readings mean.",
    "status": "info",
    "numbers": []
   },
