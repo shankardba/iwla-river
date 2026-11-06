@@ -124,6 +124,21 @@
     if (code.length >= 2 && !GREG[code.slice(0, 2)]) GREG[code.slice(0, 2)] = await get(`data/geo/r${code.slice(0, 2)}.json`);
     if (code.length >= 4 && !GSUB[code.slice(0, 4)]) GSUB[code.slice(0, 4)] = await get(`data/geo/s${code.slice(0, 4)}.json`);
   }
+  // Neighbours: units at the same level as the one in view, from the next basin over too, so the map can step sideways.
+  const BB = {};
+  const bbox = c => BB[c] || (shape(c) ? (BB[c] = shape(c).flat().reduce((b, [lo, la]) => [Math.min(b[0], lo), Math.min(b[1], la), Math.max(b[2], lo), Math.max(b[3], la)], [180, 90, -180, -90])) : null);
+  const meets = (a, b) => !!(a && b) && a[0] <= b[2] && b[0] <= a[2] && a[1] <= b[3] && b[1] <= a[3];
+  const around = (c, f) => { const b = bbox(c); if (!b) return null; const dx = (b[2] - b[0]) * f, dy = (b[3] - b[1]) * f; return [b[0] - dx, b[1] - dy, b[2] + dx, b[3] + dy]; };
+  async function ensureNeighbours(code) {
+    if (code.length < 4) return;                       // regions: top.json already holds all of them
+    const v = around(code, 1), get = u => fetch(u).then(r => r.ok ? r.json() : {}).catch(() => ({}));
+    if (!v) return;
+    const h2 = Object.keys(GTOP || {}).filter(k => meets(bbox(k), v));
+    await Promise.all(h2.filter(k => !GREG[k]).map(async k => { GREG[k] = await get(`data/geo/r${k}.json`); }));
+    if (code.length < 6) return;
+    const h4 = h2.flatMap(k => Object.keys(GREG[k] || {})).filter(k => meets(bbox(k), v));
+    await Promise.all(h4.map(async k => { if (!GSUB[k]) GSUB[k] = await get(`data/geo/s${k}.json`); await ensure(k); }));
+  }
   // ---------- rivers ----------
   // data/rivers/<huc4>.json: { huc8: [river] }, each river {n name, k kind, L km in all, Li km in the subbasin, s source [lon,lat],
   // se source elevation m, si source inside the subbasin, m mouth, me mouth elevation, f flows into, t reaches tidal water,
@@ -245,8 +260,18 @@
       s += `<g class="ex-water">` + wat.poly.map(p => `<path d="${p.map(ring).join("")}" fill-rule="evenodd"/>`).join("") + `</g>`;
       wat.names.forEach(([n, lo, la, k]) => { const q = albers(la, lo), x = X(q), y = Y(q); if (x > 30 && x < W - 30 && y > 16 && y < H - 10) waterNames.push({ x, y, n, k }); });
     }
-    // watershed areas
     const labels = [];
+    // neighbours at the same level: outlined, named, one click away
+    if (code) {
+      const v = around(code, 1.2);
+      Object.keys(W8).filter(k => k.length === code.length && k !== code && !["19", "20", "21", "22"].includes(k.slice(0, 2)) && meets(bbox(k), v)).forEach(k => {
+        const x = w(k), rings = shape(k);
+        s += `<a href="#w${k}" data-go="${k}" data-code="${k}" class="ex-area ex-nb"><path d="${pathOf(rings)}" fill="transparent" fill-rule="evenodd"><title>${esc(x.n || k)}: ${fmt(x.s)} sites. Click to go there.</title></path></a>`;
+        const an = anchor(rings);
+        if (an.p && an.p[0] > 20 && an.p[0] < W - 20 && an.p[1] > 12 && an.p[1] < H - 8) labels.push({ x: an.p[0], y: an.p[1], area: an.area * 0.5, n: x.n || k, nb: 1 });
+      });
+    }
+    // watershed areas
     withShape.forEach(x => {
       const rings = shape(x.c), col = colorOf(x), ch = CHAPTER && CHAPTER.startsWith(x.c);
       s += `<a href="#w${x.c}" data-go="${x.c}" data-code="${x.c}" class="ex-area${ch ? " chapter" : ""}"><path d="${pathOf(rings)}" fill="${showRings ? col : "transparent"}" fill-rule="evenodd"><title>${esc(x.n || x.c)}: ${fmt(x.s)} sites, ${fmt(x.bv)} biological surveys${num(x.g) ? `, ${pts(x.g)} sensitive vs expected` : ""}. Click to zoom in.</title></path></a>`;
@@ -313,7 +338,7 @@
       const x = Math.min(W - tw / 2 - 2, Math.max(tw / 2 + 2, l.x)), y = Math.min(H - 6, Math.max(14, l.y + 4));
       if (!free(x - tw / 2, y - 11, tw, 14)) return;
       boxes.push([x - tw / 2, y - 11, tw, 14]);
-      s += `<text class="ex-label${l.ch ? " ch" : ""}${l.src ? " src" : ""}${l.rn ? " rn" : ""}${l.wn ? " wn" : ""}" x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="middle">${esc(nm)}</text>`;
+      s += `<text class="ex-label${l.ch ? " ch" : ""}${l.src ? " src" : ""}${l.rn ? " rn" : ""}${l.wn ? " wn" : ""}${l.nb ? " nb" : ""}" x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="middle">${esc(nm)}</text>`;
     });
     return s + "</svg>";
   }
@@ -590,6 +615,7 @@
       return renderStates(push);
     }
     await Promise.all([ensure(cur), ensureGeo(cur), ensureRivers(cur), ensureWater(cur), ensureWsf(cur)]);
+    await ensureNeighbours(cur);
     if (push) { const h = site ? `#s${site}@${cur}` : `#w${cur || "US"}`; try { history.replaceState(null, "", h); } catch (e) { /* keep the old address */ } }
     const x = w(cur) || {}, parent = cur ? w(cur.slice(0, -2)) : null;
     $(".ex-tools-kind").innerHTML = KINDS.map(([k, t]) => `<button type="button" data-kind="${k}" aria-pressed="${k === kind}">${KCOL[k] ? `<i class="dot" style="background:${KCOL[k]}"></i>` : ""}${t}</button>`).join("");
