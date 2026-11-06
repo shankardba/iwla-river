@@ -2111,5 +2111,329 @@
     }
    ]
   }
+ },
+ "chloride_sources": {
+  "readings": 40584,
+  "sites": 6338,
+  "seasons": {
+   "sites": 658,
+   "winter_median": 86.5,
+   "summer_median": 53.0,
+   "summer_over_winter_median": 0.72,
+   "summer_ge_winter_share": 0.228,
+   "summer_over_50": 0.515,
+   "summer_over_100": 0.21,
+   "summer_over_230": 0.024,
+   "rho_summer_winter": 0.854,
+   "bugs": {
+    "sites": 55,
+    "sensitive_share": {
+     "winter": {
+      "rho": -0.297,
+      "coef": -0.0635,
+      "lo": -0.1579,
+      "hi": 0.031,
+      "p": 0.19,
+      "r2": 0.296
+     },
+     "summer": {
+      "rho": -0.188,
+      "coef": -0.0644,
+      "lo": -0.137,
+      "hi": 0.0083,
+      "p": 0.082,
+      "r2": 0.292
+     },
+     "both": {
+      "winter_coef": -0.0445,
+      "winter_p": 0.47,
+      "summer_coef": -0.0215,
+      "summer_p": 0.7
+     }
+    },
+    "pct_tolerant": {
+     "winter": {
+      "rho": 0.396,
+      "coef": 9.1502,
+      "lo": 1.0652,
+      "hi": 17.2351,
+      "p": 0.027,
+      "r2": 0.261
+     },
+     "summer": {
+      "rho": 0.305,
+      "coef": 10.3619,
+      "lo": 1.471,
+      "hi": 19.2529,
+      "p": 0.022,
+      "r2": 0.271
+     },
+     "both": {
+      "winter_coef": 0.0695,
+      "winter_p": 0.99,
+      "summer_coef": 10.295,
+      "summer_p": 0.38
+     }
+    },
+    "score_pct": {
+     "winter": {
+      "rho": -0.008,
+      "coef": -3.6865,
+      "lo": -22.398,
+      "hi": 15.025,
+      "p": 0.7,
+      "r2": 0.673
+     },
+     "summer": {
+      "rho": -0.007,
+      "coef": -2.0963,
+      "lo": -12.9284,
+      "hi": 8.7357,
+      "p": 0.7,
+      "r2": 0.668
+     },
+     "both": {
+      "winter_coef": -11.3993,
+      "winter_p": 0.34,
+      "summer_coef": 8.936,
+      "summer_p": 0.43
+     }
+    }
+   }
+  },
+  "sources": {
+   "huc12_winter": {
+    "sites": 658,
+    "paved_only": {
+     "coef10": 0.199,
+     "p": 6.5e-93,
+     "r2": 0.301
+    },
+    "l_npdes_permits": {
+     "coef": -0.073,
+     "p": 0.079,
+     "r2": 0.307,
+     "n": 658
+    },
+    "l_pop_density": {
+     "coef": 0.238,
+     "p": 4.4e-07,
+     "r2": 0.28,
+     "n": 588
+    }
+   },
+   "huc12_summer": {
+    "sites": 658,
+    "paved_only": {
+     "coef10": 0.12,
+     "p": 5.3e-49,
+     "r2": 0.186
+    },
+    "l_npdes_permits": {
+     "coef": -0.067,
+     "p": 0.065,
+     "r2": 0.195,
+     "n": 658
+    },
+    "l_pop_density": {
+     "coef": 0.14,
+     "p": 0.00015,
+     "r2": 0.167,
+     "n": 588
+    }
+   },
+   "streamcat_winter": {
+    "sites": 58,
+    "paved_only": {
+     "coef10": 0.182,
+     "p": 2.1e-07,
+     "r2": 0.244
+    },
+    "l_road_density": {
+     "coef": 0.284,
+     "p": 0.13,
+     "r2": 0.251,
+     "rho": 0.814,
+     "rho_paved": 0.907,
+     "q": 0.7986
+    },
+    "l_septic": {
+     "coef": -0.101,
+     "p": 0.71,
+     "r2": 0.248,
+     "rho": 0.447,
+     "rho_paved": 0.434,
+     "q": 0.8432
+    },
+    "l_wwtp": {
+     "coef": 0.016,
+     "p": 0.84,
+     "r2": 0.245,
+     "rho": 0.152,
+     "rho_paved": -0.021,
+     "q": 0.8432
+    },
+    "l_housing": {
+     "coef": 0.08,
+     "p": 0.57,
+     "r2": 0.248,
+     "rho": 0.837,
+     "rho_paved": 0.913,
+     "q": 0.8432
+    },
+    "l_npdes_density": {
+     "coef": 0.047,
+     "p": 0.61,
+     "r2": 0.246,
+     "rho": -0.137,
+     "rho_paved": -0.127,
+     "q": 0.8432
+    },
+    "baseflow_index": {
+     "coef": -0.006,
+     "p": 0.58,
+     "r2": 0.252,
+     "rho": -0.014,
+     "rho_paved": -0.09,
+     "q": 0.8432
+    }
+   },
+   "streamcat_summer": {
+    "sites": 58,
+    "paved_only": {
+     "coef10": 0.116,
+     "p": 0.0016,
+     "r2": 0.126
+    },
+    "l_road_density": {
+     "coef": 0.136,
+     "p": 0.5,
+     "r2": 0.128,
+     "rho": 0.55,
+     "rho_paved": 0.907,
+     "q": 0.789
+    },
+    "l_septic": {
+     "coef": -0.148,
+     "p": 0.54,
+     "r2": 0.137,
+     "rho": 0.321,
+     "rho_paved": 0.434,
+     "q": 0.789
+    },
+    "l_wwtp": {
+     "coef": 0.061,
+     "p": 0.44,
+     "r2": 0.14,
+     "rho": 0.32,
+     "rho_paved": -0.021,
+     "q": 0.789
+    },
+    "l_housing": {
+     "coef": 0.059,
+     "p": 0.66,
+     "r2": 0.128,
+     "rho": 0.554,
+     "rho_paved": 0.913,
+     "q": 0.789
+    },
+    "l_npdes_density": {
+     "coef": 0.079,
+     "p": 0.43,
+     "r2": 0.131,
+     "rho": -0.036,
+     "rho_paved": -0.127,
+     "q": 0.789
+    },
+    "baseflow_index": {
+     "coef": -0.001,
+     "p": 0.88,
+     "r2": 0.127,
+     "rho": 0.105,
+     "rho_paved": -0.09,
+     "q": 0.8789
+    }
+   }
+  },
+  "flow": {
+   "winter": {
+    "readings": 10360,
+    "sites": 910,
+    "coef": -0.116,
+    "lo": -0.148,
+    "hi": -0.084,
+    "p": 6.6e-13,
+    "ratio_low_vs_high": 1.13
+   },
+   "summer": {
+    "readings": 6326,
+    "sites": 504,
+    "coef": -0.156,
+    "lo": -0.185,
+    "hi": -0.128,
+    "p": 2.6e-27,
+    "ratio_low_vs_high": 1.24
+   },
+   "other": {
+    "readings": 7026,
+    "sites": 652,
+    "coef": -0.125,
+    "lo": -0.15,
+    "hi": -0.1,
+    "p": 2.9e-22,
+    "ratio_low_vs_high": 1.2
+   }
+  },
+  "mediation": {
+   "surveys": 714,
+   "sites": 235,
+   "sensitive_share": {
+    "total_per10": -0.0521,
+    "direct_per10": -0.0338,
+    "via_chloride_per10": -0.0182,
+    "share_via_chloride": 0.35,
+    "share_lo": 0.182,
+    "share_hi": 0.5,
+    "total_lo": -0.0679,
+    "total_hi": -0.0314,
+    "direct_lo": -0.0457,
+    "direct_hi": -0.0203,
+    "via_lo": -0.0273,
+    "via_hi": -0.0066,
+    "boots": 1000
+   },
+   "pct_tolerant": {
+    "total_per10": 6.2283,
+    "direct_per10": 4.9454,
+    "via_chloride_per10": 1.2829,
+    "share_via_chloride": 0.206,
+    "share_lo": 0.059,
+    "share_hi": 0.416,
+    "total_lo": 4.1405,
+    "total_hi": 8.2953,
+    "direct_lo": 2.7581,
+    "direct_hi": 7.2102,
+    "via_lo": 0.3631,
+    "via_hi": 2.342,
+    "boots": 1000
+   },
+   "score_pct": {
+    "total_per10": -5.1306,
+    "direct_per10": -4.8254,
+    "via_chloride_per10": -0.3052,
+    "share_via_chloride": 0.059,
+    "share_lo": -0.1,
+    "share_hi": 0.253,
+    "total_lo": -6.7222,
+    "total_hi": -3.4283,
+    "direct_lo": -6.7706,
+    "direct_hi": -2.9438,
+    "via_lo": -1.2351,
+    "via_hi": 0.4752,
+    "boots": 1000
+   },
+   "paving_to_chloride_per10": 0.2686,
+   "paving_to_chloride_factor_per10": 1.856
+  }
  }
 }
