@@ -44,21 +44,7 @@
     <nav class="mainnav" aria-label="Main">
       <ul>
         <li><a class="nav-link" href="index.html" {% if here == "index.html" %}aria-current="page"{% endif %}>Explore</a></li>
-        <li class="has-menu">
-          <button class="nav-link" type="button" aria-expanded="false" aria-controls="menu-findings"
-            {% if here == "findings.html" or ((here.split("--")[0] ~ ".html") in (story | map(attribute="url") | list)) %}data-current{% endif %}>Findings<svg viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></button>
-          <div class="menu mega" id="menu-findings" hidden>
-            <a class="menu-all" href="findings.html">All findings <span class="meta">every result on one page</span></a>
-            <div class="mega-cols">
-              {% for s in story %}
-              <div class="mega-col">
-                <a class="mega-head" href="{{ s.url }}">{{ s.title }}</a>
-                <ul>{% for f in s.findings %}<li><a href="{{ f.url }}" {% if here == f.url %}aria-current="page"{% endif %}><span class="dot {{ f.page.status }}"></span>{{ f.title }}</a></li>{% endfor %}</ul>
-              </div>
-              {% endfor %}
-            </div>
-          </div>
-        </li>
+        <li><a class="nav-link" href="findings.html" {% if here == "findings.html" or ((here.split("--")[0] ~ ".html") in (story | map(attribute="url") | list)) %}aria-current="page"{% endif %}>Findings</a></li>
         {% if data_sec %}
         <li class="has-menu">
           <button class="nav-link" type="button" aria-expanded="false" aria-controls="menu-data" {% if here.startswith("data") %}data-current{% endif %}>Data<svg viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></button>
