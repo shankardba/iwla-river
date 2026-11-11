@@ -26,7 +26,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="assets/site.css?v=8e5745a8">
+<link rel="stylesheet" href="assets/site.css?v=d6ec4c82">
 <link rel="stylesheet" href="assets/terrain.css?v=1c9a0bfe">
 </head>
 <body class="">
@@ -39,7 +39,15 @@
     <nav class="mainnav" aria-label="Main">
       <ul>
         <li><a class="nav-link" href="index.html" >Explore</a></li>
-        <li><a class="nav-link" href="findings.html" aria-current="page">Findings</a></li>
+        <li class="has-menu">
+          <button class="nav-link" type="button" aria-expanded="false" aria-controls="menu-findings" data-current>Findings<svg viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></button>
+          <div class="menu" id="menu-findings" hidden>
+            <ul>
+              <li><a href="findings.html" aria-current="page"><b>All findings</b><span class="meta">Every result, by section, with its evidence and sources</span></a></li>
+              <li><a href="methods.html" ><b>How the methods work</b><span class="meta">Each method as a short animated diagram, then how every key finding was worked out</span></a></li>
+            </ul>
+          </div>
+        </li>
         <li class="has-menu">
           <button class="nav-link" type="button" aria-expanded="false" aria-controls="menu-data" >Data<svg viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></button>
           <div class="menu" id="menu-data" hidden>
@@ -60,6 +68,7 @@
   <nav aria-label="Main (phone)">
     <a class="sheet-top" href="index.html">Explore the map</a>
     <a class="sheet-top" href="findings.html">All findings</a>
+    <a class="sheet-top" href="methods.html">How the methods work</a>
     <details >
       <summary>National picture</summary>
       <ul><li><a href="national.html">Section overview</a></li><li><a href="national--map.html"><span class="dot info"></span>Where volunteers monitor</a></li><li><a href="national--paving.html"><span class="dot info"></span>Paved watersheds lose sensitive animals</a></li><li><a href="national--model.html"><span class="dot info"></span>How the expected-score model works</a></li><li><a href="national--monitoring-growth.html"><span class="dot info"></span>Volunteer monitoring took off after 2017</a></li></ul>
@@ -89,6 +98,7 @@
   <div class="eyebrow">Findings</div>
   <h1>What the data shows</h1>
   <p class="lede">83,297 volunteer samples nationwide, checked against public USGS, EPA, state and Census data. Each result has its own page with the evidence, the method and every source behind it.</p>
+  <p class="hero-actions"><a class="btn-methods" href="methods.html">How the methods work →</a></p>
 </header>
 
 <section class="block">

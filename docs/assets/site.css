@@ -408,3 +408,10 @@ ol.next { margin: 0; padding-left: 22px; display: flex; flex-direction: column; 
 .ex-area.ex-nb path { fill: transparent; stroke: var(--muted); stroke-width: 1; stroke-dasharray: 4 3; stroke-opacity: .7; }
 .ex-area.ex-nb:hover path, .ex-area.ex-nb.hl path { fill: color-mix(in srgb, var(--muted) 14%, transparent); fill-opacity: 1; stroke: var(--ink); stroke-dasharray: none; stroke-width: 1.6; }
 .ex-label.nb { opacity: .7; font-style: italic; }
+
+/* Findings page: button to the methods explainer. */
+.hero-actions { margin: 14px 0 0; }
+.btn-methods { display: inline-block; font: 600 14px/1 var(--display); padding: 10px 14px; border-radius: 8px;
+  background: var(--accent); color: var(--surface); text-decoration: none; }
+.btn-methods:hover { background: color-mix(in srgb, var(--accent) 85%, var(--ink)); }
+.btn-methods:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }

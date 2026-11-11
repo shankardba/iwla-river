@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+{% block title %}How the methods work · Save Our Streams Record{% endblock %}
+{% block description %}How each Save Our Streams finding was worked out: the methods as short animated diagrams, then every key finding with its numbers and limits.{% endblock %}
+{% block main %}
+<link rel="stylesheet" href="assets/methods.css?v={{ asset_v['methods.css'] }}">
+<div class="mx">
+<p class="mx-back"><a href="findings.html">← All findings</a></p>
+<h1>How the Save Our Streams findings were worked out</h1>
+<p class="lede">Each key finding on the Save Our Streams record rests on a handful of methods. This page shows each method as a
+  short animated diagram, then walks through every finding: what was joined, which methods ran, the numbers with their
+  intervals, and what the finding can't tell you.</p>
+<p class="meta">Dots in the diagrams are illustrative, drawn to look like the real data. Wherever a diagram or card says
+  “real”, the numbers are the site's own (Clean Water Hub snapshot 2026-10-27).</p>
+
+<nav class="toc" aria-label="Methods">
+  <a href="#m-bins">Averages by bin</a><a href="#m-pairing">Pairing</a><a href="#m-holdequal">Holding things equal</a>
+  <a href="#m-within">Each site against itself</a><a href="#m-bootstrap">How sure: intervals</a><a href="#m-trend">Trends</a>
+  <a href="#m-changepoint">Change points</a><a href="#m-agreement">Agreement</a><a href="#m-reliability">Reliability</a>
+  <a href="#m-groupcv">Prediction</a><a href="#m-clusters">Types</a><a href="#m-needscore">Need score</a>
+  <a href="#findings">The findings</a>
+</nav>
+
+<section class="method" id="howto">
+  <p class="eyebrow">Before the methods</p>
+  <h2>Three questions behind every finding</h2>
+  <div class="why">
+    <p><b>Which rows?</b> Volunteer data come from different forms, places and dates. Most analyses use only the surveys that could be
+      paired with something else, so each finding says how many surveys and sites it stands on.</p>
+    <p><b>Compared with what?</b> A link between two things can come from a third (paving brings both salt and lost habitat). The
+      methods hold such things equal, or compare each site only with itself.</p>
+    <p style="margin:0"><b>How sure?</b> Every estimate carries an interval: the range a different but similar set of sites would
+      likely give. An interval that crosses zero can't be sure of the direction.</p>
+  </div>
+</section>
+
+<section class="method" id="m-bins">
+  <p class="eyebrow">Method 1 · Description</p>
+  <h2>Averages by bin</h2>
+  <p>The simplest picture: sort surveys by one thing, average another. It shows the shape of a relationship before any model,
+    but it can't separate causes.</p>
+  <figure class="dg" data-diagram="bins"></figure>
+</section>
+
+<section class="method" id="m-pairing">
+  <p class="eyebrow">Method 2 · Joining data</p>
+  <h2>Pairing in time and space</h2>
+  <p>Bug surveys and chemistry readings are taken on different days and sometimes at different spots. A pairing rule says how
+    close in time (and place) a reading must be to count, and the share that paired is reported first.</p>
+  <figure class="dg" data-diagram="pairing"></figure>
+</section>
+
+<section class="method" id="m-holdequal">
+  <p class="eyebrow">Method 3 · Confounders</p>
+  <h2>Holding things equal</h2>
+  <p>Multiple regression estimates the link between two things while other things are held fixed. Errors are “clustered by
+    site”: a site's repeat visits count as one piece of evidence, not several.</p>
+  <figure class="dg" data-diagram="holdequal"></figure>
+</section>
+
+<section class="method" id="m-within">
+  <p class="eyebrow">Method 4 · Confounders</p>
+  <h2>Each site against itself</h2>
+  <p>Instead of naming every difference between sites, remove them all: subtract each site's own average (and each season's) and
+    look only at how a site changes from visit to visit.</p>
+  <figure class="dg" data-diagram="within"></figure>
+</section>
+
+<section class="method" id="m-bootstrap">
+  <p class="eyebrow">Method 5 · Uncertainty</p>
+  <h2>How sure: intervals from resampling</h2>
+  <p>The bootstrap asks what the estimate would be with a different, similar sample. Resampling whole sites (or whole
+    watersheds) keeps their visits together. Regression intervals on the site use a formula that does the same job
+    (cluster-robust errors).</p>
+  <figure class="dg" data-diagram="bootstrap"></figure>
+</section>
+
+<section class="method" id="m-trend">
+  <p class="eyebrow">Method 6 · Change over time</p>
+  <h2>Trends at each site</h2>
+  <p>Water quality swings with the seasons, so trends compare like seasons with like. Testing hundreds of sites calls for a
+    false-discovery-rate correction.</p>
+  <figure class="dg" data-diagram="trend"></figure>
+</section>
+
+<section class="method" id="m-changepoint">
+  <p class="eyebrow">Method 7 · Thresholds</p>
+  <h2>Change points</h2>
+  <p>Where does a response step down? The nonparametric change-point search (King and Richardson 2003) tries every split and keeps
+    the one that explains the most.</p>
+  <figure class="dg" data-diagram="changepoint"></figure>
+</section>
+
+<section class="method" id="m-agreement">
+  <p class="eyebrow">Method 8 · Checking the measurements</p>
+  <h2>Agreement with a reference</h2>
+  <p>Before trusting volunteer readings, compare them with professional ones taken nearby: numbers on a log scale, ratings as a
+    cross-table.</p>
+  <figure class="dg" data-diagram="agreement"></figure>
+</section>
+
+<section class="method" id="m-reliability">
+  <p class="eyebrow">Method 9 · Noise</p>
+  <h2>Reliability: how many visits make a site</h2>
+  <p>A mixed model separates what belongs to the site from what changes visit to visit; the intraclass correlation (ICC) is the
+    site's share.</p>
+  <figure class="dg" data-diagram="reliability"></figure>
+</section>
+
+<section class="method" id="m-groupcv">
+  <p class="eyebrow">Method 10 · Prediction</p>
+  <h2>Predicting sites the model never saw</h2>
+  <p>Machine-learning models fit anything; the honest test is prediction for sites held out, with each site's surveys kept
+    together.</p>
+  <figure class="dg" data-diagram="groupcv"></figure>
+</section>
+
+<section class="method" id="m-clusters">
+  <p class="eyebrow">Method 11 · Grouping</p>
+  <h2>Types of watershed</h2>
+  <p>Clustering groups watersheds by their pressures alone, checks the groups are stable, and only then compares the bugs.</p>
+  <figure class="dg" data-diagram="clusters"></figure>
+</section>
+
+<section class="method" id="m-needscore">
+  <p class="eyebrow">Method 12 · Overlay and count</p>
+  <h2>A need score and coverage</h2>
+  <p>Some findings are counts: overlay public maps of pressures with where volunteers work.</p>
+  <figure class="dg" data-diagram="needscore"></figure>
+</section>
+
+<section class="method" id="findings">
+  <p class="eyebrow">Part two</p>
+  <h2>The findings, one by one</h2>
+  <p>Each card says what was joined, which methods ran (linked above), the real numbers with intervals, and the limits the site
+    states.</p>
+  <div class="findings" id="cards"></div>
+</section>
+
+<section class="method" id="m-shuffle">
+  <p class="eyebrow">Afterword · Re-checking</p>
+  <h2>How DataLab re-checks these findings</h2>
+  <p>DataLab's study engine re-ran the road-salt analysis independently and got the same slopes. It also adds tests the site
+    doesn't run, such as the shuffle test below. It gave “saltier streams hold fewer sensitive animals” a verdict of
+    <b>hinted</b>: the link holds across sites, in each half of the data and against EPA's professional survey, but it vanishes
+    when each site is compared with itself.</p>
+  <figure class="dg" data-diagram="shuffle"></figure>
+</section>
+</div>
+<template id="dg-shell">
+  <div class="stage"><svg role="img"></svg></div>
+  <p class="cap" aria-live="polite"></p>
+  <div class="bar">
+    <button type="button" data-act="prev">Back</button>
+    <button type="button" data-act="play" aria-pressed="false">Play</button>
+    <button type="button" data-act="next">Next</button>
+    <span class="dots"></span>
+  </div>
+</template>
+<script src="assets/methods-engine.js?v={{ asset_v['methods-engine.js'] }}"></script>
+<script src="assets/methods-diagrams-core.js?v={{ asset_v['methods-diagrams-core.js'] }}"></script>
+<script src="assets/methods-diagrams-more.js?v={{ asset_v['methods-diagrams-more.js'] }}"></script>
+<script src="assets/methods-findings.js?v={{ asset_v['methods-findings.js'] }}"></script>
+<script>
+(() => {
+  const shell = document.getElementById("dg-shell");
+  const made = new Map();
+  const io = new IntersectionObserver((es) => es.forEach((e) => {
+    if (!e.isIntersecting) return;
+    const d = made.get(e.target);
+    if (d && !d.started) { d.started = true; d.play(); }   // play once when first seen
+  }), { threshold: 0.5 });
+  document.querySelectorAll("figure.dg").forEach((fig) => {
+    fig.appendChild(shell.content.cloneNode(true));
+    const name = fig.dataset.diagram;
+    fig.querySelector("svg").setAttribute("aria-label", fig.closest("section").querySelector("h2").textContent + ", step by step");
+    const d = new SOS.Diagram(fig, SOS_DIAGRAMS[name]);
+    made.set(fig, d);
+    io.observe(fig);
+  });
+})();
+</script>
+{% endblock %}

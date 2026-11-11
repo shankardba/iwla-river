@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>How the methods work · Save Our Streams Record</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="icon" href="assets/icon.svg?v=3" type="image/svg+xml">
+<link rel="icon" href="assets/favicon-32.png?v=3" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="https://shankardba.github.io/iwla-river/assets/apple-touch-icon.png?v=3">
+<meta name="description" content="How each Save Our Streams finding was worked out: the methods as short animated diagrams, then every key finding with its numbers and limits.">
+<meta name="theme-color" content="#1d6a86">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Save Our Streams Record">
+<meta property="og:title" content="How the methods work · Save Our Streams Record">
+<meta property="og:description" content="How each Save Our Streams finding was worked out: the methods as short animated diagrams, then every key finding with its numbers and limits.">
+<meta property="og:url" content="https://shankardba.github.io/iwla-river/methods.html">
+<meta property="og:image" content="https://shankardba.github.io/iwla-river/assets/og-image.png?v=3">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Save Our Streams Record: volunteer samples, lab chemistry, EPA assessments and land cover flow into one river that becomes a trend; an independent analysis of Save Our Streams data">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="How the methods work · Save Our Streams Record">
+<meta name="twitter:description" content="How each Save Our Streams finding was worked out: the methods as short animated diagrams, then every key finding with its numbers and limits.">
+<meta name="twitter:image" content="https://shankardba.github.io/iwla-river/assets/og-image.png?v=3">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="assets/site.css?v=d6ec4c82">
+<link rel="stylesheet" href="assets/terrain.css?v=1c9a0bfe">
+</head>
+<body class="">
+<header class="topbar">
+  <div class="topbar-in">
+    <a class="brand" href="index.html" aria-label="Save Our Streams Record, home">
+      <img src="assets/icon.svg?v=3" alt="" width="26" height="26">
+      <span class="brand-name">Save Our Streams Record</span>
+    </a>
+    <nav class="mainnav" aria-label="Main">
+      <ul>
+        <li><a class="nav-link" href="index.html" >Explore</a></li>
+        <li class="has-menu">
+          <button class="nav-link" type="button" aria-expanded="false" aria-controls="menu-findings" data-current>Findings<svg viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></button>
+          <div class="menu" id="menu-findings" hidden>
+            <ul>
+              <li><a href="findings.html" ><b>All findings</b><span class="meta">Every result, by section, with its evidence and sources</span></a></li>
+              <li><a href="methods.html" aria-current="page"><b>How the methods work</b><span class="meta">Each method as a short animated diagram, then how every key finding was worked out</span></a></li>
+            </ul>
+          </div>
+        </li>
+        <li class="has-menu">
+          <button class="nav-link" type="button" aria-expanded="false" aria-controls="menu-data" >Data<svg viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></button>
+          <div class="menu" id="menu-data" hidden>
+            <ul><li><a href="data--data-quality.html" ><b>How clean the data is</b><span class="meta">83,297 of 88,511 records (94%) are usable after removing undated,...</span></a></li><li><a href="data--temperature-units.html" ><b>Water temperature switches units</b><span class="meta">The Hub stores no temperature unit; at one long-running site pair...</span></a></li><li><a href="data--methods.html" ><b>Sources and methods</b><span class="meta">Built from a Clean Water Hub snapshot of 2026-10-27, with public...</span></a></li><li><a href="data--references.html" ><b>References</b><span class="meta">Every number on this site traces to 27 data sources, 31 published...</span></a></li><li><a href="data--downloads.html" ><b>Downloads</b><span class="meta">Watershed-level figures and every finding, free to download.</span></a></li></ul>
+          </div>
+        </li>
+        <li><a class="nav-link" href="about.html" >About</a></li>
+      </ul>
+    </nav>
+    <button class="menu-btn" id="menu-btn" type="button" aria-expanded="false" aria-controls="sheet" aria-label="Open the menu">
+      <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+</header>
+
+<div class="sheet" id="sheet" hidden>
+  <div class="sheet-head"><span class="brand-name">Menu</span><button class="sheet-close" id="sheet-close" type="button" aria-label="Close the menu">×</button></div>
+  <nav aria-label="Main (phone)">
+    <a class="sheet-top" href="index.html">Explore the map</a>
+    <a class="sheet-top" href="findings.html">All findings</a>
+    <a class="sheet-top" href="methods.html">How the methods work</a>
+    <details >
+      <summary>National picture</summary>
+      <ul><li><a href="national.html">Section overview</a></li><li><a href="national--map.html"><span class="dot info"></span>Where volunteers monitor</a></li><li><a href="national--paving.html"><span class="dot info"></span>Paved watersheds lose sensitive animals</a></li><li><a href="national--model.html"><span class="dot info"></span>How the expected-score model works</a></li><li><a href="national--monitoring-growth.html"><span class="dot info"></span>Volunteer monitoring took off after 2017</a></li></ul>
+    </details>
+    <details >
+      <summary>In context</summary>
+      <ul><li><a href="context.html">Section overview</a></li><li><a href="context--enrichment.html"><span class="dot info"></span>What each public dataset added</a></li><li><a href="context--chloride-check.html"><span class="dot good"></span>Volunteer chloride tracks agency lab chloride</a></li><li><a href="context--chloride-sites.html"><span class="dot watch"></span>Chloride is rising at more sites than it is falling</a></li><li><a href="context--development-salt.html"><span class="dot info"></span>Paved land, more than winter salt, tracks low bug scores</a></li><li><a href="context--chloride-bugs.html"><span class="dot concern"></span>Saltier streams hold fewer sensitive animals, well below EPA&#39;s chloride limit</a></li><li><a href="context--development-trend.html"><span class="dot watch"></span>Paving keeps spreading, fastest where volunteers work</a></li><li><a href="context--storm-timing.html"><span class="dot good"></span>A storm the week before does not change a site&#39;s score</a></li><li><a href="context--impaired-biology.html"><span class="dot info"></span>State impairment listings match the bug surveys</a></li><li><a href="context--volunteers-vs-professionals.html"><span class="dot info"></span>Volunteers and professionals mostly agree, but volunteers rate generously</a></li><li><a href="context--monitoring-gaps.html"><span class="dot concern"></span>Most high-need watersheds have no volunteer monitor</a></li><li><a href="context--restoration.html"><span class="dot info"></span>Stream restoration: no gain beyond what a placebo shows</a></li><li><a href="context--site-visits.html"><span class="dot info"></span>Three surveys capture most of what a site is</a></li><li><a href="context--maps-vs-local.html"><span class="dot info"></span>Maps predict about half of why sites differ; the rest is local</a></li><li><a href="context--watershed-types.html"><span class="dot concern"></span>Urban watersheds stand apart; livestock watersheds score like low-pressure ones</a></li></ul>
+    </details>
+    <details >
+      <summary>Watersheds</summary>
+      <ul><li><a href="watersheds.html">Section overview</a></li><li><a href="watersheds--watershed-findings.html"><span class="dot info"></span>How the findings for each watershed are worked out</a></li></ul>
+    </details>
+    <details >
+      <summary>Case study: Great Seneca Creek</summary>
+      <ul><li><a href="chapter.html">Section overview</a></li><li><a href="chapter--expected.html"><span class="dot watch"></span>Compared with what its setting predicts</a></li><li><a href="chapter--score-trend.html"><span class="dot steady"></span>The score has held steady</a></li><li><a href="chapter--species-mix.html"><span class="dot watch"></span>The mix of animals is shifting</a></li><li><a href="chapter--trend-tests.html"><span class="dot concern"></span>Trend tests</a></li><li><a href="chapter--score-parts.html"><span class="dot info"></span>What moves the score</a></li><li><a href="chapter--season.html"><span class="dot info"></span>Season matters</a></li><li><a href="chapter--survey-forms.html"><span class="dot info"></span>The chapter changed survey forms in 2024</a></li><li><a href="chapter--great-seneca.html"><span class="dot info"></span>Great Seneca Creek within its watersheds</a></li><li><a href="chapter--road-salt.html"><span class="dot watch"></span>Road salt reaches the creek every winter</a></li><li><a href="chapter--nitrate.html"><span class="dot good"></span>Nitrate stays low</a></li><li><a href="chapter--local-map.html"><span class="dot info"></span>Map of sites around the creek</a></li><li><a href="chapter--neighbour-trends.html"><span class="dot good"></span>Streams near the creek are mostly improving</a></li><li><a href="chapter--nearby-sites.html"><span class="dot info"></span>Sites near the creek</a></li></ul>
+    </details>
+    <details >
+      <summary>Data and methods</summary>
+      <ul><li><a href="data.html">Section overview</a></li><li><a href="data--data-quality.html"><span class="dot info"></span>How clean the data is</a></li><li><a href="data--temperature-units.html"><span class="dot info"></span>Water temperature switches units</a></li><li><a href="data--methods.html"><span class="dot info"></span>Sources and methods</a></li><li><a href="data--references.html"><span class="dot info"></span>References</a></li><li><a href="data--downloads.html"><span class="dot info"></span>Downloads</a></li></ul>
+    </details>
+    <a class="sheet-top" href="about.html">About</a>
+  </nav>
+</div>
+
+<div class="page">
+<link rel="stylesheet" href="assets/methods.css?v=4e18c48c">
+<div class="mx">
+<p class="mx-back"><a href="findings.html">← All findings</a></p>
+<h1>How the Save Our Streams findings were worked out</h1>
+<p class="lede">Each key finding on the Save Our Streams record rests on a handful of methods. This page shows each method as a
+  short animated diagram, then walks through every finding: what was joined, which methods ran, the numbers with their
+  intervals, and what the finding can't tell you.</p>
+<p class="meta">Dots in the diagrams are illustrative, drawn to look like the real data. Wherever a diagram or card says
+  “real”, the numbers are the site's own (Clean Water Hub snapshot 2026-10-27).</p>
+
+<nav class="toc" aria-label="Methods">
+  <a href="#m-bins">Averages by bin</a><a href="#m-pairing">Pairing</a><a href="#m-holdequal">Holding things equal</a>
+  <a href="#m-within">Each site against itself</a><a href="#m-bootstrap">How sure: intervals</a><a href="#m-trend">Trends</a>
+  <a href="#m-changepoint">Change points</a><a href="#m-agreement">Agreement</a><a href="#m-reliability">Reliability</a>
+  <a href="#m-groupcv">Prediction</a><a href="#m-clusters">Types</a><a href="#m-needscore">Need score</a>
+  <a href="#findings">The findings</a>
+</nav>
+
+<section class="method" id="howto">
+  <p class="eyebrow">Before the methods</p>
+  <h2>Three questions behind every finding</h2>
+  <div class="why">
+    <p><b>Which rows?</b> Volunteer data come from different forms, places and dates. Most analyses use only the surveys that could be
+      paired with something else, so each finding says how many surveys and sites it stands on.</p>
+    <p><b>Compared with what?</b> A link between two things can come from a third (paving brings both salt and lost habitat). The
+      methods hold such things equal, or compare each site only with itself.</p>
+    <p style="margin:0"><b>How sure?</b> Every estimate carries an interval: the range a different but similar set of sites would
+      likely give. An interval that crosses zero can't be sure of the direction.</p>
+  </div>
+</section>
+
+<section class="method" id="m-bins">
+  <p class="eyebrow">Method 1 · Description</p>
+  <h2>Averages by bin</h2>
+  <p>The simplest picture: sort surveys by one thing, average another. It shows the shape of a relationship before any model,
+    but it can't separate causes.</p>
+  <figure class="dg" data-diagram="bins"></figure>
+</section>
+
+<section class="method" id="m-pairing">
+  <p class="eyebrow">Method 2 · Joining data</p>
+  <h2>Pairing in time and space</h2>
+  <p>Bug surveys and chemistry readings are taken on different days and sometimes at different spots. A pairing rule says how
+    close in time (and place) a reading must be to count, and the share that paired is reported first.</p>
+  <figure class="dg" data-diagram="pairing"></figure>
+</section>
+
+<section class="method" id="m-holdequal">
+  <p class="eyebrow">Method 3 · Confounders</p>
+  <h2>Holding things equal</h2>
+  <p>Multiple regression estimates the link between two things while other things are held fixed. Errors are “clustered by
+    site”: a site's repeat visits count as one piece of evidence, not several.</p>
+  <figure class="dg" data-diagram="holdequal"></figure>
+</section>
+
+<section class="method" id="m-within">
+  <p class="eyebrow">Method 4 · Confounders</p>
+  <h2>Each site against itself</h2>
+  <p>Instead of naming every difference between sites, remove them all: subtract each site's own average (and each season's) and
+    look only at how a site changes from visit to visit.</p>
+  <figure class="dg" data-diagram="within"></figure>
+</section>
+
+<section class="method" id="m-bootstrap">
+  <p class="eyebrow">Method 5 · Uncertainty</p>
+  <h2>How sure: intervals from resampling</h2>
+  <p>The bootstrap asks what the estimate would be with a different, similar sample. Resampling whole sites (or whole
+    watersheds) keeps their visits together. Regression intervals on the site use a formula that does the same job
+    (cluster-robust errors).</p>
+  <figure class="dg" data-diagram="bootstrap"></figure>
+</section>
+
+<section class="method" id="m-trend">
+  <p class="eyebrow">Method 6 · Change over time</p>
+  <h2>Trends at each site</h2>
+  <p>Water quality swings with the seasons, so trends compare like seasons with like. Testing hundreds of sites calls for a
+    false-discovery-rate correction.</p>
+  <figure class="dg" data-diagram="trend"></figure>
+</section>
+
+<section class="method" id="m-changepoint">
+  <p class="eyebrow">Method 7 · Thresholds</p>
+  <h2>Change points</h2>
+  <p>Where does a response step down? The nonparametric change-point search (King and Richardson 2003) tries every split and keeps
+    the one that explains the most.</p>
+  <figure class="dg" data-diagram="changepoint"></figure>
+</section>
+
+<section class="method" id="m-agreement">
+  <p class="eyebrow">Method 8 · Checking the measurements</p>
+  <h2>Agreement with a reference</h2>
+  <p>Before trusting volunteer readings, compare them with professional ones taken nearby: numbers on a log scale, ratings as a
+    cross-table.</p>
+  <figure class="dg" data-diagram="agreement"></figure>
+</section>
+
+<section class="method" id="m-reliability">
+  <p class="eyebrow">Method 9 · Noise</p>
+  <h2>Reliability: how many visits make a site</h2>
+  <p>A mixed model separates what belongs to the site from what changes visit to visit; the intraclass correlation (ICC) is the
+    site's share.</p>
+  <figure class="dg" data-diagram="reliability"></figure>
+</section>
+
+<section class="method" id="m-groupcv">
+  <p class="eyebrow">Method 10 · Prediction</p>
+  <h2>Predicting sites the model never saw</h2>
+  <p>Machine-learning models fit anything; the honest test is prediction for sites held out, with each site's surveys kept
+    together.</p>
+  <figure class="dg" data-diagram="groupcv"></figure>
+</section>
+
+<section class="method" id="m-clusters">
+  <p class="eyebrow">Method 11 · Grouping</p>
+  <h2>Types of watershed</h2>
+  <p>Clustering groups watersheds by their pressures alone, checks the groups are stable, and only then compares the bugs.</p>
+  <figure class="dg" data-diagram="clusters"></figure>
+</section>
+
+<section class="method" id="m-needscore">
+  <p class="eyebrow">Method 12 · Overlay and count</p>
+  <h2>A need score and coverage</h2>
+  <p>Some findings are counts: overlay public maps of pressures with where volunteers work.</p>
+  <figure class="dg" data-diagram="needscore"></figure>
+</section>
+
+<section class="method" id="findings">
+  <p class="eyebrow">Part two</p>
+  <h2>The findings, one by one</h2>
+  <p>Each card says what was joined, which methods ran (linked above), the real numbers with intervals, and the limits the site
+    states.</p>
+  <div class="findings" id="cards"></div>
+</section>
+
+<section class="method" id="m-shuffle">
+  <p class="eyebrow">Afterword · Re-checking</p>
+  <h2>How DataLab re-checks these findings</h2>
+  <p>DataLab's study engine re-ran the road-salt analysis independently and got the same slopes. It also adds tests the site
+    doesn't run, such as the shuffle test below. It gave “saltier streams hold fewer sensitive animals” a verdict of
+    <b>hinted</b>: the link holds across sites, in each half of the data and against EPA's professional survey, but it vanishes
+    when each site is compared with itself.</p>
+  <figure class="dg" data-diagram="shuffle"></figure>
+</section>
+</div>
+<template id="dg-shell">
+  <div class="stage"><svg role="img"></svg></div>
+  <p class="cap" aria-live="polite"></p>
+  <div class="bar">
+    <button type="button" data-act="prev">Back</button>
+    <button type="button" data-act="play" aria-pressed="false">Play</button>
+    <button type="button" data-act="next">Next</button>
+    <span class="dots"></span>
+  </div>
+</template>
+<script src="assets/methods-engine.js?v=ed28af93"></script>
+<script src="assets/methods-diagrams-core.js?v=e80fb41d"></script>
+<script src="assets/methods-diagrams-more.js?v=4ffa95dd"></script>
+<script src="assets/methods-findings.js?v=a1acd9c2"></script>
+<script>
+(() => {
+  const shell = document.getElementById("dg-shell");
+  const made = new Map();
+  const io = new IntersectionObserver((es) => es.forEach((e) => {
+    if (!e.isIntersecting) return;
+    const d = made.get(e.target);
+    if (d && !d.started) { d.started = true; d.play(); }   // play once when first seen
+  }), { threshold: 0.5 });
+  document.querySelectorAll("figure.dg").forEach((fig) => {
+    fig.appendChild(shell.content.cloneNode(true));
+    const name = fig.dataset.diagram;
+    fig.querySelector("svg").setAttribute("aria-label", fig.closest("section").querySelector("h2").textContent + ", step by step");
+    const d = new SOS.Diagram(fig, SOS_DIAGRAMS[name]);
+    made.set(fig, d);
+    io.observe(fig);
+  });
+})();
+</script>
+</div>
+
+<footer class="foot">
+  <div class="foot-in">
+    <p class="meta">Data: <a href="https://www.cleanwaterhub.org/">Clean Water Hub</a> (Izaak Walton League), snapshot 2026-10-27; USGS Watershed Boundary Dataset and NLDI; EPA StreamCat; Open-Meteo; US Census Bureau boundaries. No personal details are shown.</p>
+    <p class="meta"><a href="https://github.com/shankardba/iwla-river">Code and methods</a> · <a href="data--downloads.html">Downloads</a> · <a href="about.html">About</a></p>
+  </div>
+</footer>
+<script type="application/json" id="chart-specs">[]</script>
+<script src="assets/charts.js?v=4f2d43b7"></script>
+<script src="assets/terrain.js?v=bfa52bed"></script>
+<script src="assets/explorer.js?v=593ff7aa"></script>
+<script>
+  // Menus: click to open, Escape or an outside click closes; one open at a time. Phones: a full-screen sheet.
+  (function () {
+    var btns = document.querySelectorAll(".has-menu > button");
+    function closeAll(except) {
+      btns.forEach(function (b) { if (b !== except) { b.setAttribute("aria-expanded", "false"); document.getElementById(b.getAttribute("aria-controls")).hidden = true; } });
+    }
+    btns.forEach(function (b) {
+      var m = document.getElementById(b.getAttribute("aria-controls"));
+      b.addEventListener("click", function (e) {
+        e.stopPropagation();
+        var open = b.getAttribute("aria-expanded") === "true";
+        closeAll(b); b.setAttribute("aria-expanded", String(!open)); m.hidden = open;
+        if (!open && e.detail === 0) { var first = m.querySelector("a"); if (first) first.focus(); }
+      });
+    });
+    document.addEventListener("click", function (e) { if (!e.target.closest(".has-menu")) closeAll(); });
+    var sheet = document.getElementById("sheet"), mb = document.getElementById("menu-btn");
+    function setSheet(open) {
+      sheet.hidden = !open; mb.setAttribute("aria-expanded", String(open));
+      document.documentElement.classList.toggle("sheet-open", open);
+      if (open) sheet.querySelector("a").focus(); else mb.focus();
+    }
+    document.addEventListener("keydown", function (e) {
+      if (e.key !== "Escape") return;
+      var openBtn = document.querySelector('.has-menu > button[aria-expanded="true"]');
+      closeAll(); if (openBtn) openBtn.focus();
+      if (!sheet.hidden) setSheet(false);
+    });
+    mb.addEventListener("click", function () { setSheet(true); });
+    document.getElementById("sheet-close").addEventListener("click", function () { setSheet(false); });
+  })();
+</script>
+</body>
+</html>

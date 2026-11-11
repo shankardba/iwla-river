@@ -402,6 +402,7 @@ def build(db_path=C.DB_PATH, out: Path = OUT, body_out: Path = BODY_OUT) -> Path
                                   key=[i for s in sections for i in s["findings"] if i["key"]])}
     key = [i for s in sections for i in s["findings"] if i["key"]]
     pages["findings.html"] = render("findings.html", "findings.html", key=key)
+    pages["methods.html"] = render("methods.html", "methods.html")
     from .diagrams import about as about_dg
     pages["about.html"] = render("about.html", "about.html", datasets=ABOUT_DATASETS,
                                  joins_svg=about_dg.joins(meta["sites"], meta["usable"]))
