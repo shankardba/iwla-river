@@ -32,22 +32,22 @@ BODY_OUT = C.REPORTS / "site"  # body-only copy of index.html for hosts that add
 
 
 # About page: each joined dataset as (name, refs key, what it adds, how it joins, [(finding, page)]).
-_WF = ("Watershed findings", "watersheds--watershed-findings.html")
+_WF = ("Watershed findings", "data--watershed-findings.html")
 ABOUT_DATASETS = [
     ("USGS Watershed Boundary Dataset", "wbd", "HUC2 to HUC12 watersheds", "Site location inside the polygon", [("Explore", "index.html"), _WF]),
     ("NHDPlus V2 via USGS NLDI", "nhdplus", "Stream segment (COMID) for each public site", "Nearest flowline to the site", [("Volunteers vs professionals", "context--volunteers-vs-professionals.html")]),
-    ("EPA StreamCat", "streamcat", "Catchment land cover, soils, dams, climate", "Stream segment", [("Expected-score model", "national--model.html"), _WF]),
-    ("USGS Annual NLCD", "annual-nlcd", "Paved share of each watershed, 1985–2025", "HUC12, each year", [("Paving trend", "context--development-trend.html"), _WF]),
+    ("EPA StreamCat", "streamcat", "Catchment land cover, soils, dams, climate", "Stream segment", [("Expected-score model", "data--model.html"), _WF]),
+    ("USGS Annual NLCD", "annual-nlcd", "Paved share of each watershed, 1985–2025", "HUC12, each year", [("Paving trend", "national--development-trend.html"), _WF]),
     ("EPA ATTAINS", "attains", "Impaired waters and their causes", "HUC12", [("Impairment listings", "context--impaired-biology.html"), _WF]),
     ("EPA ECHO", "echo", "Discharge permits", "HUC12", [_WF]),
     ("USGS USMIN", "usmin", "Mine features", "HUC12", [_WF]),
-    ("Census ACS 2020–2024", "acs", "Population, income, poverty", "HUC12", [("Monitoring gaps", "context--monitoring-gaps.html")]),
+    ("Census ACS 2020–2024", "acs", "Population, income, poverty", "HUC12", [("Monitoring gaps", "national--monitoring-gaps.html")]),
     ("Water Quality Portal", "wqp", "Agency lab chloride", "HUC12, within 7 days", [("Chloride check", "context--chloride-check.html")]),
     ("USGS NWIS gauges", "nwis", "Flow percentile on the survey day", "HUC12 (else HUC10), same day", [("Storm timing", "context--storm-timing.html")]),
     ("EPA NRSA", "nrsa", "Professional bug surveys", "Same segment, ≤1 km or HUC12; ≤2 years", [("Volunteers vs professionals", "context--volunteers-vs-professionals.html")]),
     ("Maryland MBSS and Stream Waders", "mbss", "Maryland professional and volunteer bug surveys", "≤1 km, ≤2 years", [("Volunteers vs professionals", "context--volunteers-vs-professionals.html")]),
-    ("EPA 319 and county restoration records", "epa319", "Restoration projects and dates", "≤5 km, before and after", [("Restoration", "context--restoration.html")]),
-    ("Open-Meteo (ERA5)", "openmeteo", "Rain 1, 3 and 7 days before; recent heat", "Site and survey date", [("Expected-score model", "national--model.html")]),
+    ("EPA 319 and county restoration records", "epa319", "Restoration projects and dates", "≤5 km, before and after", [("Restoration", "national--restoration.html")]),
+    ("Open-Meteo (ERA5)", "openmeteo", "Rain 1, 3 and 7 days before; recent heat", "Site and survey date", [("Expected-score model", "data--model.html")]),
 ]
 
 def load_findings() -> None:
@@ -395,6 +395,7 @@ def build(db_path=C.DB_PATH, out: Path = OUT, body_out: Path = BODY_OUT) -> Path
     for a in (HERE / "assets").iterdir():
         shutil.copy(a, out / "assets" / a.name)
 
+    from . import glossary
     from .diagrams import plates
     from .findings.watersheds import chapter_huc, complete
     pages = {"index.html": render("home.html", "index.html",
@@ -411,12 +412,26 @@ def build(db_path=C.DB_PATH, out: Path = OUT, body_out: Path = BODY_OUT) -> Path
         for n, i in enumerate(s["findings"]):
             prev = s["findings"][n - 1] if n else None
             nxt = s["findings"][n + 1] if n + 1 < len(s["findings"]) else None
-            pages[i["url"]] = render("finding.html", i["url"], section=s, item=i, prev=prev, next=nxt)
+            html = render("finding.html", i["url"], section=s, item=i, prev=prev, next=nxt)
+            pages[i["url"]] = html.replace("__GLOSSARY__", glossary.block(html))
     # Pages that moved into the Great Seneca Creek case study keep working at their old addresses.
     moved = {"chemistry.html": "chapter.html", "chemistry--road-salt.html": "chapter--road-salt.html",
              "chemistry--nitrate.html": "chapter--nitrate.html", "region.html": "chapter.html",
              "region--neighbour-trends.html": "chapter--neighbour-trends.html", "region--nearby-sites.html": "chapter--nearby-sites.html",
-             "region--local-map.html": "chapter--local-map.html", "watersheds--great-seneca.html": "chapter--great-seneca.html"}
+             "region--local-map.html": "chapter--local-map.html", "watersheds--great-seneca.html": "chapter--great-seneca.html",
+             "context--chloride-sites.html": "national--chloride-sites.html",
+             "context--development-salt.html": "national--development-salt.html",
+             "context--monitoring-gaps.html": "national--monitoring-gaps.html",
+             "context--restoration.html": "national--restoration.html",
+             "context--development-trend.html": "national--development-trend.html",
+             "context--site-visits.html": "planning--site-visits.html",
+             "context--maps-vs-local.html": "planning--maps-vs-local.html",
+             "context--watershed-types.html": "national--watershed-types.html",
+             "context--chloride-bugs.html": "national--chloride-bugs.html",
+             "national--model.html": "data--model.html",
+             "national--monitoring-growth.html": "planning--monitoring-growth.html",
+             "watersheds--watershed-findings.html": "data--watershed-findings.html",
+             "watersheds.html": "data.html"}
     for old, new in moved.items():
         if old not in pages and new in pages:
             pages[old] = (f'<!doctype html><meta charset="utf-8"><title>Moved</title><link rel="canonical" href="{new}">'

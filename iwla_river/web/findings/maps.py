@@ -49,7 +49,7 @@ def albers(lat, lon, lat0=23.0, lon0=-96.0, p1=29.5, p2=45.5):
     return rho * math.sin(th), rho0 - rho * math.cos(th)
 
 
-@finding("national", "map", "Where volunteers monitor", order=5, key=True)
+@finding("national", "map", "Where volunteers monitor", order=80)
 def national_map(db):
     rows = db.rows("""SELECT s.site_id, s.lat, s.lon, u.protocol, count(*) AS n FROM usable_surveys u JOIN sites s USING (site_id)
                       WHERE s.lat BETWEEN 24 AND 50 AND s.lon BETWEEN -125 AND -66 GROUP BY ALL""")
@@ -99,7 +99,7 @@ def national_map(db):
                 links([("model", "the model trained on these surveys"), ("monitoring-gaps", "where high-need watersheds have no volunteer")])])
 
 
-@finding("chapter", "local-map", "Map of sites around the creek", order=68)
+@finding("chapter", "local-map", "Map of sites around the creek", order=74)
 def local_map(db):
     c = db.rows("SELECT lat, lon FROM sites WHERE site_id = 467")[0]
     lat0, lon0 = c["lat"], c["lon"]

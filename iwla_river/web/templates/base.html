@@ -49,7 +49,13 @@
           <div class="menu" id="menu-findings" hidden>
             <ul>
               <li><a href="findings.html" {% if here == "findings.html" %}aria-current="page"{% endif %}><b>All findings</b><span class="meta">Every result, by section, with its evidence and sources</span></a></li>
+              {% for s in story if s.id != "chapter" %}
+              <li><a href="{{ s.url }}" {% if here.startswith(s.id) %}aria-current="page"{% endif %}><b>{{ s.title }}</b><span class="meta">{{ {"national": "Results across the country, the most actionable first", "planning": "How many surveys a site needs, and what maps can tell", "context": "How the volunteer data compares with agency and professional data"}.get(s.id, s.intro | truncate(80)) }}</span></a></li>
+              {% endfor %}
               <li><a href="methods.html" {% if here == "methods.html" %}aria-current="page"{% endif %}><b>How the methods work</b><span class="meta">Each method as a short animated diagram, then how every key finding was worked out</span></a></li>
+              {% for s in story if s.id == "chapter" %}
+              <li class="menu-sep"><a href="{{ s.url }}" {% if here.startswith(s.id) %}aria-current="page"{% endif %}><b>{{ s.title }}</b><span class="meta">One creek followed in depth: the IWLA Rockville Chapter's sites since 2005</span></a></li>
+              {% endfor %}
             </ul>
           </div>
         </li>

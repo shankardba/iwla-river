@@ -7,7 +7,7 @@ from ..registry import Page, chart, finding, section, table, text
 
 section("data", "Data and methods",
         "Where the numbers come from, how they were cleaned, and the problems found in the volunteer data along the way.",
-        order=90)
+        order=70)
 
 
 @finding("data", "data-quality", "How clean the data is", order=10)

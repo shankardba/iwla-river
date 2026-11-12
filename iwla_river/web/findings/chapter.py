@@ -9,7 +9,7 @@ from ..registry import Page, chart, diagram, finding, links, pill, section, tabl
 section("chapter", "Case study: Great Seneca Creek",
         "One creek followed in depth: the IWLA Rockville Chapter's two monitoring sites on Great Seneca Creek in "
         "Germantown, Maryland, surveyed since 2005. How stream health has moved, which animals are changing, road salt "
-        "in winter, how the creek compares with what its setting predicts, and how nearby streams are changing.", order=80)
+        "in winter, how the creek compares with what its setting predicts, and how nearby streams are changing.", order=90)
 
 SITE_COLOR = {467: "accent", 468: "grey"}
 LEGEND_SITES = [{"name": "Site 1", "color": "accent"}, {"name": "Site 2", "color": "grey"}]

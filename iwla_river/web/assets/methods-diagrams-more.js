@@ -117,7 +117,7 @@ D.changepoint = (svg) => {
   const band = el("rect", { x: F.X(Math.log10(25)), width: F.X(Math.log10(54)) - F.X(Math.log10(25)), y: F.y0, height: F.h, class: "band", opacity: 0 }, svg);
   const epa = el("g", { opacity: 0 }, svg);
   el("line", { x1: F.X(Math.log10(230)), x2: F.X(Math.log10(230)), y1: F.y0, y2: F.y0 + F.h, class: "guide" }, epa);
-  el("text", { x: F.X(Math.log10(230)) + 6, y: F.y0 + 14, class: "lbl m", text: "EPA chronic limit 230" }, epa);
+  el("text", { x: F.X(Math.log10(230)) + 6, y: F.y0 + 14, class: "lbl m", text: "EPA criterion 230" }, epa);
   const bestLbl = el("text", { x: F.X(Math.log10(47)), y: F.y0 + 14, class: "lbl hi", "text-anchor": "middle", opacity: 0, text: "47 mg/L (90%: 25–54)" }, svg);
   return [
     { cap: "Volunteer rocky-bottom surveys against chloride within 30 days (illustrative dots with the real form's shape). Is there a level where scores step down?", play: async () => {} },
@@ -135,7 +135,7 @@ D.changepoint = (svg) => {
     { cap: "<b>How sure?</b> Redo the search on 500 resamples of whole sites; the middle 90% of the change points is the interval. <b>Real:</b> rocky-bottom form 47 mg/L (25–54), original SOS form 60 (48–165): each form gets its own, because they score on different scales.", play: async (h) => {
       await h.tween(600, (t) => band.setAttribute("opacity", t));
     } },
-    { cap: "Both sit far below EPA's chronic limit of 230 mg/L: the animals respond to salt well before the legal line.", hold: 2600, play: async (h) => { await h.tween(500, (t) => epa.setAttribute("opacity", t)); } },
+    { cap: "Both sit far below EPA's recommended long-term criterion of 230 mg/L: the animals respond to salt well before that line.", hold: 2600, play: async (h) => { await h.tween(500, (t) => epa.setAttribute("opacity", t)); } },
   ];
 };
 

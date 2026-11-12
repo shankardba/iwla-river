@@ -1,9 +1,9 @@
 """Where stream chloride comes from, and how paving reaches the bugs. Four checks, volunteer chloride throughout.
 
   seasons   each site's winter (Dec-Mar, road-salt season) and summer (Jun-Sep, no road salt) median chloride: how high
-            summer chloride stays, and which of the two tracks the site's bugs better (paving held equal)
+            summer chloride stays, and which of the two tracks the site's bugs better (paving held fixed)
   sources   site summer and winter chloride against paving and road density, then whether septic systems, wastewater
-            plants, discharge permits, housing and population add anything once paving is held equal
+            plants, discharge permits, housing and population add anything once paving is held fixed
   flow      the same site on low- vs high-water days (USGS gauge flow percentile on the sampling day), by season:
             a steady source is diluted at high water; a salt pulse rises with melt and runoff
   paving    paving -> chloride -> bugs: how much of paving's link to the bugs runs through chloride, and how much does not
@@ -64,7 +64,7 @@ def seasons(r, cl, b):
            "summer_over_50": r3((ss.cl_summer > 50).mean()), "summer_over_100": r3((ss.cl_summer > 100).mean()),
            "summer_over_230": r3((ss.cl_summer > 230).mean()),
            "rho_summer_winter": r3(stats.spearmanr(ss.cl_summer, ss.cl_winter).statistic)}
-    # bugs: each site's average against its winter and its summer chloride (paving held equal)
+    # bugs: each site's average against its winter and its summer chloride (paving held fixed)
     bb = b.groupby(["site_id", "protocol"]).agg(n=("score", "size"), sensitive_share=("sensitive_share", "mean"),
                                                 pct_tolerant=("pct_tolerant", "mean"), score_pct=("score_pct", "mean")).reset_index()
     x = bb.merge(ss, on="site_id").dropna(subset=["paved"])

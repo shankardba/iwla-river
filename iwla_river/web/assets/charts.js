@@ -8,7 +8,8 @@
   const node = document.getElementById("chart-specs");
   if (!node) return;
   const SPECS = JSON.parse(node.textContent);
-  const W = 760;
+  // Drawing width: narrower on phones so text inside the chart stays readable when the chart is scaled down.
+  let W = 760;
   const COLORS = { accent: "var(--accent)", grey: "var(--grey)", good: "var(--good)", bad: "var(--bad)",
     warn: "var(--warn)", c1: "var(--c1)", c2: "var(--c2)", c3: "var(--c3)", c4: "var(--c4)" };
   const col = c => COLORS[c] || "var(--accent)";
@@ -33,7 +34,7 @@
   // Title, subtitle and legend; returns the svg so far and the y where the plot may start.
   function header(spec) {
     let s = "", y = 0;
-    wrap(spec.title || "", 86).forEach(line => { y += 20; s += `<text class="t-title" x="0" y="${y - 2}">${esc(line)}</text>`; });
+    wrap(spec.title || "", Math.round(W / 8.8)).forEach(line => { y += 20; s += `<text class="t-title" x="0" y="${y - 2}">${esc(line)}</text>`; });
     if (spec.subtitle) { y += 20; s += `<text class="t-sub" x="0" y="${y - 2}">${esc(spec.subtitle)}</text>`; }
     if (spec.legend && spec.legend.length) {
       y += 22; let x = 0;
@@ -211,6 +212,7 @@
   const DRAW = { time, bars, stack, hbars, strip, heat, dotrank, map };
   document.querySelectorAll(".chart[data-chart]").forEach(el => {
     const spec = SPECS[Number(el.dataset.chart)];
+    W = el.clientWidth && el.clientWidth < 560 ? ({ time: 420, hbars: 420, strip: 420, map: 760 }[spec.type] || 560) : 760;
     try { el.innerHTML = DRAW[spec.type](spec); }
     catch (e) { el.innerHTML = `<p class="meta">This chart could not be drawn (${esc(e.message)}).</p>`; console.error(e); }
   });

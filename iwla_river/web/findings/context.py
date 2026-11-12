@@ -14,8 +14,8 @@ from ..registry import Page, chart, finding, links, section, table, text
 RES = Path(__file__).with_name("context_results.json")
 
 section("context", "In context",
-        "The volunteer data checked against public measurements: agency laboratory chloride, professional bug surveys, "
-        "state lists of impaired waters, land cover, permits and census data.", order=20)
+        "How far the volunteer data can be trusted: volunteer readings checked against agency laboratory chloride, professional bug surveys, "
+        "state lists of impaired waters, land cover, permits and census data.", order=30)
 
 
 def res(key):
@@ -39,7 +39,7 @@ def inputs():
     return f"Clean Water Hub snapshot of {r['clean_water_hub_snapshot']}; joined public data as of {r['streams_dataset']}"
 
 
-@finding("context", "chloride-check", "Volunteer chloride tracks agency lab chloride", order=10, key=True)
+@finding("context", "chloride-check", "Volunteer chloride tracks agency lab chloride", order=10)
 def chloride_check(db):
     v = res("chloride_validation")
     if not v:
@@ -75,7 +75,7 @@ def chloride_check(db):
                f"signed-rank test on winter log ratios. Code: iwla_river/context.py.")
 
 
-@finding("context", "chloride-sites", "Chloride is rising at more sites than it is falling", order=20, key=True)
+@finding("national", "chloride-sites", "Chloride is rising at more sites than it is falling", order=30, key=True)
 def chloride_sites(db):
     t = res("chloride_trend")
     if not t:
@@ -90,9 +90,9 @@ def chloride_sites(db):
                  f"{dn} a falling one after correcting for testing many sites at once.",
         status="watch",
         numbers=[(fmt(up), "sites rising"), (fmt(dn), "sites falling"), (f"+{t['rising_median_pct_per_year']:.0f}%", "a year, median at rising sites")],
-        blocks=[chart(spec, "Seasonal Kendall test at each site on log chloride; false discovery rate held at 5% (Benjamini–Hochberg)."),
+        blocks=[chart(spec, "Each site's trend is tested season by season (winter against winter, summer against summer), with a correction for testing hundreds of sites at once."),
                 text(f"Freshwater across the northern United States has been getting saltier for decades, mainly from road salt, "
-                     f"and chloride above 230 mg/L harms stream animals. Among the volunteer sites with long enough records, rising "
+                     f"and EPA's recommended long-term criterion for chloride is 230 mg/L, though volunteer bug surveys show sensitive animals declining from about 50 mg/L. Among the volunteer sites with long enough records, rising "
                      f"sites outnumber falling ones {up} to {dn}; at the rising sites chloride climbs by a median of "
                      f"{t['rising_median_pct_per_year']:.0f}% a year.",
                      f"Across the whole network the picture is not significant (seasonal Kendall on monthly medians of each "
@@ -108,7 +108,7 @@ def chloride_sites(db):
                f"Network: monthly median of each reading minus its site's median, months with 3+ readings. Code: iwla_river/context.py.")
 
 
-@finding("context", "development-salt", "Paved land, more than winter salt, tracks low bug scores", order=30, key=True)
+@finding("national", "development-salt", "Across whole watersheds, paving tracks low bug scores better than winter salt does", order=60)
 def development_salt(db):
     d = res("development_vs_salt")
     if not d:
@@ -144,7 +144,7 @@ def development_salt(db):
                f"Paving interpolated between the 5-yearly Annual NLCD maps. {inputs()}. Code: iwla_river/context.py.")
 
 
-@finding("context", "impaired-biology", "State impairment listings match the bug surveys", order=40)
+@finding("context", "impaired-biology", "State impairment listings match the bug surveys", order=30)
 def impaired_biology(db):
     d = res("impaired_biology")
     if not d:
@@ -171,7 +171,7 @@ def impaired_biology(db):
                f"Two-sided Mann–Whitney U tests. {inputs()}. Code: iwla_river/context.py.")
 
 
-@finding("context", "volunteers-vs-professionals", "Volunteers and professionals mostly agree, but volunteers rate generously", order=50, key=True)
+@finding("context", "volunteers-vs-professionals", "Volunteers and professionals mostly agree, but volunteers rate generously", order=20)
 def volunteers_vs_professionals(db):
     d = res("volunteer_vs_professional")
     if not d:
@@ -206,7 +206,7 @@ def volunteers_vs_professionals(db):
                f"scores; Cohen's weighted kappa (linear weights) on condition classes. Code: iwla_river/context.py.")
 
 
-@finding("context", "monitoring-gaps", "Most high-need watersheds have no volunteer monitor", order=60, key=True)
+@finding("national", "monitoring-gaps", "Most high-need watersheds have no volunteer monitor", order=10, key=True)
 def monitoring_gaps(db):
     g = res("monitoring_gaps")
     if not g:
@@ -238,14 +238,14 @@ def monitoring_gaps(db):
                f"Annual NLCD and USGS USMIN; income from ACS 2020–2024 tracts. Mann–Whitney U tests. {inputs()}. Code: iwla_river/context.py.")
 
 
-@finding("context", "restoration", "Stream restoration: no gain beyond what a placebo shows", order=70)
+@finding("national", "restoration", "Stream restoration: no benefit the volunteer data can detect yet", order=70)
 def restoration(db):
     r = res("restoration")
     if not r or "did_mean" not in r.get("real", {}):
         return None
     a, p = r["real"], r["placebo"]
     rows = [["At completion", fmt(a["projects"]), f"{a['treated_change']:+.2f}", f"{a['control_change']:+.2f}", f"{a['did_mean']:+.2f} ({ci(a['did_ci'])})"],
-            ["Placebo: 5 years earlier", fmt(p["projects"]), f"{p['treated_change']:+.2f}", f"{p['control_change']:+.2f}", f"{p['did_mean']:+.2f} ({ci(p['did_ci'])})"]]
+            ["Fake date, 5 years earlier", fmt(p["projects"]), f"{p['treated_change']:+.2f}", f"{p['control_change']:+.2f}", f"{p['did_mean']:+.2f} ({ci(p['did_ci'])})"]]
     return Page(refs=["cwh", "restoration", "efron1979", "barnett2005", "bernhardt2005"],
         headline=f"Virginia SOS scores near completed stream restorations rise {a['did_mean']:+.2f} points more than at comparison "
                  f"sites, but a fake completion date five years earlier shows a rise just as large ({p['did_mean']:+.2f}).",
@@ -256,15 +256,15 @@ def restoration(db):
                       "Mean Virginia SOS score 1–5 years after minus 1–5 years before; sites within 5 km of a project; comparison "
                       "sites in the same state with no project of any kind within 5 km."),
                 text(f"Sites near restorations start far lower ({a['treated_start']:.1f} vs {a['control_start']:.1f} on a 0–12 "
-                     f"scale), and low scores tend to drift back up whatever happens. The placebo test, with each project's date "
-                     f"moved five years earlier, shows that drift: the gain appears before any work was done.",
+                     f"scale), and low scores tend to drift back up whatever happens. A check with each project's date "
+                     f"moved five years earlier (a placebo test) shows that drift: the gain appears before any work was done.",
                      "So the volunteer data cannot show a restoration benefit. That is not proof restorations fail. Many aim at "
                      "channel stability or nutrient credits rather than stream animals, and recovery can take longer than five years.")],
         method=f"Completed stream restoration projects 1995–2022 with a place and year; difference in differences with "
                f"comparison sites; 95% intervals from 2,000 bootstrap resamples of projects. {inputs()}. Code: iwla_river/context.py.")
 
 
-@finding("context", "enrichment", "What each public dataset added", order=5)
+@finding("context", "enrichment", "What each public dataset added", order=50)
 def enrichment(db):
     e = res("enrichment")
     if not e:
@@ -303,7 +303,7 @@ def enrichment(db):
         method=f"{inputs()}. Code for the statistics: iwla_river/context.py.")
 
 
-@finding("context", "development-trend", "Paving keeps spreading, fastest where volunteers work", order=35)
+@finding("national", "development-trend", "Paving keeps spreading, fastest where volunteers work", order=45)
 def development_trend(db):
     t = res("development_trend")
     if not t:
@@ -344,7 +344,7 @@ def development_trend(db):
                f"{inputs()}. Code: iwla_river/context.py.")
 
 
-@finding("context", "storm-timing", "A storm the week before does not change a site's score", order=37)
+@finding("context", "storm-timing", "A storm the week before does not change a site's score", order=40)
 def storm_timing(db):
     t = res("storm_timing")
     if not t:
@@ -378,7 +378,7 @@ def _q(v):
     return f"q = {v:.3f}" if 0.03 < v < 0.07 else f"q = {v:.2g}"
 
 
-@finding("context", "site-visits", "Three surveys capture most of what a site is", order=80, key=True)
+@finding("planning", "site-visits", "Three surveys capture most of what a site is", order=10)
 def site_visits(db):
     a = res("site_reliability")
     if not a:
@@ -416,7 +416,7 @@ def site_visits(db):
                f"Code: iwla_river/survey_models.py.")
 
 
-@finding("context", "maps-vs-local", "Maps predict about half of why sites differ; the rest is local", order=82, key=True)
+@finding("planning", "maps-vs-local", "Maps predict about half of why sites differ; the rest is local", order=20)
 def maps_vs_local(db):
     b = res("mapped_vs_local")
     if not b:
@@ -453,7 +453,7 @@ def maps_vs_local(db):
                f"vs paving. {fmt(b['surveys'])} surveys at {fmt(b['sites'])} sites. {inputs()}. Code: iwla_river/survey_models.py.")
 
 
-@finding("context", "watershed-types", "Urban watersheds stand apart; livestock watersheds score like low-pressure ones", order=84, key=True)
+@finding("national", "watershed-types", "Urban watersheds stand apart; livestock watersheds score like low-pressure ones", order=50, key=True)
 def watershed_types(db):
     w = res("watershed_types")
     if not w:
@@ -505,7 +505,7 @@ def watershed_types(db):
                f"Code: iwla_river/survey_models.py.")
 
 
-@finding("context", "chloride-bugs", "Saltier streams hold fewer sensitive animals, well below EPA's chloride limit", order=32, key=True)
+@finding("national", "chloride-bugs", "Saltier streams hold fewer sensitive animals, well below EPA's chloride criterion", order=20, key=True)
 def chloride_bugs(db):
     s = res("salt_bugs")
     if not s:
@@ -548,8 +548,8 @@ def chloride_bugs(db):
                       "kruskal", "bh1995", "efron1979"],
         headline=f"Where volunteers measured chloride within a week of a bug survey ({fmt(P['within_7d'])} surveys at "
                  f"{fmt(P['sites_7d'])} sites), saltier streams have fewer pollution-sensitive animals and more tolerant ones, with "
-                 f"paving, season and state held equal; scores start to fall around {tv['change_point_mg_l']:.0f}–"
-                 f"{ts['change_point_mg_l']:.0f} mg/L, far below EPA's chronic limit of 230.",
+                 f"paving, season and state held fixed; scores start to fall around {tv['change_point_mg_l']:.0f}–"
+                 f"{ts['change_point_mg_l']:.0f} mg/L, far below EPA's recommended long-term criterion of 230 mg/L.",
         status="concern",
         numbers=[(f"{round(100 * lo_b['sensitive_share'])}%", f"of groups found are sensitive, chloride under 25 mg/L"),
                  (f"{round(100 * mid_b['sensitive_share'])}%", "at 100–230 mg/L"),
@@ -568,7 +568,7 @@ def chloride_bugs(db):
                      f"Salt and pavement travel together (rank correlation {P['paved_cl_rho']:.2f} here), so every comparison "
                      f"below holds the paved share of the watershed, the season, the state and the survey form equal. The paved "
                      f"share comes from the national land cover maps; it is the only outside data used, and only as a control."),
-                table([("Measure",), ("Rank correlation", 1), ("Per tenfold more chloride, paving held equal (95% CI)", 1),
+                table([("Measure",), ("Rank correlation", 1), ("Per tenfold more chloride, paving held fixed (95% CI)", 1),
                        ("Same site, saltier weeks", 1), ("Site's typical chloride", 1)], rows_o,
                       f"Change per tenfold rise in chloride (for example 20 to 200 mg/L). Same site: each site compared with itself "
                       f"in saltier and fresher weeks. Site's typical chloride: median of all its readings (sites with 3 or more) "
@@ -593,13 +593,13 @@ def chloride_bugs(db):
                      f"communities can change at chloride levels below such criteria."),
                 table([("Form",), ("Animal group",), ("Tolerance",), ("Found in", 1), ("Share of animals, per tenfold chloride", 1),
                        ("Chance of finding it, 25 → 100 mg/L", 1)], rows_t,
-                      f"Groups with q below 0.1 on either test, out of {ntx} tested across both forms. Paving and season held equal; "
+                      f"Groups with q below 0.1 on either test, out of {ntx} tested across both forms. Paving and season held fixed; "
                       f"surveys with a chloride reading within 30 days. q: Benjamini–Hochberg within each form and test."),
                 text("Stoneflies show the strongest link: on the Virginia form they are found in about half of surveys at 25 mg/L "
                      "and far less often at 100. Common net-spinning caddisflies make up a smaller share of the catch as chloride "
                      "rises, while midges and flatworms make up more. On the original form, most caddisflies are found less often "
                      "and sowbugs make up more. Mayflies fall with chloride in the raw numbers, but that mostly goes once paving is "
-                     "held equal. The other groups show no clear link either way."),
+                     "held fixed. The other groups show no clear link either way."),
                 text(f"Two more checks point the same way. Winter chloride at a site (December to March) against its spring bug "
                      f"survey: {w['surveys']} surveys at {w['sites']} sites, sensitive share "
                      f"{100 * w['sensitive_share']['controlled']['coef']:+.1f} points per tenfold, {p_(w['sensitive_share']['controlled']['p'])}, "
@@ -607,7 +607,7 @@ def chloride_bugs(db):
                      f"measured chloride and bugs on the same visit ({fmt(pro['visits'])} visits): {round(100 * pb['under 25']['good_share'])}% "
                      f"of streams under 25 mg/L were in good condition, against {round(100 * pb['over 860']['good_share'])}% above "
                      f"860 mg/L (rank correlation {pro['spearman']:+.2f})."),
-                text(f"Limits. Paving is held equal in every comparison, but salt and paving rise together, so the two cannot be "
+                text(f"Limits. Paving is held fixed in every comparison, but salt and paving rise together, so the two cannot be "
                      f"fully separated: some of what is shown here may be other harms that come with development. Very salty "
                      f"samples are few ({fmt(rows_b[-1]['surveys'])} surveys at {fmt(rows_b[-1]['sites'])} sites above 230 mg/L). "
                      f"Salt Watch strips read in steps, and zero readings are left out as likely blanks.",

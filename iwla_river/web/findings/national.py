@@ -6,12 +6,16 @@ from ..db import PROTO, fmt, pct
 from ..diagrams import plates
 from ..registry import Page, chart, diagram, finding, links, section, table, text
 
-section("national", "National picture",
-        "What thousands of volunteer surveys across the country show, and the expected-score model trained on them "
-        "that every survey is judged against.", order=10)
+section("national", "National findings",
+        "What tens of thousands of volunteer surveys across the country show, checked against public data. The results "
+        "best supported by the data, and most useful for deciding where and what to monitor, come first.", order=10)
+
+section("planning", "Planning monitoring",
+        "How many surveys it takes to know a site, how much mapped data can say before anyone visits, and how the "
+        "volunteer network has grown.", order=20)
 
 
-@finding("national", "paving", "Paved watersheds lose sensitive animals", order=10, key=True)
+@finding("national", "paving", "Paved watersheds lose sensitive animals", order=40, key=True)
 def paving(db):
     if not db.has("expected"):
         return None
@@ -45,7 +49,7 @@ def paving(db):
                        ("development-salt", "paved land versus winter salt"), ("watershed-findings", "findings for each watershed")])])
 
 
-@finding("national", "model", "How the expected-score model works", order=20)
+@finding("data", "model", "How the expected-score model works", order=25)
 def model(db):
     if not db.has("model_metrics"):
         return None
@@ -82,7 +86,7 @@ def model(db):
                "leaf); importance by scrambling each input group on held-out folds.")
 
 
-@finding("national", "monitoring-growth", "Volunteer monitoring took off after 2017", order=30)
+@finding("planning", "monitoring-growth", "Volunteer monitoring took off after 2017", order=30)
 def monitoring_growth(db):
     rows = db.rows("""SELECT year(survey_date) AS year, protocol, count(*) AS n FROM usable_surveys
                       WHERE year(survey_date) >= 2000 GROUP BY ALL ORDER BY year, protocol""")

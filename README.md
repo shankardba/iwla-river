@@ -103,8 +103,7 @@ downstream, marks each source, lists them in the panel, finds them in search, an
 | Menu | Page | What it is |
 | --- | --- | --- |
 | Explore | `index.html` | The workspace: map of where samples are taken (heat, filter by sample type), watershed rings coloured by a chosen measure, and a panel with each watershed's figures against its parent, what is inside it, and each biological site's survey history. Search with `/`. Every view has its own link (`#w<huc>`, `#s<site>@<huc12>`). |
-| Findings | `findings.html`, `<section>.html`, `<section>--<finding>.html` | Every result, by section, each with its evidence and method; finding pages have an "In this section" list. |
-| Great Seneca Creek | `chapter.html` | The chapter's own sites. |
+| Findings | `findings.html`, `<section>.html`, `<section>--<finding>.html`, `methods.html` | Every result, grouped: National findings (most actionable first), Planning monitoring, In context (checks against public data), Data and methods, and the Great Seneca Creek case study last. Finding pages list the technical terms they use (`web/glossary.py`). Pages that moved forward from their old addresses (`moved` in `build.py`). |
 | Data | `data--*.html` | Data quality, temperature units, sources and methods, downloads. |
 | About | `about.html` | How volunteers sample, how to use the tool, sources and privacy. |
 

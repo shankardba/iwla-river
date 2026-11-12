@@ -50,7 +50,7 @@ class Page:
 SECTIONS: dict[str, Section] = {}
 FINDINGS: list[Finding] = []
 
-STATUS_WORDS = {"concern": "Concern", "watch": "Watch", "steady": "Steady", "good": "Good news", "info": "Context"}
+STATUS_WORDS = {"concern": "Concern", "watch": "Watch", "steady": "Steady", "good": "Good news", "info": "Background"}
 
 
 def section(id: str, title: str, intro: str, order: int) -> None:

@@ -6,10 +6,6 @@ from ... import config as C
 from ..db import fmt, pct
 from ..registry import Page, finding, links, section, table, text
 
-section("watersheds", "Watersheds",
-        "Findings for every watershed in the country, from regions down to small subwatersheds: pick one on the Explore "
-        "map to see what the data show there.", order=30)
-
 LEVEL = {2: "Region", 4: "Subregion", 6: "Basin", 8: "Subbasin", 10: "Watershed", 12: "Subwatershed"}
 
 
@@ -49,7 +45,7 @@ def explorer(db):  # retired: the Explore page (index.html) is the explorer now
                "median gap per season and year, shown only with at least 10 same-season comparisons.")
 
 
-@finding("chapter", "great-seneca", "Great Seneca Creek within its watersheds", order=60)
+@finding("chapter", "great-seneca", "Great Seneca Creek within its watersheds", order=7)
 def great_seneca(db):
     huc = chapter_huc(db)
     if not huc:
@@ -78,7 +74,7 @@ def great_seneca(db):
                 links([("expected", "the chapter's own sites against expectations")])])
 
 
-@finding("watersheds", "watershed-findings", "How the findings for each watershed are worked out", order=40)
+@finding("data", "watershed-findings", "How the findings for each watershed are worked out", order=28)
 def watershed_findings(db):
     import json
     from pathlib import Path

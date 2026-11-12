@@ -45,7 +45,7 @@
     await Promise.all([refsP, f ? wsfP[f] : null]);
   }
   function findingsIn(code) {
-    const head = `<h3 class="ex-h">What the data show here <span class="meta"><a href="watersheds--watershed-findings.html">how these are worked out</a></span></h3>`;
+    const head = `<h3 class="ex-h">What the data show here <span class="meta"><a href="data--watershed-findings.html">how these are worked out</a></span></h3>`;
     if (!code) return `<h3 class="ex-h">What the data show</h3><p class="meta">Pick a region for findings about that watershed. National results are in <a href="findings.html">Findings</a> and <a href="context.html">In context</a>.</p>`;
     const u = (WSF[wsfFile(code)] || {})[code];
     if (!u || !u.items.length) return head + '<p class="meta">Not enough data in this unit for findings of its own; see the larger unit above it.</p>';

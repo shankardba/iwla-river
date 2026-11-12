@@ -11,14 +11,16 @@
   <article class="finding">
     <nav class="crumbs" aria-label="Breadcrumb"><a href="findings.html">Findings</a><span>›</span><a href="{{ section.url }}">{{ section.title }}</a></nav>
     <header class="hero">
+      <p class="hero-status">{{ ui.status(item.page.status) }}</p>
       <h1>{{ item.title }}</h1>
-      <p class="lede">{{ ui.status(item.page.status) }} {{ item.page.headline }}</p>
+      <p class="lede">{{ item.page.headline }}</p>
     </header>
     {{ ui.numbers(item.page.numbers) }}
     {{ ui.blocks(item.page.blocks) }}
     {% if item.page.method %}
     <details class="method"><summary>How this was worked out</summary><p>{{ item.page.method }}</p></details>
     {% endif %}
+    __GLOSSARY__
     {% if item.page.refs %}
     <section class="sources" aria-label="Sources">
       <h2>Sources</h2>
