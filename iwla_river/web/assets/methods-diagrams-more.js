@@ -55,7 +55,7 @@ D.trend = (svg) => {
   const mid = pts.reduce((s, p) => s + p.v, 0) / pts.length;
   const senLine = el("line", { x1: F.X(0), y1: F.Y(mid - sen * 4), x2: F.X(8), y2: F.Y(mid + sen * 4), class: "fit", opacity: 0 }, svg);
   // 396 sites
-  const gx = 90, gy = 280, cell = 11, cols = 50;
+  const gx = 90, gy = 298, cell = 11, cols = 50;
   const tiles = [];
   const order = Array.from({ length: 396 }, (_, i) => i).sort(() => r() - 0.5);
   for (let i = 0; i < 396; i++) tiles.push(el("rect", { x: gx + (i % cols) * cell, y: gy + Math.floor(i / cols) * cell, width: cell - 2, height: cell - 2, rx: 2, class: "bar m", opacity: 0 }, svg));

@@ -1,4 +1,4 @@
-/* Core method diagrams: pairing, holding things equal, each site against itself, resampling, shuffling.
+/* Core method diagrams: pairing, holding other variables fixed, each site against itself, resampling, shuffling.
    The dots are illustrative (seeded), shaped like the real data; the real numbers are in each finding's card. */
 "use strict";
 (() => {
@@ -52,7 +52,7 @@ D.pairing = (svg) => {
   ];
 };
 
-// ---------------------------------------------------------------- 2. Holding things equal
+// ---------------------------------------------------------------- 2. Holding other variables fixed
 function saltData(seed, nSites = 60, visits = 4) {
   const r = rng(seed); const pts = [];
   for (let s = 0; s < nSites; s++) {
@@ -103,7 +103,7 @@ D.holdequal = (svg) => {
     } },
     { cap: `<b>Holding paving equal</b> means comparing saltier and less salty streams <i>within</i> the same paving level. The slope shrinks to ${Math.abs(common).toFixed(2)}: most of the raw link was paving.`, hold: 2400, play: async (h) => {
       await h.tween(900, (t) => { raw.setAttribute("opacity", 1 - 0.75 * t); within.forEach((l) => l.setAttribute("opacity", t)); });
-      note.textContent = `raw ${all.b.toFixed(2)} → paving held equal ${common.toFixed(2)}`;
+      note.textContent = `raw ${all.b.toFixed(2)} → paving held fixed ${common.toFixed(2)}`;
       await h.tween(400, (t) => note.setAttribute("opacity", t));
     } },
     { cap: "The real model holds <b>paving, season, state and survey form</b> equal at once (multiple regression), and treats each site's repeat visits as one cluster so they don't count as independent evidence.", play: async () => {} },
@@ -191,7 +191,7 @@ D.bootstrap = (svg) => {
         count.textContent = `resamples: ${upto}`;
       });
     } },
-    { cap: "The <b>95% interval</b> is the middle 95% of those slopes (2.5th to 97.5th percentile). Every number in the findings carries one; a slope whose interval crosses zero isn't sure of its direction.", hold: 2600, play: async (h) => { await h.tween(500, (t) => ci.setAttribute("opacity", t)); } },
+    { cap: "The <b>95% interval</b> is the middle 95% of those slopes (2.5th to 97.5th percentile). Every number in the findings comes with one. If a slope's interval runs from below zero to above zero, the data can't tell whether it truly rises or falls, so its direction is not settled.", hold: 2600, play: async (h) => { await h.tween(500, (t) => ci.setAttribute("opacity", t)); } },
   ];
 };
 

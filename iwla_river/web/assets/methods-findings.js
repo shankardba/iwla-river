@@ -2,7 +2,7 @@
    results, Clean Water Hub snapshot 2026-10-27). */
 "use strict";
 (() => {
-const M = { bins: "Averages by bin", pairing: "Pairing", holdequal: "Holding things equal", within: "Each site against itself",
+const M = { bins: "Averages by bin", pairing: "Pairing", holdequal: "Holding other variables fixed", within: "Each site against itself",
   bootstrap: "Intervals", trend: "Trends", changepoint: "Change points", agreement: "Agreement", reliability: "Reliability",
   groupcv: "Prediction", clusters: "Types", needscore: "Need score" };
 const F = [
@@ -10,7 +10,7 @@ const F = [
     joined: "7,326 bug surveys at about 1,150 sites, each given its watershed's paved share from EPA StreamCat (NLCD 2019).",
     methods: ["bins"],
     numbers: "Sensitive share averages 40% in near-natural watersheds (0–2% paved, 3,021 surveys), 33% at 10–15%, and 22% where a quarter or more is paved (1,251 surveys).",
-    limits: "Observed averages, no model, no interval, nothing held equal. Losses start early, well before 25% paved." },
+    limits: "Plain averages: no model, no uncertainty range, and nothing else held fixed. Losses start early, well before 25% paved." },
   { status: "good", title: "Volunteer chloride tracks agency lab chloride", url: "context--chloride-check.html",
     joined: "Each volunteer chloride reading paired with the median state or federal lab reading (Water Quality Portal) in the same small watershed (HUC12) within 7 days: 4,845 kit pairs at 377 sites, 3,887 Salt Watch strip pairs at 2,209 sites.",
     methods: ["pairing", "agreement", "bootstrap"],
@@ -27,7 +27,7 @@ const F = [
     numbers: "Salt alone: <span class=num>−0.37 SD</span> per SD of salt (p &lt; 0.001). With paving in the model: paving <span class=num>−0.5 SD per 10 points</span> (p &lt; 0.001), salt <span class=num>+0.03</span> (p = 0.71). Within a watershed, year to year: <span class=num>−0.09 (SE 0.08)</span>, p = 0.25.",
     limits: "This doesn't clear road salt: salt may be one of the ways paving harms streams, and paving and salt move together (r = 0.66). Spring surveys miss winter spikes; the site-scale finding below sees salt more directly." },
   { status: "concern", title: "Saltier streams hold fewer sensitive animals, well below EPA's chloride limit", url: "context--chloride-bugs.html",
-    joined: "Rocky-bottom and original SOS bug surveys paired with the median volunteer chloride at the same site within 7 days: 644 surveys at 236 sites, only 8.8% of all surveys (30 days for change points: 735 at 254). Paving, season, state and form held equal.",
+    joined: "Rocky-bottom and original SOS bug surveys paired with the median volunteer chloride at the same site within 7 days: 644 surveys at 236 sites, only 8.8% of all surveys (30 days for change points: 735 at 254). Paving, season, state and form held fixed.",
     methods: ["pairing", "holdequal", "within", "changepoint", "bootstrap"],
     numbers: "Per tenfold chloride: sensitive share <span class=num>−6.2 points (−8.6 to −3.8)</span>, tolerant animals <span class=num>+6.9 (3.2 to 10.6)</span>, EPT <span class=num>−5.4 (−10.1 to −0.8)</span>. Within a site: no clear change (sensitive +0.7, p = 0.56). Scores step down at <span class=num>47 mg/L (25–54)</span> on the rocky-bottom form and <span class=num>60 (48–165)</span> on the original form, against EPA's chronic limit of 230. EPA's professional survey (8,752 visits) points the same way.",
     limits: "Salt and paving can't be fully separated (ρ 0.69), so other harms of development may ride along. Few samples above 230 mg/L. The link holds between sites, not within one: DataLab's engine rates it hinted." },
