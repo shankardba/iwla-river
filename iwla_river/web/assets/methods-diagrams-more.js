@@ -28,7 +28,7 @@ D.bins = (svg) => {
       labs.forEach((l) => l.setAttribute("opacity", 1)); ns.forEach((n) => n.setAttribute("opacity", 1));
       cloud.setAttribute("opacity", 0.5);
     } },
-    { cap: "This is <b>description</b>, not a test: no interval, nothing held equal. It shows the shape (losses start early, well before 25% paved). Whether paving or salt does it needs the models below.", hold: 2400, play: async () => {} },
+    { cap: "These are plain averages: they <b>describe</b> the pattern but do not test it. There is no uncertainty range, and nothing else is held fixed. The pattern shows losses starting early, well before 25% paved. Telling whether paving or salt causes them takes the models below.", hold: 2400, play: async () => {} },
   ];
 };
 
